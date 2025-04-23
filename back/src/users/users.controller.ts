@@ -1,6 +1,7 @@
 import { Controller, Body, Res, Post } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
+import { SaveUserDto } from './dto/save-user.dto';
 
 @Controller('api/users')
 export class UsersController {
@@ -11,8 +12,8 @@ export class UsersController {
     // Endpoint to register a new user
     @Post('register')
     async register(
-        @Body() saveUserDto: { username: string; password: string },
-        @Res() res: Response
+        @Body() saveUserDto: SaveUserDto,
+        @Res() res: Response,
     ){
         try{
             // Register user in service
