@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
 import { UserResponseDto } from './dto/user-response.dto';
 import { ConflictException } from 'src/errors/conflictException';
+import { SaveUserDto } from './dto/save-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,20 +14,20 @@ export class UsersService {
         private usersRepo: Repository<User>,
     ) {}
 
-    async save(username: string, password: string): Promise<UserResponseDto> {
+    async save(saveUserDto: SaveUserDto): Promise<UserResponseDto> {
         // Check if username is already taken
-        const existingUsername = await this.usersRepo.findOne({ where: { username } });
+        const existingUsername = await this.usersRepo.findOne({ where: { username: saveUserDto.username } });
         if (existingUsername) {
             throw new ConflictException('Username already taken');
         }
         // Hash the password using argon2 library
-        const argon2psswrd = await argon2.hash(password);
+        const argon2psswrd = await argon2.hash(saveUserDto.password);
         // Get the current date
         const todayDate = new Date();
         const registerDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDay());
         // Create a new user object
         const user = this.usersRepo.create({
-            username,
+            username: saveUserDto.username,
             password: argon2psswrd, 
             registerDate,
         });

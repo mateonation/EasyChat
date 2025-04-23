@@ -18,10 +18,7 @@ export class UsersController {
     ){
         try{
             // Register user in service
-            const user = await this.usersService.save(
-                saveUserDto.username,
-                saveUserDto.password,
-            );
+            const user = await this.usersService.save(saveUserDto);
             // Return 'success' response
             return res.status(201).json({
                 statusCode: 201,
