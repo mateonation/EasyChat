@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +12,7 @@ export class UsersService {
         private usersRepo: Repository<User>,
     ) {}
     
-    async save(username: string, password: string): Promise<User> {
+    async save(username: string, password: string): Promise<UserResponseDto> {
         // Check if username is already taken
         const existingUsername = await this.usersRepo.findOne({ where: { username } });
         if (existingUsername) {
@@ -29,6 +30,8 @@ export class UsersService {
             registerDate,
         });
         // Save user to the DB
-        return this.usersRepo.save(user);
+        await this.usersRepo.save(user);
+        // Return user response dto
+        return UserResponseDto.fromUser(user);
     }
 }
