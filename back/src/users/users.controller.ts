@@ -2,6 +2,7 @@ import { Controller, Body, Res, Post } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { SaveUserDto } from './dto/save-user.dto';
+import { ConflictException } from 'src/errors/conflictException';
 
 @Controller('api/users')
 export class UsersController {
@@ -28,8 +29,10 @@ export class UsersController {
                 user,
             });
         } catch (error) {
-            // Handle errors throwed by service
-            return res.status(error.getStatus()).json(error.getResponse());
+            // Handle conflict error
+            if (error instanceof ConflictException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
         }
         // If error is not handled by service, return 500
         return res.status(500).json({
