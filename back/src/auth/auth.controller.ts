@@ -22,7 +22,6 @@ export class AuthController {
             req.session.user = {
                 id: user.id,
             };
-            console.log(req.session);
             // Return 'success' response
             return res.status(200).json({
                 statusCode: 200,
@@ -30,6 +29,38 @@ export class AuthController {
                 user,
             });
         }catch(error){
+            // Handle unauthorized error
+            if (error instanceof UnauthorizedException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+        }
+        // If error is not handled by service, return 500
+        return res.status(500).json({
+            statusCode: 500,
+            message: 'Internal server error',
+        });
+    }
+
+    // Endpoint to logout user
+    @Post('logout')
+    async logout(
+        @Res() res: Response,
+        @Req() req: Request,
+    ){
+        try{
+            // If user not logged in, throw exception
+            if (!req.session.user) {
+                throw new UnauthorizedException('User not logged in');
+            }
+            // Destroy session
+            req.session.destroy(()=>{
+                res.clearCookie('connect.sid');
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: 'Logged out',
+                });
+            });
+        } catch (error) {
             // Handle unauthorized error
             if (error instanceof UnauthorizedException) {
                 return res.status(error.getStatus()).json(error.getResponse());
