@@ -1,20 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { predefinedRoles } from './role/predefinedRoles';
 import * as argon2 from 'argon2';
 import { UserResponseDto } from './dto/user-response.dto';
 import { ConflictException } from 'src/errors/conflictException';
 import { SaveUserDto } from './dto/save-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UnauthorizedException } from 'src/errors/unauthorizedException';
+import { Role } from './role/role';
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User)
-        private usersRepo: Repository<User>,
+        @InjectRepository(User) private usersRepo: Repository<User>,
+        @InjectRepository(Role) private rolesRepo: Repository<Role>,
     ) {}
+
+    // Autoinject predefined roles into the DB when initiating app if they do not exist
+    async onModuleInit() {
+        // Count existing roles in the DB
+        const existingRoles = await this.rolesRepo.count();
+        // Count total predefined roles
+        const totalPreRoles = predefinedRoles.length;
+        // If roles does not exist, create them
+        if (existingRoles === 0) {
+            console.log('Roles not found in DB, creating them...');
+            await this.rolesRepo.save(predefinedRoles.map(name=>({name})));
+            console.log(totalPreRoles + ' roles created.');
+        // If there are less existing roles than the predefined ones, create the missing ones
+        } else if (existingRoles < totalPreRoles) {
+            console.log('Some roles are missing in DB, creating them...');
+            const existingRoleNames = (await this.rolesRepo.find()).map(role => role.name);
+            const newRoles = predefinedRoles.filter(role => !existingRoleNames.includes(role));
+            await this.rolesRepo.save(newRoles.map(name => ({ name })));
+            console.log(newRoles.length + ' roles created.');
+        }
+    }
 
     // Authenticate and return user if credentials are valid
     async authenticate(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
