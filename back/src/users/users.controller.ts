@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { UsersService } from './users.service';
 import { SaveUserDto } from './dto/save-user.dto';
 import { ConflictException } from 'src/errors/conflictException';
+import { NotFoundException } from 'src/errors/notFoundException';
 
 @Controller('api/users')
 export class UsersController {
@@ -27,7 +28,7 @@ export class UsersController {
             });
         } catch (error) {
             // Handle conflict error
-            if (error instanceof ConflictException) {
+            if (error instanceof ConflictException || error instanceof NotFoundException) {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
         }

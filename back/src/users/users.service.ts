@@ -10,6 +10,7 @@ import { SaveUserDto } from './dto/save-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UnauthorizedException } from 'src/errors/unauthorizedException';
 import { Role } from './role/role';
+import { NotFoundException } from 'src/errors/notFoundException';
 
 @Injectable()
 export class UsersService {
@@ -58,6 +59,18 @@ export class UsersService {
         if (existingUsername) {
             throw new ConflictException('Username already taken');
         }
+        // Count total users in the DB
+        const totalUsers = await this.usersRepo.count();
+        // If the user being registered is the first one, register it as an admin, moderator and user
+        // If not, only user
+        const rolesToAssign = totalUsers === 0 ? ['admin', 'moderator', 'user'] : ['user'];
+        const roles = await Promise.all(
+            rolesToAssign.map(async (name)=>{
+                const role = await this.rolesRepo.findOne({ where: { name } });
+                if(!role) throw new NotFoundException("Role with id '" + name + "' not found");
+                return role;
+            }),
+        );
         // Hash the password using argon2 library
         const argon2psswrd = await argon2.hash(saveUserDto.password);
         // Get the current date w/o time
@@ -68,6 +81,7 @@ export class UsersService {
             username: saveUserDto.username,
             password: argon2psswrd, 
             registerDate,
+            roles,
         });
         // Save user to the DB
         await this.usersRepo.save(user);
