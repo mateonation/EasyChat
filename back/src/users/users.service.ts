@@ -43,12 +43,21 @@ export class UsersService {
     // Authenticate and return user if credentials are valid
     async authenticate(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
         // Find user by username
-        const user = await this.usersRepo.findOne({ where: { username: loginUserDto.username } });
+        const user = await this.usersRepo.findOne({ where: { username: loginUserDto.username }, relations: ['roles'] });
         // Check if user exists and password matches
         if (!user || !(await argon2.verify(user.password, loginUserDto.password))) {
             throw new UnauthorizedException('Username or password is incorrect');
         }
         // Return user response dto
+        return UserResponseDto.fromUser(user);
+    }
+
+    // Find user by their ID
+    async findById(id: number): Promise<UserResponseDto> {
+        const user = await this.usersRepo.findOne({ where: { id }, relations: ['roles'] });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
         return UserResponseDto.fromUser(user);
     }
 
