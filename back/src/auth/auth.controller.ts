@@ -52,13 +52,13 @@ export class AuthController {
             if (!req.session.user) {
                 throw new UnauthorizedException('User not logged in');
             }
-            // Destroy session
-            req.session.destroy(()=>{
-                res.clearCookie('connect.sid');
-                return res.status(200).json({
-                    statusCode: 200,
-                    message: 'Logged out',
-                });
+            // Destroy session + clear cookie
+            await new Promise(result => req.session.destroy(result));
+            res.clearCookie('connect.sid');
+            // Return 'success' response
+            return res.status(200).json({
+                statusCode: 200,
+                message: 'Logged out',
             });
         } catch (error) {
             // Handle unauthorized error
