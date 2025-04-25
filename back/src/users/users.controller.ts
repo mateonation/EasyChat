@@ -47,10 +47,7 @@ export class UsersController {
         @Req() req: Request,
     ){
         try{
-            // If user not logged in, throw exception
-            if (!req.session.user) {
-                throw new UnauthorizedException('You have to be logged in to access this resource');
-            }
+            if (!req.session.user?.id) return;
             // Get user info from service
             const user = await this.usersService.findById(req.session.user.id);
             // Return 'success' response
@@ -59,7 +56,7 @@ export class UsersController {
                 user,
             });
         } catch (error) {
-            if (error instanceof UnauthorizedException || error instanceof NotFoundException) {
+            if (error instanceof NotFoundException) {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
         }
