@@ -1,11 +1,13 @@
-import { Controller, Body, Res, Post, Get, Req } from '@nestjs/common';
+import { Controller, Body, Res, Post, Get, Req, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { SaveUserDto } from './dto/save-user.dto';
 import { ConflictException } from 'src/errors/conflictException';
 import { NotFoundException } from 'src/errors/notFoundException';
-import { UnauthorizedException } from 'src/errors/unauthorizedException';
+import { Roles } from 'src/guards/roles.decorator';
+import { RolesGuard } from 'src/guards/roles.guard';
 
+@UseGuards(RolesGuard)
 @Controller('api/users')
 export class UsersController {
     constructor(
@@ -65,5 +67,17 @@ export class UsersController {
             statusCode: 500,
             message: 'Internal server error',
         });
+    }
+
+    // TEST ENDPOINT: Verify if the user in session is admin
+    @Get('admin')
+    @Roles('admin')
+    admin(
+        @Res() res: Response,
+    ){
+        return res.status(200).json({
+            statusCode: 200,
+            message: 'You are an admin'
+        })
     }
 }
