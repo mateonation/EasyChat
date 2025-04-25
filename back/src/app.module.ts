@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { SessionMiddleware } from './middleware/session.middleware';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -22,7 +24,13 @@ import { SessionMiddleware } from './middleware/session.middleware';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    },
+    AppService,
+  ],
 })
 export class AppModule {
   // Endpoints that require a user to be logged in before being able to access
@@ -32,6 +40,7 @@ export class AppModule {
       .forRoutes(
         'auth/logout',
         'api/users/me',
+        'api/users/admin' // TESTING
       );
   }
 }
