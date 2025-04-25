@@ -48,10 +48,6 @@ export class AuthController {
         @Req() req: Request,
     ){
         try{
-            // If user not logged in, throw exception
-            if (!req.session.user) {
-                throw new UnauthorizedException('User not logged in');
-            }
             // Destroy session + clear cookie
             await new Promise(result => req.session.destroy(result));
             res.clearCookie('connect.sid');
