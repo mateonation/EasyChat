@@ -17,6 +17,7 @@ export class ChatmembersService {
         private readonly userRepo: Repository<User>,
     ) {}
 
+    // Function to add a user to a chat
     async addUserToChat(
         chatId: number,
         userId: number,
@@ -33,5 +34,19 @@ export class ChatmembersService {
         });
 
         return this.memberRepo.save(member);
+    }
+
+    // Function to remove a user from a chat
+    // This function will throw an error if the user is not a member of the chat
+    async removeUserFromChat(
+        chatId: number,
+        userId: number,
+    ) {
+        const member = await this.memberRepo.findOneByOrFail({
+            chat: { id: chatId },
+            user: { id: userId },
+        });
+
+        return this.memberRepo.remove(member);
     }
 }
