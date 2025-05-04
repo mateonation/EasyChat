@@ -9,7 +9,7 @@ export class ChatMember {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.chatmembers, { onDelete: "CASCADE" })
+    @ManyToOne(() => User, (user) => user.chatMembers, { onDelete: "CASCADE" })
     user: User;
 
     @ManyToOne(() => Chat, (chat) => chat.members, { onDelete: "CASCADE" })

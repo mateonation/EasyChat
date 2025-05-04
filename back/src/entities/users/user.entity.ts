@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from "typeorm";
 import { Role } from "./role/role";
+import { ChatMember } from "../chatmembers/chatmembers.entity";
 
 @Entity()
 export class User {
@@ -18,4 +19,7 @@ export class User {
     @ManyToMany(() => Role, (role) => role.users, { cascade: true })
     @JoinTable()
     roles: Role[];
+
+    @OneToMany(() => ChatMember, member => member.user)
+    chatMembers: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
 }
