@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { SessionMiddleware } from './middleware/session.middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
+import { ChatsModule } from './entities/chats/chats.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RolesGuard } from './guards/roles.guard';
     }),
     UsersModule,
     AuthModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [
