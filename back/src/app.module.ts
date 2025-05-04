@@ -8,6 +8,7 @@ import { SessionMiddleware } from './middleware/session.middleware';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
 import { ChatsModule } from './entities/chats/chats.module';
+import { MessagesModule } from './entities/messages/messages.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ChatsModule } from './entities/chats/chats.module';
     UsersModule,
     AuthModule,
     ChatsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [
