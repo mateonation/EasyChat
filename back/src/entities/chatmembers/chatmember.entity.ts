@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { User } from "../users/user.entity";
-import { Chat } from "../chats/chats.entity";
+import { Chat } from "../chats/chat.entity";
 import { ChatMemberRole } from "src/types/chat-members-roles";
 
 @Entity()
