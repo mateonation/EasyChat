@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Chat } from './chat.entity';
 import { ChatMember } from '../chatmembers/chatmember.entity';
 import { User } from '../users/user.entity';
-import { BadRequestException } from 'src/errors/badRequestException';
 
 @Injectable()
 export class ChatsService {
@@ -22,11 +21,6 @@ export class ChatsService {
         requesterId: number,
         otherUserId: number,
     ): Promise<Chat> {
-        // Check if the requester id and the other user id are different
-        if (requesterId === otherUserId) {
-            throw new BadRequestException('You cannot create a chat with yourself.');
-        }
-
         // Search for an existing individual chat between the two users
         const existingChats = this.chatRepo.find({
             relations: ['members', 'members.user'],
