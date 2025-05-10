@@ -44,9 +44,10 @@ export class ChatsService {
     ): Promise<Chat> {
         const newChat = this.chatRepo.create({
             creationDate: new Date(),
-            isGroup: false,
         });
-
+        // Save chat and members in the DB
+        await this.chatRepo.save(newChat);
+        
         const requester = await this.userRepo.findOne({ where: { id: requesterId }});
         const otherUser = await this.userRepo.findOne({ where: { id: otherUserId }});
 
@@ -56,24 +57,23 @@ export class ChatsService {
             throw new NotFoundException('One or both users not found.');
         }
         // Add both users to the chat as members and save joining date
-        const members = [
+        const newMembers = [
             this.memberRepo.create({
-                user: requester,
-                chat: newChat,
+                userId: requesterId,
+                chatId: newChat.id,
                 role: 'member',
                 joinDate: new Date(),
             }),
             this.memberRepo.create({
-                user: otherUser,
-                chat: newChat,
+                userId: otherUserId,
+                chatId: newChat.id,
                 role: 'member',
                 joinDate: new Date(),
             }),
         ]
 
-        // Save chat and members in the DB
-        await this.chatRepo.save(newChat);
-        await this.memberRepo.save(members);
+        
+        await this.memberRepo.save(newMembers);
 
         return newChat;
     }
