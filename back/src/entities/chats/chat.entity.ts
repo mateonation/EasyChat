@@ -9,12 +9,14 @@ export class Chat {
     @Column()
     creationDate: Date;
 
-    @Column()
+    @Column({
+        type: 'boolean',
+        default: false,
+    })
     isGroup: boolean;
 
     @Column({ 
         type: "text",
-        length: 100,
         nullable: true,
         default: null,
     })
@@ -22,7 +24,6 @@ export class Chat {
 
     @Column({ 
         type: "text",
-        length: 255,
         nullable: true,
         default: null,
     })
