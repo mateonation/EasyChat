@@ -9,11 +9,17 @@ export class ChatMember {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.chatMembers, { onDelete: "CASCADE" })
+    @ManyToOne(() => User, (user) => user.chatMembers, { eager: true, onDelete: "CASCADE" })
     user: User;
+
+    @Column()
+    userId: number;
 
     @ManyToOne(() => Chat, (chat) => chat.members, { onDelete: "CASCADE" })
     chat: Chat;
+
+    @Column()
+    chatId: number;
 
     @Column({
         type: 'enum',
