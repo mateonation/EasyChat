@@ -28,16 +28,18 @@ export class ChatsController {
         @Res() res: Response,
     ) {
         try {
+            if (!req.session.user?.id) return;
+            if (!typeChat) throw new BadRequestException('Type of chat is required. Use "individual" or "group"');
+            if (!users) throw new BadRequestException('At least one user ID is required to create a chat');
             switch (typeChat) {
                 // Create an individual chat
                 // An individual chat only has two members and cannot be repeated
                 // If the chat already exists between two users, it will return it
                 case 'individual':
-                    // Check if the requester and other user exist
-                    if (!req.session.user?.id) return;
-                    if (!users || users.length !== 1) throw new BadRequestException('You must provide exactly one user ID to create an individual chat');
+                    if (users.length !== 1) throw new BadRequestException('You must provide exactly one user ID to create an individual chat');
                     const requesterId = req.session.user.id; // User authenticated by session
                     const otherUserId = users[0]; // User to create chat with
+                    // Check if the requester and other user exist
                     if (!requesterId || !(await this.usersService.findById(requesterId)) || !(await this.usersService.findById(otherUserId))) throw new NotFoundException('One or both users not found.');
                     // Throw bad request exception if the user tries to create a chat with themselves
                     if (requesterId == otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
@@ -63,11 +65,16 @@ export class ChatsController {
                         message: 'Chat created successfully',
                         chat,
                     });
-                    break;
                 // Create a group chat
                 // A group chat can have multiple members and can be created by any user
                 case 'group':
                     break;
+                // If the chat type is not valid, throw a bad request exception
+                default:
+                    return res.status(400).json({
+                        statusCode: 400,
+                        message: 'Invalid chat type. Use "individual" or "group"',
+                    });
                 }
             } catch (error) {
                 if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
