@@ -19,22 +19,28 @@ export class ChatsService {
 
     // Search for an existing individual chat between two users
     async findIndividualChat(
-        requesterId: number,
-        otherUserId: number,
+        user1: number,
+        user2: number,
     ): Promise<Chat | null> {
-        // Search for an existing individual chat between the two users
-        const existingChats = await this.chatRepo.find({
-            relations: ['members', 'members.user'],
-        });
+        // Check for both users in an individual chat
+        // Chat is considered individual if it has only two members and 'isGroup' boolean is false
+        const chat = await this.memberRepo
+            .createQueryBuilder('member')
+            .innerJoin(Chat, 'chat', 'chat.id = member.chatId')
+            .select('member.chatId', 'chatId')
+            .where('chat.isGroup = false')
+            .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1, user2] })
+            .groupBy('member.chatId')
+            .having('COUNT(DISTINCT member.userId) = 2')
+            .getRawOne();
+        
+        if (!chat) return null; // No chat found
 
-        // If it exists, return it
-        for (const chat of existingChats) {
-            const members = chat.members.map(m => m.user.id);
-            if (members.includes(requesterId) && members.includes(otherUserId) && !chat.isGroup) {
-                return chat; // Return the existing chat if found
-            }
-        }
-        return null; // Return null if no chat is found
+        // If chat exists, return it with members
+        return this.chatRepo.findOne({
+            where: { id: chat.chatId },
+            relations: ['members'],
+        });
     }
 
     // Create an individual chat between two users
