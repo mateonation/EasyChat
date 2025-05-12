@@ -47,6 +47,7 @@ export class AppModule {
         'auth/logout',
         'api/users/me',
         'api/chats',
+        'api/messages',
         'api/users/admin' // TESTING
       );
   }
