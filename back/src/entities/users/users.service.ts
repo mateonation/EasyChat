@@ -82,14 +82,10 @@ export class UsersService {
         );
         // Hash the password using argon2 library
         const argon2psswrd = await argon2.hash(saveUserDto.password);
-        // Get the current date w/o time
-        const todayDate = new Date();
-        const registerDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDay());
         // Create a new user object
         const user = this.usersRepo.create({
             username: saveUserDto.username,
-            password: argon2psswrd, 
-            registerDate,
+            password: argon2psswrd,
             roles,
         });
         // Save user to the DB
