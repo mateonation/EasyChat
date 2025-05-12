@@ -29,6 +29,6 @@ export class Chat {
     })
     groupDescription: string; // only used in group chats
 
-    @OneToMany(() => ChatMember, member => member.user)
+    @OneToMany(() => ChatMember, member => member.chat, { eager: true })
     members: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
 }

@@ -21,5 +21,5 @@ export class User {
     roles: Role[];
 
     @OneToMany(() => ChatMember, member => member.user)
-    chatMembers: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
+    memberOf: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
 }
