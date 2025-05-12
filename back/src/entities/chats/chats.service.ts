@@ -50,7 +50,7 @@ export class ChatsService {
     async createIndividualChat(
         requesterId: number,
         otherUserId: number,
-    ): Promise<Chat> {
+    ): Promise<ChatResponseDto | null> {
         // Check if both users exist
         const requester = await this.userRepo.findOne({ where: { id: requesterId }});
         const otherUser = await this.userRepo.findOne({ where: { id: otherUserId }});
@@ -84,6 +84,14 @@ export class ChatsService {
 
         await this.memberRepo.save(newMembers);
 
-        return newChat;
+        // Fetch the chat with its members
+        const chat = await this.chatRepo.findOne({
+            where: { id: newChat?.id },
+            relations: ['members', 'members.user'],
+        });
+
+        if (!chat) return null;
+
+        return ChatResponseDto.fromChat(chat);
     }
 }
