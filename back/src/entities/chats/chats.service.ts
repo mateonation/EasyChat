@@ -38,7 +38,7 @@ export class ChatsService {
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
             where: { id: select?.chatId },
-            relations: ['members', 'members.user'],
+            relations: ['members', 'members.user', 'members.user.roles'],
         });
 
         if (!chat) return null;
@@ -87,7 +87,7 @@ export class ChatsService {
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
             where: { id: newChat?.id },
-            relations: ['members', 'members.user'],
+            relations: ['members', 'members.user', 'members.user.roles'],
         });
 
         if (!chat) return null;
