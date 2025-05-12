@@ -20,6 +20,7 @@ export class MessagesService {
         private memberRepo: Repository<ChatMember>,
     ) {}
 
+    // Send message to a chat
     async sendMessage(senderId: number, dto: SendMessageDto): Promise<Message> {
         // Check if the user is member of the chat
         const member = await this.memberRepo.findOne({ 
@@ -43,4 +44,12 @@ export class MessagesService {
 
         return message;
     }
+
+    // Find a message by it's ID
+    async findById(messageId: number): Promise<Message | null> {
+        const message = await this.messageRepo.findOne({ where: { id: messageId } });
+        if (!message) return null;
+        return message;
+    }
+
 }
