@@ -6,6 +6,7 @@ import { ChatMember } from './chatmembers/chatmember.entity';
 import { User } from '../users/user.entity';
 import { NotFoundException } from 'src/errors/notFoundException';
 import { ChatResponseDto } from './dto/chat-response.dto';
+import { CreateChatDto } from './dto/create-chat.dto';
 
 @Injectable()
 export class ChatsService {
@@ -17,6 +18,31 @@ export class ChatsService {
         @InjectRepository(User)
         private readonly userRepo: Repository<User>,
     ) {}
+
+    // Function that updates chat properties
+    async updateChat(
+        chatId: number,
+        chatData: Partial<CreateChatDto>,
+    ): Promise<Chat | null> {
+        // Get the chat by ID
+        const chat = await this.chatRepo.findOne({ where: { id: chatId } });
+
+        // If chat is not found, throw an error
+        if (!chat) return null;
+
+        // Update the chat properties
+        chat.name = chatData.name || chat.name; // Update name if provided
+        chat.groupDescription = chatData.groupDescription || chat.groupDescription; // Update description if provided
+        // Set the chat as a group chat if it is not already
+        if (!chat.isGroup) {
+            chat.isGroup = true;
+        }
+
+        // Save the updated chat to the database
+        await this.chatRepo.save(chat);
+
+        return chat;
+    }
 
     // Find chat by ID
     async findById(chatId: number): Promise<ChatResponseDto | null> {
