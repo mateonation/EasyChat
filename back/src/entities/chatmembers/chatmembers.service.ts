@@ -38,7 +38,7 @@ export class ChatmembersService {
 
     // Function to remove a user from a chat
     // This function will throw an error if the user is not a member of the chat
-    async removeUserFromChat(
+    /*async removeUserFromChat(
         chatId: number,
         userId: number,
     ) {
@@ -48,5 +48,5 @@ export class ChatmembersService {
         });
 
         return this.memberRepo.remove(member);
-    }
+    }*/
 }

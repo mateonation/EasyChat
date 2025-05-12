@@ -35,9 +35,9 @@ export class ChatsService {
             .having('COUNT(DISTINCT member.userId) = 2')
             .getRawOne();
 
-        // If chat exists, return it with members
+        // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
-            where: { id: select.chatId },
+            where: { id: select?.chatId },
             relations: ['members', 'members.user'],
         });
 
