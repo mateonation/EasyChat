@@ -46,6 +46,7 @@ export class AppModule {
       .forRoutes(
         'auth/logout',
         'api/users/me',
+        'api/chats',
         'api/users/admin' // TESTING
       );
   }
