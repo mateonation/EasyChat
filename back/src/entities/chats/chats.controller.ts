@@ -29,6 +29,15 @@ export class ChatsController {
             if(body.requesterId != req.session.user.id) throw new ForbiddenException('You are not allowed to create a chat for another user');
             // Throw bad request exception if the user tries to create a chat with themselves
             if(body.requesterId == body.otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
+            // Check if the chat already exists
+            const existingChat = await this.chatsService.findIndividualChat(body.requesterId, body.otherUserId);
+            if (existingChat) {
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: 'Chat already exists',
+                    chat: existingChat,
+                });
+            }
             // Create chat
             const chat = await this.chatsService.createIndividualChat(body.requesterId, body.otherUserId);
             return res.status(201).json({
