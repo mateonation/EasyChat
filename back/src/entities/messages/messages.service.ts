@@ -52,4 +52,12 @@ export class MessagesService {
         return message;
     }
 
+    // Delete a message by it's ID
+    // This method DOES NOT delete a message entirely, but rather marks it as deleted
+    // by setting the 'isDeleted' field to true
+    async deleteMessage(messageId: number): Promise<boolean> {
+        const message = await this.messageRepo.findOne({ where: { id: messageId } });
+        await this.messageRepo.update(messageId, { isDeleted: true });
+        return true;
+    }
 }
