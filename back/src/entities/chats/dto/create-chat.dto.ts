@@ -1,9 +1,9 @@
 export class CreateChatDto {
     users: number[]; // Array of user IDs to be added to the chat
-    name: string;
-    groupDescription: string;
+    name?: string;  // Only used in group chats
+    groupDescription?: string; // Only used in group chats
 
-    constructor(users: number[], name: string, groupDescription: string) {
+    constructor(users: number[], name: string = '', groupDescription: string = '') {
         this.users = users;
         this.name = name;
         this.groupDescription = groupDescription;
