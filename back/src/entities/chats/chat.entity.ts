@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { ChatMember } from "../chatmembers/chatmember.entity";
+import { ChatMember } from "./chatmembers/chatmember.entity";
 
 @Entity()
 export class Chat {

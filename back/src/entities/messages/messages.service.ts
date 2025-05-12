@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChatMember } from '../chatmembers/chatmember.entity';
+import { ChatMember } from '../chats/chatmembers/chatmember.entity';
 import { Chat } from '../chats/chat.entity';
 import { Message } from './message.entity';
 import { SendMessageDto } from './dto/send-message.dto';

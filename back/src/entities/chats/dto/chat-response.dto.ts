@@ -1,4 +1,4 @@
-import { MemberResponseDto } from "src/entities/chatmembers/dto/member-response.dto";
+import { MemberResponseDto } from "../chatmembers/dto/member-response.dto";
 import { Chat } from "../chat.entity";
 
 export class ChatResponseDto {

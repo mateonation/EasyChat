@@ -8,9 +8,15 @@ export class Message {
     id: number;
 
     @ManyToOne(() => User, (user) => user.id, { onDelete: "CASCADE" })
+    user: User;
+
+    @Column()
     senderId: number; // User ID who sent the message
 
     @ManyToOne(() => Chat, (chat) => chat.id, { onDelete: "CASCADE" })
+    chat: Chat;
+
+    @Column()
     chatId: number; // Chat ID where the message is sent
 
     @Column({

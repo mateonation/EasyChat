@@ -9,7 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
 import { ChatsModule } from './entities/chats/chats.module';
 import { MessagesModule } from './entities/messages/messages.module';
-import { ChatmembersModule } from './entities/chatmembers/chatmembers.module';
+import { ChatmembersModule } from './entities/chats/chatmembers/chatmembers.module';
 
 @Module({
   imports: [

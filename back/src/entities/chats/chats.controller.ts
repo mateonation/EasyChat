@@ -7,7 +7,7 @@ import { ForbiddenException } from 'src/errors/forbiddenException';
 import { BadRequestException } from 'src/errors/badRequestException';
 import { NotFoundException } from 'src/errors/notFoundException';
 import { UsersService } from '../users/users.service';
-import { ChatmembersService } from '../chatmembers/chatmembers.service';
+import { ChatmembersService } from './chatmembers/chatmembers.service';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
@@ -15,8 +15,8 @@ export class ChatsController {
     constructor(
         private readonly chatsService: ChatsService,
         private readonly usersService: UsersService,
-        private readonly membersService: ChatmembersService, 
-    ) {}
+        private readonly membersService: ChatmembersService,
+    ) { }
 
     // Endpoint to create an individual chat between two users
     @Post('create/individual')
@@ -28,11 +28,11 @@ export class ChatsController {
     ) {
         try {
             // Check if the requester and other user exist
-            if(!req.session.user?.id) return;
+            if (!req.session.user?.id) return;
             const requesterId = req.session.user.id;
             if (!requesterId || !(await this.usersService.findById(requesterId)) || !(await this.usersService.findById(otherUserId))) throw new NotFoundException('One or both users not found.');
             // Throw bad request exception if the user tries to create a chat with themselves
-            if(requesterId == otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
+            if (requesterId == otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
             // Check if the chat already exists
             const existingChat = await this.chatsService.findIndividualChat(requesterId, otherUserId);
             if (existingChat) { // If chat already exists, return it
