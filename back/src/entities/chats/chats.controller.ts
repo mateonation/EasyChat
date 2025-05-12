@@ -20,7 +20,7 @@ export class ChatsController {
     @Post('create/individual')
     @Roles('user')
     async createIndividualChat(
-        @Body() body: { otherUserId: number },
+        @Body('otherUserId') otherUserId: number,
         @Req() req: Request,
         @Res() res: Response,
     ) {
@@ -29,12 +29,12 @@ export class ChatsController {
             if(!req.session.user?.id) return;
             const requesterId = req.session.user?.id;
             console.log('Requester ID:', requesterId);
-            console.log('Other User ID:', body.otherUserId);
-            if (!requesterId || !(await this.usersService.findById(requesterId)) || !(await this.usersService.findById(body.otherUserId))) throw new NotFoundException('One or both users not found.');
+            console.log('Other User ID:', otherUserId);
+            if (!requesterId || !(await this.usersService.findById(requesterId)) || !(await this.usersService.findById(otherUserId))) throw new NotFoundException('One or both users not found.');
             // Throw bad request exception if the user tries to create a chat with themselves
-            if(requesterId == body.otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
+            if(requesterId == otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
             // Check if the chat already exists
-            const existingChat = await this.chatsService.findIndividualChat(requesterId, body.otherUserId);
+            const existingChat = await this.chatsService.findIndividualChat(requesterId, otherUserId);
             if (existingChat) {
                 return res.status(200).json({
                     statusCode: 200,
@@ -43,7 +43,7 @@ export class ChatsController {
                 });
             }
             // Create chat
-            const chat = await this.chatsService.createIndividualChat(requesterId, body.otherUserId);
+            const chat = await this.chatsService.createIndividualChat(requesterId, otherUserId);
             return res.status(201).json({
                 statusCode: 201,
                 message: 'Chat created successfully',
