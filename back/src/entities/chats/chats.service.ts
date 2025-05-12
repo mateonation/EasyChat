@@ -18,6 +18,20 @@ export class ChatsService {
         private readonly userRepo: Repository<User>,
     ) {}
 
+    // Find chat by ID
+    async findById(chatId: number): Promise<ChatResponseDto | null> {
+        // Fetch the chat with its members
+        const chat = await this.chatRepo.findOne({
+            where: { id: chatId },
+            relations: ['members', 'members.user', 'members.user.roles'],
+        });
+
+        // If chat is not found, return null
+        if (!chat) return null;
+
+        return ChatResponseDto.fromChat(chat);
+    }
+
     // Search for an existing individual chat between two users
     async findIndividualChat(
         user1: number,
