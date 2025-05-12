@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { User } from "../users/user.entity";
 import { Chat } from "../chats/chat.entity";
 import { ChatMemberRole } from "src/types/chat-members-roles";
@@ -28,6 +28,6 @@ export class ChatMember {
     })
     role: ChatMemberRole; // Role of the user in the group chat ('creator' and 'admin' are only used in group chats)
 
-    @Column()
+    @CreateDateColumn()
     joinDate: Date;
 }
