@@ -20,7 +20,6 @@ export class Message {
 
     @Column({
         type: "text",
-        length: 280,
     })
     content: string; // Message content
 
