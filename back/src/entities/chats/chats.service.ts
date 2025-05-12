@@ -5,6 +5,7 @@ import { Chat } from './chat.entity';
 import { ChatMember } from '../chatmembers/chatmember.entity';
 import { User } from '../users/user.entity';
 import { NotFoundException } from 'src/errors/notFoundException';
+import { ChatResponseDto } from './dto/chat-response.dto';
 
 @Injectable()
 export class ChatsService {
@@ -21,10 +22,10 @@ export class ChatsService {
     async findIndividualChat(
         user1: number,
         user2: number,
-    ): Promise<Chat | null> {
+    ): Promise<ChatResponseDto | null> {
         // Check for both users in an individual chat
         // Chat is considered individual if it has only two members and 'isGroup' boolean is false
-        const chat = await this.memberRepo
+        const select = await this.memberRepo
             .createQueryBuilder('member')
             .innerJoin(Chat, 'chat', 'chat.id = member.chatId')
             .select('member.chatId', 'chatId')
@@ -33,14 +34,16 @@ export class ChatsService {
             .groupBy('member.chatId')
             .having('COUNT(DISTINCT member.userId) = 2')
             .getRawOne();
-        
-        if (!chat) return null; // No chat found
 
         // If chat exists, return it with members
-        return this.chatRepo.findOne({
-            where: { id: chat.chatId },
-            relations: ['members'],
+        const chat = await this.chatRepo.findOne({
+            where: { id: select.chatId },
+            relations: ['members', 'members.user'],
         });
+
+        if (!chat) return null;
+
+        return ChatResponseDto.fromChat(chat);
     }
 
     // Create an individual chat between two users
