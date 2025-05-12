@@ -60,43 +60,12 @@ export class ChatsService {
         return ChatResponseDto.fromChat(chat);
     }
 
-    // Create an individual chat between two users
-    async createIndividualChat(
-        requesterId: number,
-        otherUserId: number,
-    ): Promise<ChatResponseDto | null> {
+    // Create chat w/o any members
+    // Later, members can be added by a method in ChatMembersService
+    async createChat(): Promise<Chat> {
         // Create and save chat in DB
-        const newChat = this.chatRepo.create({
-            creationDate: new Date(),
-        });
-        await this.chatRepo.save(newChat);
-
-        // Add both users to the chat as members and save joining date
-        const newMembers = [
-            this.memberRepo.create({
-                userId: requesterId,
-                chatId: newChat.id,
-                role: 'member',
-                joinDate: new Date(),
-            }),
-            this.memberRepo.create({
-                userId: otherUserId,
-                chatId: newChat.id,
-                role: 'member',
-                joinDate: new Date(),
-            }),
-        ]
-
-        await this.memberRepo.save(newMembers);
-
-        // Fetch the chat with its members
-        const chat = await this.chatRepo.findOne({
-            where: { id: newChat?.id },
-            relations: ['members', 'members.user', 'members.user.roles'],
-        });
-
-        if (!chat) return null;
-
-        return ChatResponseDto.fromChat(chat);
+        const chat = this.chatRepo.create({});
+        await this.chatRepo.save(chat);
+        return chat;
     }
 }
