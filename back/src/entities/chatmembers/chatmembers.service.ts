@@ -19,21 +19,11 @@ export class ChatmembersService {
 
     // Function to add a user to a chat
     async addUserToChat(
-        chatId: number,
         userId: number,
-        role: ChatMemberRole = 'member',
+        chatId: number,
     ) {
-        const chat = await this.chatRepo.findOneByOrFail({ id: chatId });
-        const user = await this.userRepo.findOneByOrFail({ id: userId });
-
-        const member = this.memberRepo.create({
-            chat,
-            user,
-            role,
-            joinDate: new Date(),
-        });
-
-        return this.memberRepo.save(member);
+        const member = this.memberRepo.create({ userId, chatId, });
+        await this.memberRepo.save(member);
     }
 
     // Function to remove a user from a chat
