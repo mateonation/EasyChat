@@ -7,12 +7,14 @@ import { Request, Response } from 'express';
 import { ForbiddenException } from 'src/errors/forbiddenException';
 import { BadRequestException } from 'src/errors/badRequestException';
 import { NotFoundException } from 'src/errors/notFoundException';
+import { UsersService } from '../users/users.service';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
 export class ChatsController {
     constructor(
         private readonly chatsService: ChatsService,
+        private readonly usersService: UsersService,
     ) {}
 
     // Endpoint to create an individual chat between two users
@@ -29,6 +31,10 @@ export class ChatsController {
             if(body.requesterId != req.session.user.id) throw new ForbiddenException('You are not allowed to create a chat for another user');
             // Throw bad request exception if the user tries to create a chat with themselves
             if(body.requesterId == body.otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
+            // Check if the requester and other user exist
+            const requester = await this.usersService.findById(body.requesterId);
+            const otherUser = await this.usersService.findById(body.otherUserId);
+            if (!requester || !otherUser) throw new NotFoundException('One or both users not found.');
             // Check if the chat already exists
             const existingChat = await this.chatsService.findIndividualChat(body.requesterId, body.otherUserId);
             if (existingChat) {
