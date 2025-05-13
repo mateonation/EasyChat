@@ -44,7 +44,7 @@ export class ChatmembersService {
     // Function to update the role of a user in a chat
     async updateMemberRole(
         user: UserResponseDto,
-        chat: Chat,
+        chat: Chat | ChatResponseDto,
         role: ChatMemberRole,
     ) {
         const member = await this.memberRepo.findOne({ where: { user: { id: user.id }, chat: { id: chat.id } } });
