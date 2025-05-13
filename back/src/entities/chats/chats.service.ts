@@ -63,17 +63,25 @@ export class ChatsService {
         user1: number,
         user2: number,
     ): Promise<ChatResponseDto | null> {
-        // Check for both users in an individual chat
-        // Chat is considered individual if it has only two members and 'isGroup' boolean is false
-        const select = await this.memberRepo
-            .createQueryBuilder('member')
-            .innerJoin(Chat, 'chat', 'chat.id = member.chatId')
-            .select('member.chatId', 'chatId')
+        // Check if both users are actual members of an already existing individual chat
+        // This query builder only returns an existing individual chat where both users are already members
+        // It checks for the following:
+        // 1. The chat is not a group chat (isGroup = false)
+        // 2. Both users are members of the chat
+        // 3. The chat has exactly two members (the two users)
+        const select = await this.chatRepo
+            .createQueryBuilder('chat')
+            .innerJoin('chat.members', 'member')
+            .select('chat.id', 'chatId')
             .where('chat.isGroup = false')
             .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1, user2] })
-            .groupBy('member.chatId')
+            .groupBy('chat.id')
             .having('COUNT(DISTINCT member.userId) = 2')
+            .andHaving('COUNT(*) = 2')
             .getRawOne();
+
+        // If no chat is found, return null
+        if (!select) return null;
 
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
