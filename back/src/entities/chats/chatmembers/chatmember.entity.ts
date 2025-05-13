@@ -12,14 +12,8 @@ export class ChatMember {
     @ManyToOne(() => User, (user) => user.memberOf, { eager: true, onDelete: "CASCADE" })
     user: User;
 
-    @Column()
-    userId: number;
-
-    @ManyToOne(() => Chat, (chat) => chat.members, { onDelete: "CASCADE" })
+    @ManyToOne(() => Chat, (chat) => chat.members, { eager: true, onDelete: "CASCADE" })
     chat: Chat;
-
-    @Column()
-    chatId: number;
 
     @Column({
         type: 'enum',
