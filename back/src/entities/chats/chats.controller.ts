@@ -108,7 +108,6 @@ export class ChatsController {
                     chat,
                 });
             } catch (error) {
-                console.log(error);
                 if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
                     return res.status(error.getStatus()).json(error.getResponse());
                 }
