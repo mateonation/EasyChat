@@ -28,11 +28,11 @@ export class Chat {
         nullable: true,
         default: null,
     })
-    groupDescription: string; // only used in group chats
+    description: string; // only used in group chats
 
-    @OneToMany(() => ChatMember, member => member.chat, { eager: true })
+    @OneToMany(() => ChatMember, member => member.chat, { cascade: true, })
     members: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
 
-    @OneToMany(() => Message, (message) => message.chat)
+    @OneToMany(() => Message, (message) => message.chat, { cascade: true, })
     messages: Message[]; // List of messages in the chat
 }
