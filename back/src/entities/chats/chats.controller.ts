@@ -9,6 +9,8 @@ import { NotFoundException } from 'src/errors/notFoundException';
 import { UsersService } from '../users/users.service';
 import { ChatmembersService } from './chatmembers/chatmembers.service';
 import { CreateChatDto } from './dto/create-chat.dto';
+import { AddMembersDto } from './chatmembers/dto/add-members.dto';
+import { ConflictException } from 'src/errors/conflictException';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
@@ -136,6 +138,68 @@ export class ChatsController {
             return res.status(201).json({
                 statusCode: 201,
                 message: 'Chat created successfully',
+                chat,
+            });
+        } catch (error) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
+
+    // Add a member to a group chat
+    @Post(':chatId/members/add')
+    @Roles('user')
+    async addMemberToGroup(
+        @Param('chatId') chatId: number,
+        @Body() dto: AddMembersDto,
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+        try{
+            // Check if the user in session exists
+            if (!req.session.user?.id) return;
+            const requester = await this.usersService.findById(req.session.user.id);
+            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
+
+            // Check if the chat exists + 
+            const chat = await this.chatsService.findById(chatId);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+
+            // Check if the requester is a member of the chat
+            const member = await this.membersService.findChatMember(requester, chat);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
+            
+            // Check if it's a group
+            if (!chat.isGroup) throw new ConflictException('You can only add members to group chats');
+
+            // Check if the requester is a creator or admin of the chat
+            if (member.role === 'member') throw new ForbiddenException('You are not allowed to add members to this chat');
+
+            // Check if the users to be added exist
+            for (const uid of dto.userIds) {
+                const user = await this.usersService.findById(uid);
+                if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
+
+                const alreadyAMember = await this.membersService.findChatMember(user, chat);
+                if (alreadyAMember) throw new ConflictException(`${user.username} (ID: ${uid}) is already a member of this chat`);
+            }
+
+            // Add users to the chat
+            for (const uid of dto.userIds) {
+                const user = await this.usersService.findById(uid);
+                if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
+                await this.membersService.addUserToChat(user, chat);
+            }
+
+            return res.status(200).json({
+                statusCode: 200,
+                message: 'Members added successfully',
                 chat,
             });
         } catch (error) {
