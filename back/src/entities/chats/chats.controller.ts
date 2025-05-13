@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -18,6 +18,36 @@ export class ChatsController {
         private readonly usersService: UsersService,
         private readonly membersService: ChatmembersService,
     ) { }
+
+    // Get a list of all chats for the authenticated user
+    @Get('')
+    @Roles('user')
+    async getChatsAuthUser(
+        @Res() res: Response,
+        @Req() req: Request,
+    ) {
+        try {
+            if (!req.session.user?.id) return;
+            const requesterId = req.session.user.id; // User authenticated by session
+            // Get all chats for the user
+            const chats = await this.chatsService.getChatsByUserId(requesterId);
+            // Return the list of chats
+            return res.status(200).json({
+                statusCode: 200,
+                message: 'Chats retrieved successfully',
+                chats,
+            });
+        } catch (error) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
 
     // Endpoint to create an individual chat between two users
     @Post('create/:typeChat')
