@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ChatMember } from "./chatmembers/chatmember.entity";
+import { Message } from "../messages/message.entity";
 
 @Entity()
 export class Chat {
@@ -31,4 +32,7 @@ export class Chat {
 
     @OneToMany(() => ChatMember, member => member.chat, { eager: true })
     members: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
+
+    @OneToMany(() => Message, (message) => message.chat)
+    messages: Message[]; // List of messages in the chat
 }
