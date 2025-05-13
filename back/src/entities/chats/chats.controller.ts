@@ -116,7 +116,7 @@ export class ChatsController {
                     // Add the requester to the chat
                     await this.membersService.addUserToChat(requester, groupCreated);
                     // Add the requester as creator of the chat
-                    await this.membersService.updateMemberRole(requester, groupCreated, 'creator');
+                    await this.membersService.updateMemberRole(requester, groupCreated, ChatMemberRole.CREATOR);
                     // Add all users to the chat
                     for (const uid of uids) {
                         const u = await this.usersService.findById(uid);
