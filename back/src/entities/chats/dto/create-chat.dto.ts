@@ -1,19 +1,19 @@
 export class CreateChatDto {
     users: number[]; // Array of user IDs to be added to the chat
     name?: string;  // Only used in group chats
-    groupDescription?: string; // Only used in group chats
+    description?: string; // Only used in group chats
 
-    constructor(users: number[], name: string = '', groupDescription: string = '') {
+    constructor(users: number[], name: string = '', description: string = '') {
         this.users = users;
         this.name = name;
-        this.groupDescription = groupDescription;
+        this.description = description;
     }
 
-    static fromRequest(request: CreateChatDto): CreateChatDto {
-        return new CreateChatDto(request.users, request.name, request.groupDescription);
+    static fromRequest(dto: CreateChatDto): CreateChatDto {
+        return new CreateChatDto(dto.users, dto.name, dto.description);
     }
 
-    static fromRequests(requests: CreateChatDto[]): CreateChatDto[] {
-        return requests.map(request => new CreateChatDto(request.users, request.name, request.groupDescription));
+    static fromRequests(dto: CreateChatDto[]): CreateChatDto[] {
+        return dto.map(c => new CreateChatDto(c.users, c.name, c.description));
     }
 }
