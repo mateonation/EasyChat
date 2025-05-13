@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -205,6 +205,76 @@ export class ChatsController {
             return res.status(200).json({
                 statusCode: 200,
                 message: 'Members added successfully',
+                chatWithMembers,
+            });
+        } catch (error) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
+
+    // Remove a member from a group chat
+    @Delete(':chatId/:userId/rm')
+    @Roles('user')
+    async removeFromGroup(
+        @Param('chatId') chatId: number,
+        @Param('userId') userId: number,
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+        try {
+            // Check if the user in session exists
+            if (!req.session.user?.id) return;
+            const requester = await this.usersService.findById(req.session.user.id);
+            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
+
+            // Check if the chat exists
+            const chat = await this.chatsService.findById(chatId);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+
+            // Check if the requester is a member of the chat
+            const member = await this.membersService.findChatMember(requester, chat);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+            // Check if it's a group
+            if (!chat.isGroup) throw new ConflictException('You can only remove members from group chats');
+
+            // Check if the requester is a creator or admin of the chat
+            if (member.role === 'member') throw new ForbiddenException('You are not allowed to remove members from this chat');
+
+            // Check if the user to be removed exists
+            const userToRemove = await this.usersService.findById(userId);
+            if (!userToRemove) throw new NotFoundException(`User with ID ${userId} not found`);
+
+            // Check if the user to be removed is a member of the chat
+            const memberToRemove = await this.membersService.findChatMember(userToRemove, chat);
+            if (!memberToRemove) throw new ConflictException(`${userToRemove.username} (ID: ${userId}) is not a member of this chat`);
+
+            // Check if the user to be removed is the creator of the chat
+            if (memberToRemove.role === 'creator') throw new ConflictException('You cannot remove the creator of the chat');
+
+            // Check if the user to be removed is the requester
+            if (userToRemove.id === requester.id) throw new ConflictException('You cannot remove yourself from the chat');
+
+            // Allow user removal if the requester is an admin removing a member or the requester is a creator
+            if (member.role === 'admin' && memberToRemove.role === 'member' || member.role === 'creator') {
+                // Remove the user from the chat
+                await this.membersService.removeUserFromChat(userToRemove, chat);
+            }
+            
+            // Fetch the chat with its members
+            const chatWithMembers = await this.chatsService.findById(chatId);
+
+            // Return the chat with its members
+            return res.status(200).json({
+                statusCode: 200,
+                message: `${userToRemove.username} removed from chat ${chat.name}`,
                 chatWithMembers,
             });
         } catch (error) {

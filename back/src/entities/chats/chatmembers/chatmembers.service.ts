@@ -54,4 +54,12 @@ export class ChatmembersService {
     }
 
     // Function to remove a user from a chat
+    async removeUserFromChat(
+        user: UserResponseDto,
+        chat: Chat | ChatResponseDto,
+    ): Promise<void> {
+        const member = await this.memberRepo.findOne({ where: { user: { id: user.id }, chat: { id: chat.id } } });
+        if (!member) return;
+        await this.memberRepo.remove(member);
+    }
 }
