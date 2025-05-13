@@ -7,6 +7,7 @@ import { User } from '../users/user.entity';
 import { NotFoundException } from 'src/errors/notFoundException';
 import { ChatResponseDto } from './dto/chat-response.dto';
 import { CreateChatDto } from './dto/create-chat.dto';
+import { UserResponseDto } from '../users/dto/user-response.dto';
 
 @Injectable()
 export class ChatsService {
@@ -24,8 +25,8 @@ export class ChatsService {
         userId: number
     ): Promise<ChatResponseDto[] | null> {
         const memberEntries = await this.memberRepo.find({
-            where: { userId },
-            relations: ['chat', 'chat.members', 'chat.members.user'], // Cargamos el chat y todos sus miembros
+            where: { user: { id: userId } },
+            relations: ['chat', 'chat.members', 'chat.members.user', 'chat.messages', 'chat.members.user.roles',],
         });
 
         // If no member entries are found, return an empty array
@@ -56,7 +57,7 @@ export class ChatsService {
 
         // Update the chat properties
         chat.name = chatData.name || chat.name; // Update name if provided
-        chat.groupDescription = chatData.groupDescription || chat.groupDescription; // Update description if provided
+        chat.description = chatData.description || chat.description; // Update description if provided
         // Set the chat as a group chat if it is not already
         if (!chat.isGroup) {
             chat.isGroup = true;
@@ -69,7 +70,9 @@ export class ChatsService {
     }
 
     // Find chat by ID
-    async findById(chatId: number): Promise<ChatResponseDto | null> {
+    async findById(
+        chatId: number
+    ): Promise<ChatResponseDto | null> {
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
             where: { id: chatId },
@@ -84,8 +87,8 @@ export class ChatsService {
 
     // Search for an existing individual chat between two users
     async findIndividualChat(
-        user1: number,
-        user2: number,
+        user1: UserResponseDto,
+        user2: UserResponseDto,
     ): Promise<ChatResponseDto | null> {
         // Check if both users are actual members of an already existing individual chat
         // This query builder only returns an existing individual chat where both users are already members
@@ -98,7 +101,7 @@ export class ChatsService {
             .innerJoin('chat.members', 'member')
             .select('chat.id', 'chatId')
             .where('chat.isGroup = false')
-            .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1, user2] })
+            .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1.id, user2.id] })
             .groupBy('chat.id')
             .having('COUNT(DISTINCT member.userId) = 2')
             .andHaving('COUNT(*) = 2')
