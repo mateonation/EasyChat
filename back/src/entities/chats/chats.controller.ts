@@ -11,6 +11,7 @@ import { ChatmembersService } from './chatmembers/chatmembers.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { AddMembersDto } from './chatmembers/dto/add-members.dto';
 import { ConflictException } from 'src/errors/conflictException';
+import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ChatMember } from './chatmember.entity';
 import { Chat } from '../../chats/chat.entity';
 import { User } from '../../users/user.entity';
-import { ChatMemberRole } from 'src/types/chat-members-roles';
+import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
 import { UserResponseDto } from 'src/entities/users/dto/user-response.dto';
 import { ChatResponseDto } from '../dto/chat-response.dto';
 
