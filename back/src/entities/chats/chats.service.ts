@@ -19,6 +19,30 @@ export class ChatsService {
         private readonly userRepo: Repository<User>,
     ) {}
 
+    // Function that returns all chats for a user
+    async getChatsByUserId(
+        userId: number
+    ): Promise<ChatResponseDto[] | null> {
+        const memberEntries = await this.memberRepo.find({
+            where: { userId },
+            relations: ['chat', 'chat.members', 'chat.members.user'], // Cargamos el chat y todos sus miembros
+        });
+
+        // If no member entries are found, return an empty array
+        if (!memberEntries || memberEntries.length === 0) return null;
+
+        // Extract the chat objects from the member entries
+        // This will give us an array of chat objects
+        const chats = memberEntries.map(entry => entry.chat);
+
+        // Remove duplicates based on chat ID (it shouldn't be possible to have duplicates, but just in case)
+        const uniqueChats = [...new Map(chats.map(chat => [chat.id, chat])).values()];
+
+        // Map the unique chat objects to ChatResponseDto instances
+        // This will convert each chat object to a ChatResponseDto
+        return uniqueChats.map(chat => ChatResponseDto.fromChat(chat, userId));
+    }
+
     // Function that updates chat properties
     async updateChat(
         chatId: number,
