@@ -7,17 +7,11 @@ export class Message {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.id, { onDelete: "CASCADE" })
-    user: User;
+    @ManyToOne(() => User, (user) => user.messages, { onDelete: "CASCADE", eager: true })
+    user: User; // User who sent the message
 
-    @Column()
-    senderId: number; // User ID who sent the message
-
-    @ManyToOne(() => Chat, chat => chat.messages, { onDelete: "CASCADE" })
-    chat: Chat;
-
-    @Column()
-    chatId: number; // Chat ID where the message is sent
+    @ManyToOne(() => Chat, (chat) => chat.messages, { onDelete: "CASCADE" })
+    chat: Chat; // Chat where the message is sent
 
     @Column({
         default: false,
