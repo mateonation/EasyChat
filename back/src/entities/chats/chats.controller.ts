@@ -28,9 +28,10 @@ export class ChatsController {
     ) {
         try {
             if (!req.session.user?.id) return;
-            const requesterId = req.session.user.id; // User authenticated by session
+            const requester = await this.usersService.findById(req.session.user.id); // User authenticated by session
+            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
             // Get all chats for the user
-            const chats = await this.chatsService.getChatsByUserId(requesterId);
+            const chats = await this.chatsService.getChatsByUserId(requester.id);
             // Return the list of chats
             return res.status(200).json({
                 statusCode: 200,
@@ -42,6 +43,7 @@ export class ChatsController {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
             // If error is not handled by service, return 500
+            console.error(error);
             return res.status(500).json({
                 statusCode: 500,
                 message: 'Internal server error',
@@ -60,23 +62,25 @@ export class ChatsController {
     ) {
         try {
             if (!req.session.user?.id) return;
-            const requesterId = req.session.user.id; // User authenticated by session
             if (!typeChat) throw new BadRequestException('Type of chat is required. Use "individual" or "group"');
             if (!dto.users || dto.users.length === 0) throw new BadRequestException('At least one user ID is required to create a chat');
             let chatId: number;
+            // Check if the user in session exists
+            const requester = await this.usersService.findById(req.session.user.id);
+            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
             switch (typeChat) {
                 // Create an individual chat
                 // An individual chat only has two members and cannot be repeated
                 // If the chat already exists between two users, it will return it
                 case 'individual':
                     if (dto.users.length !== 1) throw new BadRequestException('You must provide exactly one user ID to create an individual chat');
-                    const otherUserId = dto.users[0]; // User to create chat with
-                    // Check if the requester and other user exist
-                    if (!requesterId || !(await this.usersService.findById(requesterId)) || !(await this.usersService.findById(otherUserId))) throw new NotFoundException('One or both users not found.');
                     // Throw bad request exception if the user tries to create a chat with themselves
-                    if (requesterId == otherUserId) throw new BadRequestException('You cannot create a chat with yourself');
-                    // Check if the chat already exists
-                    const existingChat = await this.chatsService.findIndividualChat(requesterId, otherUserId);
+                    if (requester.id === dto.users[0]) throw new BadRequestException('You cannot create a chat with yourself');
+                    // Check if the user provided in the request exists
+                    const userToCreateChatWith = await this.usersService.findById(dto.users[0]) // User to create chat with
+                    if (!userToCreateChatWith) throw new NotFoundException(`User (ID: ${dto.users[0]}) not found`);
+                    // If an individual chat between the two users already exists, return it instead of creating a new one
+                    const existingChat = await this.chatsService.findIndividualChat(requester, userToCreateChatWith);
                     if (existingChat) { // If chat already exists, return it
                         return res.status(200).json({
                             statusCode: 200,
@@ -86,52 +90,39 @@ export class ChatsController {
                     }
                     // If not, create a new chat
                     const chatCreated = await this.chatsService.createChat();
-                    chatId = chatCreated.id; // Get the ID of the created chat
                     // Add both users to the chat
-                    await this.membersService.addUserToChat(requesterId, chatId);
-                    await this.membersService.addUserToChat(otherUserId, chatId);
+                    await this.membersService.addUserToChat(requester, chatCreated);
+                    await this.membersService.addUserToChat(userToCreateChatWith, chatCreated);
+                    chatId = chatCreated.id; // Get the ID of the created chat
                     break;
                 // Create a group chat
                 // A group chat can have multiple members and can be created by any user
                 case 'group':
-                    if (dto.users.length < 1) throw new BadRequestException('You must provide at least one user ID to create a group chat');
-                    const usersToAdd = dto.users;
-                    // Check one by one if the users provided on the body exist
-                    // If any user does not exist, throw a NotFoundException
-                    // If any user provided in the request is the requester, remove it from the list
-                    const requester = await this.usersService.findById(requesterId);
-                    if (!requester) throw new NotFoundException(`User with ID ${req.session.user.id} not found`);
-                    for (const userId of usersToAdd) {
-                        // Check if the user is the requester
-                        if (userId == requesterId) {
-                            // Remove the requester from the list of users to add
-                            usersToAdd.splice(usersToAdd.indexOf(userId), 1);
-                            // Check if after removing the requester, there are still users to add
-                            // If not, throw a BadRequestException
-                            // This is to prevent the user from creating a group chat with themselves
-                            if (usersToAdd.length === 0) throw new BadRequestException('You cannot create a group chat with yourself.');
-                            continue;
-                        }
+                    // Filter out the requester ID from the list of users
+                    const uids = dto.users.filter((uid) => uid !== requester.id);
+                    if (uids.length === 0) throw new BadRequestException('You must provide at least one user ID to create a group chat');
+                    for (const uid of uids) {
                         // Check if the user exists
-                        if (!(await this.usersService.findById(userId))) throw new NotFoundException(`User with ID ${userId} not found`);
+                        if (!(await this.usersService.findById(uid))) throw new NotFoundException(`User with ID ${uid} not found`);
                     }
                     // Create a new chat
-                    const groupChatCreated = await this.chatsService.createChat();
-                    if (!groupChatCreated) return;
-                    chatId = groupChatCreated.id; // Get the ID of the created chat
+                    const groupCreated = await this.chatsService.createChat();
                     // Update chat with group chat properties given by the requester
-                    await this.chatsService.updateChat(chatId, {
-                        name: dto.name ?? `Group - ${chatId}`,
-                        groupDescription: dto.groupDescription ?? `Group chat created by user ${requester.username}.`,
+                    await this.chatsService.updateChat(groupCreated.id, {
+                        name: dto.name ?? `Group ${groupCreated.id}`,
+                        description: dto.description ?? `Group chat created by user ${requester.username}.`,
                     });
                     // Add the requester to the chat
-                    await this.membersService.addUserToChat(requesterId, chatId);
+                    await this.membersService.addUserToChat(requester, groupCreated);
                     // Add the requester as creator of the chat
-                    await this.membersService.updateMemberRole(requesterId, chatId, 'creator');
+                    await this.membersService.updateMemberRole(requester, groupCreated, 'creator');
                     // Add all users to the chat
-                    for (const userId of usersToAdd) {
-                        await this.membersService.addUserToChat(userId, chatId);
+                    for (const uid of uids) {
+                        const u = await this.usersService.findById(uid);
+                        if (!u) throw new NotFoundException(`User with ID ${uid} not found`);
+                        await this.membersService.addUserToChat(u, groupCreated);
                     }
+                    chatId = groupCreated.id; // Get the ID of the created chat
                     break;
                 // If the chat type is not valid, throw a bad request exception
                 default:
@@ -139,24 +130,24 @@ export class ChatsController {
                         statusCode: 400,
                         message: 'Invalid chat type. Use "individual" or "group"',
                     });
-                }
-                // If the chat was created successfully, return it
-                // Fetch the chat with its members
-                const chat = await this.chatsService.findById(chatId);
-                return res.status(201).json({
-                    statusCode: 201,
-                    message: 'Group chat created successfully',
-                    chat,
-                });
-            } catch (error) {
-                if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
-                    return res.status(error.getStatus()).json(error.getResponse());
-                }
-                // If error is not handled by service, return 500
-                return res.status(500).json({
-                    statusCode: 500,
-                    message: 'Internal server error',
-                });
             }
+            // If the chat was created successfully, return it
+            // Fetch the chat with its members
+            const chat = await this.chatsService.findById(chatId);
+            return res.status(201).json({
+                statusCode: 201,
+                message: 'Chat created successfully',
+                chat,
+            });
+        } catch (error) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
         }
+    }
 }
