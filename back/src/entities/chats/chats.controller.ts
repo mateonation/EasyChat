@@ -94,13 +94,24 @@ export class ChatsController {
                 // Create a group chat
                 // A group chat can have multiple members and can be created by any user
                 case 'group':
-                    if (dto.users.length < 2) throw new BadRequestException('You must provide at least two user IDs to create a group chat');
+                    if (dto.users.length < 1) throw new BadRequestException('You must provide at least one user ID to create a group chat');
                     const usersToAdd = dto.users;
                     // Check one by one if the users provided on the body exist
                     // If any user does not exist, throw a NotFoundException
+                    // If any user provided in the request is the requester, remove it from the list
                     const requester = await this.usersService.findById(requesterId);
                     if (!requester) throw new NotFoundException(`User with ID ${req.session.user.id} not found`);
                     for (const userId of usersToAdd) {
+                        // Check if the user is the requester
+                        if (userId == requesterId) {
+                            // Remove the requester from the list of users to add
+                            usersToAdd.splice(usersToAdd.indexOf(userId), 1);
+                            // Check if after removing the requester, there are still users to add
+                            // If not, throw a BadRequestException
+                            // This is to prevent the user from creating a group chat with themselves
+                            if (usersToAdd.length === 0) throw new BadRequestException('You cannot create a group chat with yourself.');
+                            continue;
+                        }
                         // Check if the user exists
                         if (!(await this.usersService.findById(userId))) throw new NotFoundException(`User with ID ${userId} not found`);
                     }
