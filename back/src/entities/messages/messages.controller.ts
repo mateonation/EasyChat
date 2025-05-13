@@ -66,7 +66,7 @@ export class MessagesController {
                 throw new NotFoundException('Message not found');
             }
             // If user requesting the deletion is not the sender of the message, throw an error
-            if (message.senderId !== requesterId) {
+            if (message.user.id !== requesterId) {
                 throw new ForbiddenException('You can only delete your own messages');
             }
             // Delete message

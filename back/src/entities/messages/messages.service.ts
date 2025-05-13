@@ -35,8 +35,8 @@ export class MessagesService {
         // Create a new message
         const message = this.messageRepo.create({
             content: dto.content,
-            chatId: dto.chatId,
-            senderId,
+            chat: { id: dto.chatId },
+            user: { id: senderId },
         });
 
         // Save message into DB

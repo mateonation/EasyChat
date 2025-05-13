@@ -53,7 +53,10 @@ export class UsersService {
     }
 
     // Find user by their ID
-    async findById(id: number): Promise<UserResponseDto | null> {
+    // Return with UserResponseDto
+    async findById(
+        id: number
+    ): Promise<UserResponseDto | null> {
         const user = await this.usersRepo.findOne({ where: { id }, relations: ['roles'] });
         if (!user) return null;
         return UserResponseDto.fromUser(user);

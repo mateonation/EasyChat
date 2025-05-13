@@ -43,7 +43,6 @@ export class ChatsController {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
             // If error is not handled by service, return 500
-            console.error(error);
             return res.status(500).json({
                 statusCode: 500,
                 message: 'Internal server error',
