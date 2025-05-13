@@ -199,14 +199,16 @@ export class ChatsController {
                 if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
                 await this.membersService.addUserToChat(user, chat);
             }
-
+            // Fetch the chat with its members
+            const chatWithMembers = await this.chatsService.findById(chatId);
+            // Return the chat with its members
             return res.status(200).json({
                 statusCode: 200,
                 message: 'Members added successfully',
-                chat,
+                chatWithMembers,
             });
         } catch (error) {
-            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
             // If error is not handled by service, return 500
