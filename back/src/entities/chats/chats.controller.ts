@@ -152,16 +152,19 @@ export class ChatsController {
         }
     }
 
-    // Add a member to a group chat
+    // Add members to a group chat
     @Post(':chatId/members/add')
     @Roles('user')
-    async addMemberToGroup(
+    async addToGroup(
         @Param('chatId') chatId: number,
         @Body() dto: AddMembersDto,
         @Req() req: Request,
         @Res() res: Response,
     ) {
         try{
+            // Validate the request body
+            if (!dto.userIds || dto.userIds.length === 0) throw new BadRequestException('At least one user ID is required to add members to the chat');
+
             // Check if the user in session exists
             if (!req.session.user?.id) return;
             const requester = await this.usersService.findById(req.session.user.id);
