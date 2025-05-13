@@ -1,1 +1,5 @@
-export type ChatMemberRole = 'creator' | 'admin' | 'member';
+export enum ChatMemberRole {
+    CREATOR = 'creator',
+    ADMIN = 'admin',
+    MEMBER = 'member',
+}
