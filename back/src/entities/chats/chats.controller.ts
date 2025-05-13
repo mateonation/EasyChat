@@ -20,7 +20,7 @@ export class ChatsController {
     ) { }
 
     // Get a list of all chats for the authenticated user
-    @Get('')
+    @Get('my')
     @Roles('user')
     async getChatsAuthUser(
         @Res() res: Response,
