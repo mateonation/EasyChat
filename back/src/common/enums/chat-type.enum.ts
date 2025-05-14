@@ -1,4 +1,4 @@
 export enum ChatType {
-    PRIVATE = 'creator',
-    GROUP = 'admin',
+    PRIVATE = 'private',
+    GROUP = 'group',
 }
