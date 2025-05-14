@@ -8,6 +8,7 @@ import { NotFoundException } from 'src/errors/notFoundException';
 import { ChatResponseDto } from './dto/chat-response.dto';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UserResponseDto } from '../users/dto/user-response.dto';
+import { ChatType } from 'src/common/enums/chat-type.enum';
 
 @Injectable()
 export class ChatsService {
@@ -59,8 +60,8 @@ export class ChatsService {
         chat.name = chatData.name || chat.name; // Update name if provided
         chat.description = chatData.description || chat.description; // Update description if provided
         // Set the chat as a group chat if it is not already
-        if (!chat.isGroup) {
-            chat.isGroup = true;
+        if (chat.type !== 'group') {
+            chat.type = ChatType.GROUP;
         }
 
         // Save the updated chat to the database
@@ -93,14 +94,14 @@ export class ChatsService {
         // Check if both users are actual members of an already existing individual chat
         // This query builder only returns an existing individual chat where both users are already members
         // It checks for the following:
-        // 1. The chat is not a group chat (isGroup = false)
+        // 1. The chat is not a group chat (type = 'private')
         // 2. Both users are members of the chat
         // 3. The chat has exactly two members (the two users)
         const select = await this.chatRepo
             .createQueryBuilder('chat')
             .innerJoin('chat.members', 'member')
             .select('chat.id', 'chatId')
-            .where('chat.isGroup = false')
+            .where("chat.type = 'private'")
             .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1.id, user2.id] })
             .groupBy('chat.id')
             .having('COUNT(DISTINCT member.userId) = 2')
