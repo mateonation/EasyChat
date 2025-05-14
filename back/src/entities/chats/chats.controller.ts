@@ -180,7 +180,7 @@ export class ChatsController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
             
             // Check if it's a group
-            if (!chat.isGroup) throw new ConflictException('You can only add members to group chats');
+            if (!chat.type || chat.type !== 'group') throw new ConflictException('You can only add members to group chats');
 
             // Check if the requester is a creator or admin of the chat
             if (member.role === 'member') throw new ForbiddenException('You are not allowed to add members to this chat');
@@ -244,7 +244,7 @@ export class ChatsController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Check if it's a group
-            if (!chat.isGroup) throw new ConflictException('You can only remove members from group chats');
+            if (!chat.type || chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
 
             // Check if the requester is a creator or admin of the chat
             if (member.role === 'member') throw new ForbiddenException('You are not allowed to remove members from this chat');
@@ -318,7 +318,7 @@ export class ChatsController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Check if it's a group chat
-            if (!chat.isGroup) throw new ConflictException('You can only edit roles in group chats');
+            if (!chat.type || chat.type !== 'group') throw new ConflictException('You can only edit roles in group chats');
 
             // Check if the requester is a creator or admin of the chat
             if (member.role === 'member') throw new ForbiddenException('You are not allowed to edit roles in this chat');
