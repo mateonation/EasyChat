@@ -1,10 +1,11 @@
 import { MemberResponseDto } from "../chatmembers/dto/member-response.dto";
 import { Chat } from "../chat.entity";
+import { ChatType } from "src/common/enums/chat-type.enum";
 
 export class ChatResponseDto {
     id: number;
     creationDate: Date;
-    isGroup: boolean;
+    type: ChatType;
     name: string;
     description: string;
     lastMessagePreview?: string;
@@ -13,7 +14,7 @@ export class ChatResponseDto {
     constructor(chat: Chat) {
         this.id = chat.id;
         this.creationDate = chat.creationDate;
-        this.isGroup = chat.isGroup;
+        this.type = chat.type;
         this.name = chat.name;
         this.description = chat.description;
         this.members = MemberResponseDto.fromMembers(chat.members);
@@ -23,7 +24,7 @@ export class ChatResponseDto {
         let name: string | undefined = chat.name;
 
         // Set the other member's username as the name of the chat if it's not a group chat and the current user ID is provided
-        if (!chat.isGroup && currentUserId) {
+        if (chat.type === ChatType.GROUP && currentUserId) {
             const otherMember = chat.members.find(m => m.user.id !== currentUserId);
             name = otherMember?.user.username ?? 'Unknown';
         }
@@ -38,7 +39,8 @@ export class ChatResponseDto {
             const sender = lastMessage.user;
             const senderIsCurrentUser = sender.id === currentUserId;
 
-            if(chat.isGroup) {
+            // Set the last message preview based on the chat type and sender
+            if(chat.type === ChatType.GROUP) {
                 lastMessagePreview = senderIsCurrentUser
                     ? `You: ${lastMessage.content}`
                     : `${sender.username}: ${lastMessage.content}`;
@@ -52,7 +54,7 @@ export class ChatResponseDto {
         return {
             id: chat.id,
             creationDate: chat.creationDate,
-            isGroup: chat.isGroup,
+            type: chat.type,
             name,
             description: chat.description,
             lastMessagePreview,
