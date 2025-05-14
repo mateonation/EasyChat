@@ -7,7 +7,11 @@ export class Message {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.messages, { onDelete: "CASCADE", eager: true })
+    @ManyToOne(() => User, (user) => user.messages, {
+        nullable: true,
+        onDelete: "SET NULL",
+        eager: true,
+    })
     user: User; // User who sent the message
 
     @ManyToOne(() => Chat, (chat) => chat.messages, { onDelete: "CASCADE" })
