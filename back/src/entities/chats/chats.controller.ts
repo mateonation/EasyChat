@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -278,6 +278,68 @@ export class ChatsController {
                 message: `${userToRemove.username} removed from chat ${chat.name}`,
                 chatWithMembers,
             });
+        } catch (error) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
+
+    // Edit the user role in a group chat
+    @Patch(':chatId/:userId/role')
+    @Roles('user')
+    async editRole(
+        @Param('chatId') chatId: number,
+        @Param('userId') userId: number,
+        @Body('role') role: string,
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+        try {
+            // Check if the user in session exists
+            if (!req.session.user?.id) return;
+            const requester = await this.usersService.findById(req.session.user.id);
+            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
+
+            // Check if the role is valid
+            if (!role || !['admin', 'member'].includes(role)) throw new BadRequestException('Role is required and must be either "admin" or "member"');
+
+            // Check if the chat exists
+            const chat = await this.chatsService.findById(chatId);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+
+            // Check if the requester is a member of the chat
+            const member = await this.membersService.findChatMember(requester, chat);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+            // Check if it's a group chat
+            if (!chat.isGroup) throw new ConflictException('You can only edit roles in group chats');
+
+            // Check if the requester is a creator or admin of the chat
+            if (member.role === 'member') throw new ForbiddenException('You are not allowed to edit roles in this chat');
+
+            // Check if the user to be edited exists
+            const userToEdit = await this.usersService.findById(userId);
+            if (!userToEdit) throw new NotFoundException(`User with ID ${userId} not found`);
+
+            // Check if the user to be edited is a member of the chat
+            const memberToEdit = await this.membersService.findChatMember(userToEdit, chat);
+            if (!memberToEdit) throw new ConflictException(`${userToEdit.username} is not a member of this chat`);
+
+            // Check if the user to be edited is the creator of the chat
+            if (memberToEdit.role === 'creator') throw new ConflictException('You cannot edit the role of the creator of the chat');
+
+            // Edit the user role
+            await this.membersService.updateMemberRole(userToEdit, chat, role as ChatMemberRole);
+            return res.status(200).json({
+                statusCode: 200,
+                message: `${userToEdit.username} role updated to ${role}`,
+            });             
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
                 return res.status(error.getStatus()).json(error.getResponse());
