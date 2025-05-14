@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ChatMember } from "./chatmembers/chatmember.entity";
 import { Message } from "../messages/message.entity";
+import { ChatType } from "src/common/enums/chat-type.enum";
 
 @Entity()
 export class Chat {
@@ -11,10 +12,12 @@ export class Chat {
     creationDate: Date;
 
     @Column({
-        type: 'boolean',
-        default: false,
+        type: 'enum',
+        enum: ChatType,
+        default: ChatType.PRIVATE,
+        nullable: false,
     })
-    isGroup: boolean;
+    type: ChatType; // Type of chat (private by default). Private chats are one-to-one, group chats can have multiple members.
 
     @Column({ 
         type: "text",
