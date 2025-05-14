@@ -21,18 +21,11 @@ export class MessagesService {
     ) {}
 
     // Send message to a chat
-    async sendMessage(senderId: number, dto: SendMessageDto): Promise<Message> {
-        // Check if the user is member of the chat
-        const member = await this.memberRepo.findOne({ 
-            where: { chat: { id: dto.chatId }, user: { id: senderId } }, 
-        });
-
-        // If the user is not a member of the chat, throw an error
-        if (!member) {
-            throw new ForbiddenException('You are not a member of this chat');
-        }
-
-        // Create a new message
+    async sendMessage(
+        dto: SendMessageDto,
+        senderId?: number,
+    ): Promise<Message> {
+        if (!senderId) senderId = undefined;
         const message = this.messageRepo.create({
             content: dto.content,
             chat: { id: dto.chatId },
