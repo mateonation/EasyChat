@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../users/user.entity";
 import { Chat } from "../chats/chat.entity";
+import { MessageType } from "src/common/enums/message-type.enum";
 
 @Entity()
 export class Message {
@@ -26,6 +27,13 @@ export class Message {
         type: "text",
     })
     content: string; // Message content
+
+    @Column({
+        type: "enum",
+        enum: MessageType,
+        default: MessageType.TEXT,
+    })
+    type: MessageType; // Type of the message (text, image, video, etc.)
 
     @CreateDateColumn()
     sentDate: Date; // Date and timestamp when the message was sent
