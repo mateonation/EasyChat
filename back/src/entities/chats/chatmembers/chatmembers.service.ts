@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { ChatMember } from './chatmember.entity';
 import { Chat } from '../../chats/chat.entity';
 import { User } from '../../users/user.entity';
@@ -64,5 +64,21 @@ export class ChatmembersService {
         const member = await this.memberRepo.findOne({ where: { user: { id: userId }, chat: { id: chatId } } });
         if (!member) return;
         await this.memberRepo.remove(member);
+    }
+
+    // Function to get all members of a chat except one
+    async getAllMembersExceptOne(
+        chatId: number,
+        userId: number,
+    ): Promise<ChatMember[]> {
+        const members = await this.memberRepo.find({
+            where: { 
+                chat: { id: chatId }, 
+                user: { id: Not(userId) } 
+            },
+            order: { joinDate: 'ASC' },
+            relations: ['user'],
+        });
+        return members;
     }
 }
