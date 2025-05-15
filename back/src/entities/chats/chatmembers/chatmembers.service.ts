@@ -5,8 +5,6 @@ import { ChatMember } from './chatmember.entity';
 import { Chat } from '../../chats/chat.entity';
 import { User } from '../../users/user.entity';
 import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
-import { UserResponseDto } from 'src/entities/users/dto/user-response.dto';
-import { ChatResponseDto } from '../dto/chat-response.dto';
 
 @Injectable()
 export class ChatmembersService {
@@ -21,33 +19,33 @@ export class ChatmembersService {
 
     // Function to get a member from a chat
     async findChatMember(
-        user: UserResponseDto,
-        chat: ChatResponseDto,
+        userId: number,
+        chatId: number,
     ): Promise<ChatMember | null> {
         return this.memberRepo.findOne({
-            where: { user: { id: user.id }, chat: { id: chat.id } },
+            where: { user: { id: userId }, chat: { id: chatId } },
         });
     }
 
     // Function to add a user to a chat
     async addUserToChat(
-        user: UserResponseDto,
-        chat: Chat | ChatResponseDto,
+        userId: number,
+        chatId: number,
     ): Promise<void> {
-        const userEntity = await this.userRepo.findOne({ where: { id: user.id } });
-        const chatEntity = await this.chatRepo.findOne({ where: { id: chat.id } });
-        if (!userEntity || !chatEntity) return;
-        const member = this.memberRepo.create({ user: userEntity, chat: chatEntity });
+        const user = await this.userRepo.findOne({ where: { id: userId } });
+        const chat = await this.chatRepo.findOne({ where: { id: chatId } });
+        if (!user || !chat) return;
+        const member = this.memberRepo.create({ user: user, chat: chat });
         await this.memberRepo.save(member);
     }
 
     // Function to update the role of a user in a chat
     async updateMemberRole(
-        user: UserResponseDto,
-        chat: Chat | ChatResponseDto,
+        userId: number,
+        chatId: number,
         role: ChatMemberRole,
     ) {
-        const member = await this.memberRepo.findOne({ where: { user: { id: user.id }, chat: { id: chat.id } } });
+        const member = await this.memberRepo.findOne({ where: { user: { id: userId }, chat: { id: chatId } } });
         if (!member) return null;
         member.role = role;
         await this.memberRepo.save(member);
@@ -55,10 +53,10 @@ export class ChatmembersService {
 
     // Function to remove a user from a chat
     async removeUserFromChat(
-        user: UserResponseDto,
-        chat: Chat | ChatResponseDto,
+        userId: number,
+        chatId: number,
     ): Promise<void> {
-        const member = await this.memberRepo.findOne({ where: { user: { id: user.id }, chat: { id: chat.id } } });
+        const member = await this.memberRepo.findOne({ where: { user: { id: userId }, chat: { id: chatId } } });
         if (!member) return;
         await this.memberRepo.remove(member);
     }
