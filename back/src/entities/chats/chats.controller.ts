@@ -93,8 +93,8 @@ export class ChatsController {
                     // If not, create a new chat
                     const chatCreated = await this.chatsService.createChat();
                     // Add both users to the chat
-                    await this.membersService.addUserToChat(requester, chatCreated);
-                    await this.membersService.addUserToChat(userToCreateChatWith, chatCreated);
+                    await this.membersService.addUserToChat(requester.id, chatCreated.id);
+                    await this.membersService.addUserToChat(userToCreateChatWith.id, chatCreated.id);
                     chatId = chatCreated.id; // Get the ID of the created chat
                     break;
                 // Create a group chat
@@ -115,14 +115,14 @@ export class ChatsController {
                         description: dto.description ?? `Group chat created by user ${requester.username}.`,
                     });
                     // Add the requester to the chat
-                    await this.membersService.addUserToChat(requester, groupCreated);
+                    await this.membersService.addUserToChat(requester.id, groupCreated.id);
                     // Add the requester as creator of the chat
-                    await this.membersService.updateMemberRole(requester, groupCreated, ChatMemberRole.CREATOR);
+                    await this.membersService.updateMemberRole(requester.id, groupCreated.id, ChatMemberRole.CREATOR);
                     // Add all users to the chat
                     for (const uid of uids) {
                         const u = await this.usersService.findById(uid);
                         if (!u) throw new NotFoundException(`User with ID ${uid} not found`);
-                        await this.membersService.addUserToChat(u, groupCreated);
+                        await this.membersService.addUserToChat(u.id, groupCreated.id);
                     }
                     chatId = groupCreated.id; // Get the ID of the created chat
                     break;
@@ -176,7 +176,7 @@ export class ChatsController {
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
             // Check if the requester is a member of the chat
-            const member = await this.membersService.findChatMember(requester, chat);
+            const member = await this.membersService.findChatMember(requester.id, chat.id);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
             
             // Check if it's a group
@@ -190,7 +190,7 @@ export class ChatsController {
                 const user = await this.usersService.findById(uid);
                 if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
 
-                const alreadyAMember = await this.membersService.findChatMember(user, chat);
+                const alreadyAMember = await this.membersService.findChatMember(user.id, chat.id);
                 if (alreadyAMember) throw new ConflictException(`${user.username} (ID: ${uid}) is already a member of this chat`);
             }
 
@@ -198,7 +198,7 @@ export class ChatsController {
             for (const uid of dto.userIds) {
                 const user = await this.usersService.findById(uid);
                 if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
-                await this.membersService.addUserToChat(user, chat);
+                await this.membersService.addUserToChat(user.id, chat.id);
             }
             // Fetch the chat with its members
             const chatWithMembers = await this.chatsService.findById(chatId);
@@ -240,7 +240,7 @@ export class ChatsController {
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
             // Check if the requester is a member of the chat
-            const member = await this.membersService.findChatMember(requester, chat);
+            const member = await this.membersService.findChatMember(requester.id, chat.id);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Check if it's a group
@@ -254,7 +254,7 @@ export class ChatsController {
             if (!userToRemove) throw new NotFoundException(`User with ID ${userId} not found`);
 
             // Check if the user to be removed is a member of the chat
-            const memberToRemove = await this.membersService.findChatMember(userToRemove, chat);
+            const memberToRemove = await this.membersService.findChatMember(userToRemove.id, chat.id);
             if (!memberToRemove) throw new ConflictException(`${userToRemove.username} (ID: ${userId}) is not a member of this chat`);
 
             // Check if the user to be removed is the creator of the chat
@@ -266,7 +266,7 @@ export class ChatsController {
             // Allow user removal if the requester is an admin removing a member or the requester is a creator
             if (member.role === 'admin' && memberToRemove.role === 'member' || member.role === 'creator') {
                 // Remove the user from the chat
-                await this.membersService.removeUserFromChat(userToRemove, chat);
+                await this.membersService.removeUserFromChat(userToRemove.id, chat.id);
             }
             
             // Fetch the chat with its members
@@ -314,7 +314,7 @@ export class ChatsController {
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
             // Check if the requester is a member of the chat
-            const member = await this.membersService.findChatMember(requester, chat);
+            const member = await this.membersService.findChatMember(requester.id, chat.id);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Check if it's a group chat
@@ -328,14 +328,14 @@ export class ChatsController {
             if (!userToEdit) throw new NotFoundException(`User with ID ${userId} not found`);
 
             // Check if the user to be edited is a member of the chat
-            const memberToEdit = await this.membersService.findChatMember(userToEdit, chat);
+            const memberToEdit = await this.membersService.findChatMember(userToEdit.id, chat.id);
             if (!memberToEdit) throw new ConflictException(`${userToEdit.username} is not a member of this chat`);
 
             // Check if the user to be edited is the creator of the chat
             if (memberToEdit.role === 'creator') throw new ConflictException('You cannot edit the role of the creator of the chat');
 
             // Edit the user role
-            await this.membersService.updateMemberRole(userToEdit, chat, role as ChatMemberRole);
+            await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
             return res.status(200).json({
                 statusCode: 200,
                 message: `${userToEdit.username} role updated to ${role}`,
