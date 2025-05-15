@@ -18,13 +18,18 @@ export class ChatmembersService {
     ) { }
 
     // Function to get a member from a chat
+    // This is needed to check if a user is a member of a chat
+    // It DOES NOT RETURN the chat id or user id
+    // It only returns the member object
     async findChatMember(
         userId: number,
         chatId: number,
     ): Promise<ChatMember | null> {
-        return this.memberRepo.findOne({
+        const user = this.memberRepo.findOne({
             where: { user: { id: userId }, chat: { id: chatId } },
         });
+        if (!user) return null;
+        return user;
     }
 
     // Function to add a user to a chat
