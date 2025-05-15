@@ -7,6 +7,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { ForbiddenException } from 'src/errors/forbiddenException';
 import { ChatsService } from '../chats/chats.service';
 import { NotFoundException } from 'src/errors/notFoundException';
+import { ChatmembersService } from './../chats/chatmembers/chatmembers.service';
 
 @UseGuards(RolesGuard)
 @Controller('api/messages')
@@ -14,6 +15,7 @@ export class MessagesController {
     constructor(
         private readonly messagesService: MessagesService,
         private readonly chatsService: ChatsService,
+        private readonly membersService: ChatmembersService,
     ) {}
 
     @Post('send')
@@ -25,12 +27,18 @@ export class MessagesController {
     ) {
         try {
             if (!req.session.user?.id) return;
+
             // Check if chat exists
             const chatDoesExist = await this.chatsService.findById(dto.chatId);
             if (!chatDoesExist) {
                 throw new NotFoundException('Chat not found');
             }
-            const message = await this.messagesService.sendMessage(req.session.user.id, dto);
+            // Check if user is a member of the chat
+            const member = await this.membersService.findChatMember(req.session.user.id, dto.chatId);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+            // Send the message and return it
+            const message = await this.messagesService.sendMessage(dto, member.id);
             return res.status(201).json({
                 statusCode: 201,
                 message: 'Message sent successfully',
