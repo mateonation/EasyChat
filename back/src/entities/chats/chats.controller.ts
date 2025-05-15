@@ -114,10 +114,10 @@ export class ChatsController {
                         name: dto.name ?? `Group ${groupCreated.id}`,
                         description: dto.description ?? `Group chat created by user ${requester.username}.`,
                     });
-                    // Add the requester to the chat
+                    // Add the requester to the group
                     await this.membersService.addUserToChat(requester.id, groupCreated.id);
-                    // Add the requester as creator of the chat
-                    await this.membersService.updateMemberRole(requester.id, groupCreated.id, ChatMemberRole.CREATOR);
+                    // Add the requester as owner of the group
+                    await this.membersService.updateMemberRole(requester.id, groupCreated.id, ChatMemberRole.OWNER);
                     // Add all users to the chat
                     for (const uid of uids) {
                         const u = await this.usersService.findById(uid);
@@ -221,7 +221,7 @@ export class ChatsController {
     }
 
     // Remove a member from a group chat
-    @Delete(':chatId/:userId/rm')
+    @Delete(':chatId/member/:userId/rm')
     @Roles('user')
     async removeFromGroup(
         @Param('chatId') chatId: number,
@@ -230,53 +230,82 @@ export class ChatsController {
         @Res() res: Response,
     ) {
         try {
-            // Check if the user in session exists
+            // User in session must exist and be a member of the group chat
             if (!req.session.user?.id) return;
             const requester = await this.usersService.findById(req.session.user.id);
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
-
-            // Check if the chat exists
-            const chat = await this.chatsService.findById(chatId);
-            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
-
-            // Check if the requester is a member of the chat
-            const member = await this.membersService.findChatMember(requester.id, chat.id);
+            const member = await this.membersService.findChatMember(requester.id, chatId);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
-            // Check if it's a group
-            if (!chat.type || chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
+            // Chat must exist and be a group chat
+            const chat = await this.chatsService.findById(chatId);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+            if (chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
 
-            // Check if the requester is a creator or admin of the chat
-            if (member.role === 'member') throw new ForbiddenException('You are not allowed to remove members from this chat');
-
-            // Check if the user to be removed exists
+            // User to be removed must exist and be a member of the group chat
             const userToRemove = await this.usersService.findById(userId);
             if (!userToRemove) throw new NotFoundException(`User with ID ${userId} not found`);
-
-            // Check if the user to be removed is a member of the chat
             const memberToRemove = await this.membersService.findChatMember(userToRemove.id, chat.id);
             if (!memberToRemove) throw new ConflictException(`${userToRemove.username} (ID: ${userId}) is not a member of this chat`);
 
-            // Check if the user to be removed is the creator of the chat
-            if (memberToRemove.role === 'creator') throw new ConflictException('You cannot remove the creator of the chat');
+            // If an user is trying to remove themselves from the group chat, let them do it
+            if (userToRemove.id === requester.id) {
 
-            // Check if the user to be removed is the requester
-            if (userToRemove.id === requester.id) throw new ConflictException('You cannot remove yourself from the chat');
+                // Check if the user removing itself is the owner of the group chat
+                if (member.role === 'owner') {
 
-            // Allow user removal if the requester is an admin removing a member or the requester is a creator
-            if (member.role === 'admin' && memberToRemove.role === 'member' || member.role === 'creator') {
-                // Remove the user from the chat
+                    // Get all other members of the group chat
+                    const otherMembers = await this.membersService.getAllMembersExceptOne(chat.id, requester.id);
+
+                    // If there are other members, assign the owner role to the oldest one
+                    if (otherMembers.length > 0) {
+
+                        // Get the first one from the array (it's the oldest one as it was ordered by the join date in the service)
+                        const oldestMember = otherMembers[0];
+
+                        // Update their role to owner
+                        await this.membersService.updateMemberRole(oldestMember.user.id, chat.id, ChatMemberRole.OWNER);
+                    
+                    // If there are no other members, delete chat
+                    } else {
+                        // If there are no other members, delete the chat
+                        await this.chatsService.deleteChatById(chat.id);
+                        return res.status(200).json({
+                            statusCode: 200,
+                            message: `"${chat.name}" group was deleted as it had no other members`,
+                        });
+                    }
+                }
+                // Finally, let the user leave the chat
                 await this.membersService.removeUserFromChat(userToRemove.id, chat.id);
-            }
-            
-            // Fetch the chat with its members
-            const chatWithMembers = await this.chatsService.findById(chatId);
 
-            // Return the chat with its members
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: `You left the group "${chat.name}"`,
+                });
+            }
+
+            // Check if the member removal can be done
+            switch (member.role) {
+                // If requester is owner, removal shall be made
+                case 'owner':
+                    break;
+                // Admins can remove anyone but the owner
+                case 'admin':
+                    if(memberToRemove.role === 'owner') throw new ForbiddenException('You are not allowed to kick the owner out of the group')
+                    break;
+                // Other members are not allowed to remove other ones
+                default:
+                    if(memberToRemove.role === 'owner') throw new ForbiddenException("You don't have enough permission to kick members out of this group")
+                    break;
+            }
+
+            // Remove member from the chat
+            await this.membersService.removeUserFromChat(userToRemove.id, chat.id);
+            
             return res.status(200).json({
                 statusCode: 200,
                 message: `${userToRemove.username} removed from chat ${chat.name}`,
-                chatWithMembers,
             });
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
@@ -332,7 +361,7 @@ export class ChatsController {
             if (!memberToEdit) throw new ConflictException(`${userToEdit.username} is not a member of this chat`);
 
             // Check if the user to be edited is the creator of the chat
-            if (memberToEdit.role === 'creator') throw new ConflictException('You cannot edit the role of the creator of the chat');
+            if (memberToEdit.role === 'owner') throw new ConflictException('You cannot edit the role of the creator of the chat');
 
             // Edit the user role
             await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
