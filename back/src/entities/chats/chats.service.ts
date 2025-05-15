@@ -130,4 +130,14 @@ export class ChatsService {
         await this.chatRepo.save(chat);
         return chat;
     }
+
+    // Delete chat using it's ID
+    async deleteChatById(
+        chatId: number,
+    ): Promise<void> {
+        // Find the chat by ID & delete it the chat from the database
+        const chat = await this.chatRepo.findOne({ where: { id: chatId } });
+        if (!chat) return;
+        await this.chatRepo.delete(chatId);
+    }
 }
