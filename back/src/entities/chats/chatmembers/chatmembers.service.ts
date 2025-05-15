@@ -49,9 +49,9 @@ export class ChatmembersService {
         userId: number,
         chatId: number,
         role: ChatMemberRole,
-    ) {
+    ): Promise<void> {
         const member = await this.memberRepo.findOne({ where: { user: { id: userId }, chat: { id: chatId } } });
-        if (!member) return null;
+        if (!member) return;
         member.role = role;
         await this.memberRepo.save(member);
     }
