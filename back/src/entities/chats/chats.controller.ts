@@ -330,44 +330,56 @@ export class ChatsController {
         @Res() res: Response,
     ) {
         try {
-            // Check if the user in session exists
+            // User in session must exist and be a member of the group chat
             if (!req.session.user?.id) return;
             const requester = await this.usersService.findById(req.session.user.id);
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
-
-            // Check if the role is valid
-            if (!role || !['admin', 'member'].includes(role)) throw new BadRequestException('Role is required and must be either "admin" or "member"');
-
-            // Check if the chat exists
-            const chat = await this.chatsService.findById(chatId);
-            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
-
-            // Check if the requester is a member of the chat
-            const member = await this.membersService.findChatMember(requester.id, chat.id);
+            const member = await this.membersService.findChatMember(requester.id, chatId);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
-            // Check if it's a group chat
-            if (!chat.type || chat.type !== 'group') throw new ConflictException('You can only edit roles in group chats');
+            // Chat must exist and be a group chat
+            const chat = await this.chatsService.findById(chatId);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+            if (chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
 
-            // Check if the requester is a creator or admin of the chat
-            if (member.role === 'member') throw new ForbiddenException('You are not allowed to edit roles in this chat');
-
-            // Check if the user to be edited exists
+            // User to be removed must exist and be a member of the group chat
             const userToEdit = await this.usersService.findById(userId);
             if (!userToEdit) throw new NotFoundException(`User with ID ${userId} not found`);
-
-            // Check if the user to be edited is a member of the chat
             const memberToEdit = await this.membersService.findChatMember(userToEdit.id, chat.id);
-            if (!memberToEdit) throw new ConflictException(`${userToEdit.username} is not a member of this chat`);
+            if (!memberToEdit) throw new ConflictException(`${userToEdit.username} (ID: ${userId}) is not a member of this chat`);
 
-            // Check if the user to be edited is the creator of the chat
-            if (memberToEdit.role === 'owner') throw new ConflictException('You cannot edit the role of the creator of the chat');
+            // Options if the user in request is changing it's role inside the group
+            if(requester.id === userToEdit.id) {
+                switch (memberToEdit.role) {
+                    // Owners cannot edit their own role manually
+                    case 'owner':
+                        throw new ForbiddenException('You are the owner of the group, changing your role in the group is not possible');
+                    // Admins only can downgrade their role to member
+                    case 'admin':
+                        if(role != ChatMemberRole.MEMBER) throw new ForbiddenException('You can only downgrade your role to member');
+                        break;
+                    // Members are not allowed to edit their own role
+                    case 'member':
+                        throw new ForbiddenException('You are not allowed to change your role in the group')
+                }
+                // Let the requester change it's role in group
+                await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: `You have changed your role in "${chat.name}" to "${role}"`,
+                });
+            }
 
-            // Edit the user role
+            // Role to be given must not be owner
+            if(role === ChatMemberRole.OWNER) throw new ForbiddenException("You can't assign 'owner' role to just anyone")
+            
+            // Prevent role change if the requester is a member
+            if(member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to edit someone else's role");
+
             await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
             return res.status(200).json({
                 statusCode: 200,
-                message: `${userToEdit.username} role updated to ${role}`,
+                message: `You have changed the role of "${userToEdit.username}" in "${chat.name}" to "${role}"`,
             });             
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
