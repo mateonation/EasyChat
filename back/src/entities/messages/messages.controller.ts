@@ -33,18 +33,20 @@ export class MessagesController {
             if (!chatDoesExist) {
                 throw new NotFoundException('Chat not found');
             }
+
             // Check if user is a member of the chat
             const member = await this.membersService.findChatMember(req.session.user.id, dto.chatId);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Send the message and return it
-            const message = await this.messagesService.sendMessage(dto, member.id);
+            const message = await this.messagesService.sendMessage(dto, req.session.user.id);
             return res.status(201).json({
                 statusCode: 201,
                 message: 'Message sent successfully',
                 data: message,
             });
         } catch (error) {
+            console.log(error);
             // Handle conflict error
             if (error instanceof ForbiddenException || error instanceof NotFoundException) {
                 return res.status(error.getStatus()).json(error.getResponse());
