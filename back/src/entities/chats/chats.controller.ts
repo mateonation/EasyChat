@@ -35,7 +35,14 @@ export class ChatsController {
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
             // Get all chats for the user
             const chats = await this.chatsService.getChatsByUserId(requester.id);
-            // Return the list of chats
+            // If there are no chats for the user, return a message
+            if (!chats || chats.length === 0) {
+                return res.status(200).json({
+                    statusCode: 200,
+                    message: 'You have no chats yet',
+                });
+            }
+            // If there are chats, return them
             return res.status(200).json({
                 statusCode: 200,
                 message: 'Chats retrieved successfully',
