@@ -43,11 +43,7 @@ export class ChatsController {
                 });
             }
             // If there are chats, return them
-            return res.status(200).json({
-                statusCode: 200,
-                message: 'Chats retrieved successfully',
-                chats,
-            });
+            return res.status(200).json(chats);
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException) {
                 return res.status(error.getStatus()).json(error.getResponse());
