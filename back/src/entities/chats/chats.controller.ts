@@ -53,6 +53,35 @@ export class ChatsController {
         }
     }
 
+    // Get chat info by it's ID
+    @Get(':chatId')
+    @Roles('user')
+    async viewChat(
+        @Param('chatId') chatId: number,
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+        // Check if the user in session exists
+        if (!req.session.user?.id) return;
+        const requester = await this.usersService.findById(req.session.user.id);
+        if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
+
+        // Check if the chat exists
+        const chat = await this.chatsService.findById(chatId);
+        if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+
+        // Check if the requester is a member of the chat
+        const member = await this.membersService.findChatMember(requester.id, chat.id);
+        if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+        // Return chat with it's members
+        return res.status(200).json({
+            statusCode: 200,
+            message: 'Chat info',
+            chat,
+        })
+    }
+
     // Endpoint to create an individual chat between two users
     @Post('create/:typeChat')
     @Roles('user')
