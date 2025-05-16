@@ -8,7 +8,7 @@ import { BadRequestException } from 'src/errors/badRequestException';
 import { NotFoundException } from 'src/errors/notFoundException';
 import { UsersService } from '../users/users.service';
 import { ChatmembersService } from './chatmembers/chatmembers.service';
-import { CreateChatDto } from './dto/create-chat.dto';
+import { GroupParamsDto } from './dto/group-params.dto';
 import { AddMembersDto } from './chatmembers/dto/add-members.dto';
 import { ConflictException } from 'src/errors/conflictException';
 import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
@@ -89,7 +89,7 @@ export class ChatsController {
     @Post('create/:typeChat')
     @Roles('user')
     async newChat(
-        @Body() dto: CreateChatDto,
+        @Body() dto: GroupParamsDto,
         @Param('typeChat') typeChat: string,
         @Req() req: Request,
         @Res() res: Response,
@@ -142,7 +142,7 @@ export class ChatsController {
                     // Create a new chat
                     const groupCreated = await this.chatsService.createChat();
                     // Update chat with group chat properties given by the requester
-                    await this.chatsService.updateChat(groupCreated.id, {
+                    await this.chatsService.updateGroup(groupCreated.id, {
                         name: dto.name ?? `Group ${groupCreated.id}`,
                         description: dto.description ?? `Group chat created by user ${requester.username}.`,
                     });

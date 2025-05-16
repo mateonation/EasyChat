@@ -1,4 +1,4 @@
-export class CreateChatDto {
+export class GroupParamsDto {
     users: number[]; // Array of user IDs to be added to the chat
     name?: string;  // Only used in group chats
     description?: string; // Only used in group chats
@@ -9,11 +9,11 @@ export class CreateChatDto {
         this.description = description;
     }
 
-    static fromRequest(dto: CreateChatDto): CreateChatDto {
-        return new CreateChatDto(dto.users, dto.name, dto.description);
+    static fromRequest(dto: GroupParamsDto): GroupParamsDto {
+        return new GroupParamsDto(dto.users, dto.name, dto.description);
     }
 
-    static fromRequests(dto: CreateChatDto[]): CreateChatDto[] {
-        return dto.map(c => new CreateChatDto(c.users, c.name, c.description));
+    static fromRequests(dto: GroupParamsDto[]): GroupParamsDto[] {
+        return dto.map(c => new GroupParamsDto(c.users, c.name, c.description));
     }
 }
