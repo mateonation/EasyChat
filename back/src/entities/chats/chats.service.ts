@@ -6,7 +6,7 @@ import { ChatMember } from './chatmembers/chatmember.entity';
 import { User } from '../users/user.entity';
 import { NotFoundException } from 'src/errors/notFoundException';
 import { ChatResponseDto } from './dto/chat-response.dto';
-import { CreateChatDto } from './dto/create-chat.dto';
+import { GroupParamsDto } from './dto/group-params.dto';
 import { UserResponseDto } from '../users/dto/user-response.dto';
 import { ChatType } from 'src/common/enums/chat-type.enum';
 
@@ -45,10 +45,11 @@ export class ChatsService {
         return uniqueChats.map(chat => ChatResponseDto.fromChat(chat, userId));
     }
 
-    // Function that updates chat properties
-    async updateChat(
+    // Function to modify data of a group chat
+    // This is ONLY FOR GROUP CHATS, private ones are not allowed to be modified
+    async updateGroup(
         chatId: number,
-        chatData: Partial<CreateChatDto>,
+        chatData: Partial<GroupParamsDto>,
     ): Promise<Chat | null> {
         // Get the chat by ID
         const chat = await this.chatRepo.findOne({ where: { id: chatId } });
@@ -59,10 +60,9 @@ export class ChatsService {
         // Update the chat properties
         chat.name = chatData.name || chat.name; // Update name if provided
         chat.description = chatData.description || chat.description; // Update description if provided
+
         // Set the chat as a group chat if it is not already
-        if (chat.type !== 'group') {
-            chat.type = ChatType.GROUP;
-        }
+        if (chat.type !== 'group') chat.type = ChatType.GROUP;
 
         // Save the updated chat to the database
         await this.chatRepo.save(chat);
@@ -77,7 +77,7 @@ export class ChatsService {
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
             where: { id: chatId },
-            relations: ['members', 'members.user', 'members.user.roles'],
+            relations: ['members', 'members.user',],
         });
 
         // If chat is not found, return null
