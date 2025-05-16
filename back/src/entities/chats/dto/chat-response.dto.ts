@@ -23,8 +23,8 @@ export class ChatResponseDto {
     static fromChat(chat: Chat, currentUserId?: number): ChatResponseDto {
         let name: string | undefined = chat.name;
 
-        // Set the other member's username as the name of the chat if it's not a group chat and the current user ID is provided
-        if (chat.type === ChatType.GROUP && currentUserId) {
+        // Set the other member's username as the name of the chat if it's private and the current user ID is provided
+        if (chat.type === ChatType.PRIVATE && currentUserId) {
             const otherMember = chat.members.find(m => m.user.id !== currentUserId);
             name = otherMember?.user.username ?? 'Unknown';
         }
