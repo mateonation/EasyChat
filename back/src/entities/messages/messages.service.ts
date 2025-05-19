@@ -6,6 +6,7 @@ import { Chat } from '../chats/chat.entity';
 import { Message } from './message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { ForbiddenException } from 'src/errors/forbiddenException';
+import { MessageResponseDto } from './dto/message-response.dto';
 
 @Injectable()
 export class MessagesService {
@@ -52,5 +53,22 @@ export class MessagesService {
         const message = await this.messageRepo.findOne({ where: { id: messageId } });
         await this.messageRepo.update(messageId, { isDeleted: true });
         return true;
+    }
+
+    // Find messages by chat ID
+    async findMessagesByChatId(
+        chatId: number,
+        offset = 0,
+        limit = 100
+    ): Promise<MessageResponseDto[]> {
+        const messages = await this.messageRepo.find({
+            where: { chat: { id: chatId } },
+            relations: ['user'],
+            order: { sentDate: 'DESC' },
+            // Pagination
+            skip: offset,
+            take: limit,
+        });
+        return MessageResponseDto.fromMessages(messages);
     }
 }
