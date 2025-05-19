@@ -8,7 +8,8 @@ export class ChatResponseDto {
     type: ChatType;
     name: string;
     description: string;
-    lastMessagePreview?: string;
+    lastMessagePrefix: string;
+    lastMessageContent: string;
     members: MemberResponseDto[];
 
     constructor(chat: Chat) {
@@ -34,20 +35,28 @@ export class ChatResponseDto {
             ? [...chat.messages].sort((a, b) => b.sentDate.getTime() - a.sentDate.getTime())[0]
             : null;
 
-        let lastMessagePreview = '';
+        let lastMessagePrefix = '';
+        let lastMessageContent = '';
         if (lastMessage) {
             const sender = lastMessage.user;
             const senderIsCurrentUser = sender.id === currentUserId;
 
-            // Set the last message preview based on the chat type and sender
+            // Set the last message prefix based on the chat type and sender
             if(chat.type === ChatType.GROUP) {
-                lastMessagePreview = senderIsCurrentUser
-                    ? `You: ${lastMessage.content}`
-                    : `${sender.username}: ${lastMessage.content}`;
+                lastMessagePrefix = senderIsCurrentUser
+                    ? `<you>`
+                    : `${sender.username}`;
             } else {
-                lastMessagePreview = senderIsCurrentUser
-                    ? `You: ${lastMessage.content}`
-                    : `${lastMessage.content}`;
+                lastMessagePrefix = senderIsCurrentUser
+                    ? `<you>`
+                    : ``;
+            }
+            // Set the last message content
+            lastMessageContent = lastMessage.content;
+            
+            // If the message is deleted -> placeholder for deleted message
+            if(lastMessage.isDeleted === true) {
+                lastMessageContent = '<msg_deleted>';
             }
         }
 
@@ -57,7 +66,8 @@ export class ChatResponseDto {
             type: chat.type,
             name,
             description: chat.description,
-            lastMessagePreview,
+            lastMessagePrefix,
+            lastMessageContent,
             members: MemberResponseDto.fromMembers(chat.members),
         };
     }
