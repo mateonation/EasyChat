@@ -7,6 +7,7 @@ import { Message } from './message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { ForbiddenException } from 'src/errors/forbiddenException';
 import { MessageResponseDto } from './dto/message-response.dto';
+import { PaginatedMessagesResponseDto } from './dto/paginated-messages-response.dto';
 
 @Injectable()
 export class MessagesService {
@@ -60,7 +61,14 @@ export class MessagesService {
         chatId: number,
         offset = 0,
         limit = 100
-    ): Promise<MessageResponseDto[]> {
+    ): Promise<PaginatedMessagesResponseDto> {
+
+        // Count total number of messages sent to a chat
+        const totalMessages = await this.messageRepo.count({
+            where: { chat: { id: chatId } },
+        });
+        
+        // Paginated query
         const messages = await this.messageRepo.find({
             where: { chat: { id: chatId } },
             relations: ['user'],
@@ -69,6 +77,8 @@ export class MessagesService {
             skip: offset,
             take: limit,
         });
-        return MessageResponseDto.fromMessages(messages);
+
+        const messageDtos = MessageResponseDto.fromMessages(messages);
+        return PaginatedMessagesResponseDto.from(messageDtos, totalMessages, offset, limit);
     }
 }
