@@ -10,7 +10,7 @@ import { NotFoundException } from 'src/errors/notFoundException';
 import { ChatmembersService } from './../chats/chatmembers/chatmembers.service';
 
 @UseGuards(RolesGuard)
-@Controller('api/messages')
+@Controller('api/message')
 export class MessagesController {
     constructor(
         private readonly messagesService: MessagesService,
@@ -59,10 +59,10 @@ export class MessagesController {
         }
     }
 
-    @Delete('')
+    @Delete(':msgId/rm')
     @Roles('user')
     async deleteMessage(
-        @Body('messageId') messageId: number,
+        @Param('msgId') messageId: number,
         @Res() res: Response,
         @Req() req: Request,
     ) {
