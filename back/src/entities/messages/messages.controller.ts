@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Request, Response } from 'express';
 import { MessagesService } from './messages.service';
@@ -18,6 +18,7 @@ export class MessagesController {
         private readonly membersService: ChatmembersService,
     ) {}
 
+    // Send a message
     @Post('send')
     @Roles('user')
     async sendMessage(
@@ -59,6 +60,7 @@ export class MessagesController {
         }
     }
 
+    // Remove message
     @Delete(':msgId/rm')
     @Roles('user')
     async deleteMessage(
@@ -86,6 +88,46 @@ export class MessagesController {
                 message: 'Message deleted successfully',
             });
         } catch (error) {
+            // Handle conflict error
+            if (error instanceof ForbiddenException || error instanceof NotFoundException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
+
+    // Get messages by chat ID
+    @Get('from/:chatId')
+    @Roles('user')
+    async getMessagesByChatId(
+        @Param('chatId', ParseIntPipe) chatId: number,
+        @Query('offset', ParseIntPipe) offset: number = 0,
+        @Res() res: Response,
+        @Req() req: Request,
+    ) {
+        try {
+            if (!req.session.user?.id) return;
+            const requesterId = req.session.user.id;
+
+            // Check if chat exists
+            const chat = await this.chatsService.findById(chatId);
+            if (!chat) {
+                throw new NotFoundException('Chat not found');
+            }
+
+            // Check if user is a member of the chat
+            const member = await this.membersService.findChatMember(requesterId, chatId);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+            // Get messages by chat ID and return them
+            const messages = await this.messagesService.findMessagesByChatId(chatId, offset);
+            return res.status(200).json(messages);
+        } catch (error) {
+            console.log(error);
             // Handle conflict error
             if (error instanceof ForbiddenException || error instanceof NotFoundException) {
                 return res.status(error.getStatus()).json(error.getResponse());
