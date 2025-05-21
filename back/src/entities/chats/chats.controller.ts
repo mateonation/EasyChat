@@ -70,7 +70,7 @@ export class ChatsController {
         if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
 
         // Check if the chat exists
-        const chat = await this.chatsService.findById(chatId);
+        const chat = await this.chatsService.findById(chatId, requester.id);
         if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
         // Check if the requester is a member of the chat
@@ -167,7 +167,7 @@ export class ChatsController {
             }
             // If the chat was created successfully, return it
             // Fetch the chat with its members
-            const chat = await this.chatsService.findById(chatId);
+            const chat = await this.chatsService.findById(chatId, requester.id);
             return res.status(201).json({
                 statusCode: 201,
                 message: 'Chat created successfully',
@@ -204,7 +204,7 @@ export class ChatsController {
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
 
             // Check if the chat exists + 
-            const chat = await this.chatsService.findById(chatId);
+            const chat = await this.chatsService.findById(chatId, requester.id);
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
             // Check if the requester is a member of the chat
@@ -233,7 +233,7 @@ export class ChatsController {
                 await this.membersService.addUserToChat(user.id, chat.id);
             }
             // Fetch the chat with its members
-            const chatWithMembers = await this.chatsService.findById(chatId);
+            const chatWithMembers = await this.chatsService.findById(chatId, requester.id);
             // Return the chat with its members
             return res.status(200).json({
                 statusCode: 200,
@@ -270,7 +270,7 @@ export class ChatsController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Chat must exist and be a group chat
-            const chat = await this.chatsService.findById(chatId);
+            const chat = await this.chatsService.findById(chatId, requester.id);
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
             if (chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
 
@@ -370,7 +370,7 @@ export class ChatsController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Chat must exist and be a group chat
-            const chat = await this.chatsService.findById(chatId);
+            const chat = await this.chatsService.findById(chatId, requester.id);
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
             if (chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
 

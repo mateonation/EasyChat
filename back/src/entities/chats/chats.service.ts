@@ -72,18 +72,19 @@ export class ChatsService {
 
     // Find chat by ID
     async findById(
-        chatId: number
+        chatId: number,
+        requesterId: number,
     ): Promise<ChatResponseDto | null> {
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
             where: { id: chatId },
-            relations: ['members', 'members.user',],
+            relations: ['members', 'members.user', 'messages', 'messages.user'],
         });
 
         // If chat is not found, return null
         if (!chat) return null;
 
-        return ChatResponseDto.fromChat(chat);
+        return ChatResponseDto.fromChat(chat, requesterId);
     }
 
     // Search for an existing individual chat between two users
@@ -126,7 +127,7 @@ export class ChatsService {
     // Later, members can be added by a method in ChatMembersService
     async createChat(): Promise<Chat> {
         // Create and save chat in DB
-        const chat = this.chatRepo.create({});
+        const chat = await this.chatRepo.create();
         await this.chatRepo.save(chat);
         return chat;
     }
