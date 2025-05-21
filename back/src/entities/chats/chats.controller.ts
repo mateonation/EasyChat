@@ -343,6 +343,15 @@ export class ChatsController {
                         // Update their role to owner
                         await this.membersService.updateMemberRole(oldestMember.user.id, chat.id, ChatMemberRole.OWNER);
 
+                        // Send system message of new owner assigned
+                        await this.messageService.sendSystemMessage(
+                            chatId,
+                            'MEMBER_NOW_OWNER',
+                            {
+                                newOwner: oldestMember.user.username,
+                            }
+                        );
+
                         // If there are no other members, delete chat
                     } else {
                         // If there are no other members, delete the chat
