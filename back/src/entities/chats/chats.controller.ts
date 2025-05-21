@@ -228,6 +228,9 @@ export class ChatsController {
             // Check if the requester is a creator or admin of the chat
             if (member.role === 'member') throw new ForbiddenException('You are not allowed to add members to this chat');
 
+            // Create an array to store usernames of the users to be added
+            const addedUsernames: string[] = [];
+
             // Check if the users to be added exist
             for (const uid of dto.userIds) {
                 const user = await this.usersService.findById(uid);
@@ -235,6 +238,9 @@ export class ChatsController {
 
                 const alreadyAMember = await this.membersService.findChatMember(user.id, chat.id);
                 if (alreadyAMember) throw new ConflictException(`${user.username} (ID: ${uid}) is already a member of this chat`);
+
+                // Add the username to the array
+                addedUsernames.push(user.username);
             }
 
             // Add users to the chat
@@ -242,6 +248,27 @@ export class ChatsController {
                 const user = await this.usersService.findById(uid);
                 if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
                 await this.membersService.addUserToChat(user.id, chat.id);
+            }
+            if (addedUsernames.length > 1) {
+                // Send system message of new members added to the group
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'NEW_MEMBERS',
+                    {
+                        admin: requester.username,
+                        newMembers: addedUsernames.join(', '),
+                    }
+                );
+            } else {
+                // Send system message of the new member added to the group
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'NEW_MEMBER',
+                    {
+                        newMember: addedUsernames[0],
+                        admin: requester.username,
+                    }
+                );
             }
             // Fetch the chat with its members
             const chatWithMembers = await this.chatsService.findById(chatId, requester.id);
@@ -321,7 +348,14 @@ export class ChatsController {
                 }
                 // Finally, let the user leave the chat
                 await this.membersService.removeUserFromChat(userToRemove.id, chat.id);
-
+                // Send system message of member leaving the group
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'MEMBER_LEFT',
+                    {
+                        username: requester.username,
+                    }
+                );
                 return res.status(200).json({
                     statusCode: 200,
                     message: `You left the group "${chat.name}"`,
@@ -343,9 +377,17 @@ export class ChatsController {
                     break;
             }
 
-            // Remove member from the chat
+            // Kick member out of the chat
             await this.membersService.removeUserFromChat(userToRemove.id, chat.id);
-            
+            // Send system message of member kicking by the requester
+            await this.messageService.sendSystemMessage(
+                chatId,
+                'MEMBER_KICKED',
+                {
+                    username: userToRemove.username,
+                    admin: requester.username,
+                }
+            );
             return res.status(200).json({
                 statusCode: 200,
                 message: `${userToRemove.username} removed from chat ${chat.name}`,
