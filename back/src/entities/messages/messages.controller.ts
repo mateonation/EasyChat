@@ -30,7 +30,7 @@ export class MessagesController {
             if (!req.session.user?.id) return;
 
             // Check if chat exists
-            const chatDoesExist = await this.chatsService.findById(dto.chatId);
+            const chatDoesExist = await this.chatsService.findById(dto.chatId, req.session.user.id);
             if (!chatDoesExist) {
                 throw new NotFoundException('Chat not found');
             }
@@ -114,7 +114,7 @@ export class MessagesController {
             const requesterId = req.session.user.id;
 
             // Check if chat exists
-            const chat = await this.chatsService.findById(chatId);
+            const chat = await this.chatsService.findById(chatId, req.session.user.id);
             if (!chat) {
                 throw new NotFoundException('Chat not found');
             }
@@ -124,8 +124,8 @@ export class MessagesController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Get messages by chat ID and return them
-            const messages = await this.messagesService.findMessagesByChatId(chatId, offset);
-            return res.status(200).json(messages);
+            const response = await this.messagesService.findMessagesByChatId(chatId, offset);
+            return res.status(200).json(response);
         } catch (error) {
             console.log(error);
             // Handle conflict error
