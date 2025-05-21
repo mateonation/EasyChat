@@ -12,8 +12,8 @@ export class MessageResponseDto {
     constructor(message: Message) {
         this.id = message.id;
         this.sentDate = message.sentDate;
-        this.senderId = message.user.id;
-        this.senderUsername = message.user.username;
+        this.senderId = message.user?.id ?? null;
+        this.senderUsername = message.user?.username ?? null;
         this.type = message.type;
         this.isDeleted = message.isDeleted;
         // If the message is deleted, do not show the content
