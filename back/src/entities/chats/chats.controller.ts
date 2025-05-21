@@ -463,6 +463,8 @@ export class ChatsController {
                     case 'member':
                         throw new ForbiddenException('You are not allowed to change your role in the group')
                 }
+                // If the role to grant is the same as the current one, throw a bad request exception
+                if (memberToEdit.role === role) throw new BadRequestException('You are already in this role');
                 // Let the requester change it's role in group
                 await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
                 // Send system message of member role change
@@ -485,6 +487,9 @@ export class ChatsController {
 
             // Prevent role change if the requester is a member
             if (member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to edit someone else's role");
+
+            // If the role to grant is the same as the current one, throw a bad request exception
+            if (memberToEdit.role === role) throw new BadRequestException('User is already a '+ role);
 
             // Update user role in the group chat
             await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
