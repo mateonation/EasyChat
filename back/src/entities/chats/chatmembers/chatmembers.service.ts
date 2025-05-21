@@ -37,10 +37,10 @@ export class ChatmembersService {
         userId: number,
         chatId: number,
     ): Promise<void> {
-        const user = await this.userRepo.findOne({ where: { id: userId } });
-        const chat = await this.chatRepo.findOne({ where: { id: chatId } });
-        if (!user || !chat) return;
-        const member = this.memberRepo.create({ user: user, chat: chat });
+        const member = this.memberRepo.create({
+            user: { id: userId },
+            chat: { id: chatId },
+        });
         await this.memberRepo.save(member);
     }
 
