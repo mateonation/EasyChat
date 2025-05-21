@@ -80,26 +80,20 @@ export class MessagesService {
     // Find messages by chat ID
     async findMessagesByChatId(
         chatId: number,
-        offset = 0,
-        limit = 100
+        offset: number = 0,
+        limit: number = 100,
     ): Promise<PaginatedMessagesResponseDto> {
-
-        // Count total number of messages sent to a chat
-        const totalMessages = await this.messageRepo.count({
+        // Get messages ordered by sentDate in descending order
+        const [messages, totalMessages] = await this.messageRepo.findAndCount({
             where: { chat: { id: chatId } },
-        });
-        
-        // Paginated query
-        const messages = await this.messageRepo.find({
-            where: { chat: { id: chatId } },
-            relations: ['user'],
             order: { sentDate: 'DESC' },
-            // Pagination
             skip: offset,
             take: limit,
+            relations: ['user'],
         });
 
-        const messageDtos = MessageResponseDto.fromMessages(messages);
+        const messageDtos = messages.map((msg) => new MessageResponseDto(msg));
+
         return PaginatedMessagesResponseDto.from(messageDtos, totalMessages, offset, limit);
     }
 }
