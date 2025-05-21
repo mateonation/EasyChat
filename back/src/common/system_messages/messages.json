@@ -1,0 +1,10 @@
+{
+    "GROUP_CREATED": "{username} created this group",
+    "NEW_MEMBER": "{newMember} was added by {admin}",
+    "MEMBER_LEFT": "{username} left the group",
+    "MEMBER_KICKED": "{username} was kicked by {admin}",
+
+    "GROUP_NAME_CHANGED": "{admin} changed the group name to '{newName}'",
+    "GROUP_DESCRIPTION_CHANGED": "{admin} changed the group description",
+    "GROUP_PIC_CHANGED": "{admin} changed the group picture"
+}
