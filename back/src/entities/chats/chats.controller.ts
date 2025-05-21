@@ -348,7 +348,7 @@ export class ChatsController {
                             chatId,
                             'MEMBER_NOW_OWNER',
                             {
-                                newOwner: oldestMember.user.username,
+                                username: oldestMember.user.username,
                             }
                         );
 
@@ -465,6 +465,15 @@ export class ChatsController {
                 }
                 // Let the requester change it's role in group
                 await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
+                // Send system message of member role change
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'MEMBER_NEW_ROLE',
+                    {
+                        username: requester.username,
+                        newRole: role,
+                    }
+                );
                 return res.status(200).json({
                     statusCode: 200,
                     message: `You have changed your role in "${chat.name}" to "${role}"`,
@@ -477,7 +486,19 @@ export class ChatsController {
             // Prevent role change if the requester is a member
             if (member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to edit someone else's role");
 
+            // Update user role in the group chat
             await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
+
+            // Send system message of member role change by other user
+            await this.messageService.sendSystemMessage(
+                chatId,
+                'MEMBER_NEW_ROLE_BY_OTHER',
+                {
+                    user1: userToEdit.username,
+                    newRole: role,
+                    user2: requester.username,
+                }
+            );
             return res.status(200).json({
                 statusCode: 200,
                 message: `You have changed the role of "${userToEdit.username}" in "${chat.name}" to "${role}"`,
