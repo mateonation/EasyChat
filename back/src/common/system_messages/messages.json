@@ -13,8 +13,7 @@
     "GROUP_PIC_CHANGED": "{admin} changed the group picture",
     "GROUP_PIC_ADDED": "{admin} added a group picture",
 
-    "MEMBER_PROMOTED_ADMIN": "{admin} promoted {newAdmin} to admin",
-    "MEMBER_DEMOTED_ADMIN": "{admin} demoted {oldAdmin} to member",
-    "MEMBER_DEMOTED_ITSELF": "{admin} changed their own role to member",
-    "MEMBER_NOW_OWNER": "{newOwner} is now the owner of the group"
+    "MEMBER_NEW_ROLE": "{username} changed their own role to {newRole}",
+    "MEMBER_NEW_ROLE_BY_OTHER": "{user1}'s role changed to {newRole} by {user2}",
+    "MEMBER_NOW_OWNER": "{username} is now the owner of the group"
 }
