@@ -1,6 +1,7 @@
 {
     "GROUP_CREATED": "{username} created this group",
     "NEW_MEMBER": "{newMember} was added by {admin}",
+    "NEW_MEMBERS": "{admin} added the following members: {newMembers}",
     "MEMBER_LEFT": "{username} left the group",
     "MEMBER_KICKED": "{username} was kicked by {admin}",
 
