@@ -114,7 +114,7 @@ export class ChatsController {
                     const userToCreateChatWith = await this.usersService.findById(dto.users[0]) // User to create chat with
                     if (!userToCreateChatWith) throw new NotFoundException(`User (ID: ${dto.users[0]}) not found`);
                     // If an individual chat between the two users already exists, return it instead of creating a new one
-                    const existingChat = await this.chatsService.findIndividualChat(requester, userToCreateChatWith);
+                    const existingChat = await this.chatsService.findIndividualChat(requester.id, userToCreateChatWith.id);
                     if (existingChat) { // If chat already exists, return it
                         return res.status(200).json({
                             statusCode: 200,

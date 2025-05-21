@@ -89,8 +89,8 @@ export class ChatsService {
 
     // Search for an existing individual chat between two users
     async findIndividualChat(
-        user1: UserResponseDto,
-        user2: UserResponseDto,
+        user1id: number,
+        user2id: number,
     ): Promise<ChatResponseDto | null> {
         // Check if both users are actual members of an already existing individual chat
         // This query builder only returns an existing individual chat where both users are already members
@@ -103,7 +103,7 @@ export class ChatsService {
             .innerJoin('chat.members', 'member')
             .select('chat.id', 'chatId')
             .where("chat.type = 'private'")
-            .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1.id, user2.id] })
+            .andWhere('member.userId IN (:...userIDs)', { userIDs: [user1id, user2id] })
             .groupBy('chat.id')
             .having('COUNT(DISTINCT member.userId) = 2')
             .andHaving('COUNT(*) = 2')
@@ -120,7 +120,7 @@ export class ChatsService {
 
         if (!chat) return null;
 
-        return ChatResponseDto.fromChat(chat);
+        return ChatResponseDto.fromChat(chat, user1id);
     }
 
     // Create chat w/o any members
