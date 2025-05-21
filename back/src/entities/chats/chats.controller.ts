@@ -12,6 +12,7 @@ import { GroupParamsDto } from './dto/group-params.dto';
 import { AddMembersDto } from './chatmembers/dto/add-members.dto';
 import { ConflictException } from 'src/errors/conflictException';
 import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
+import { MessagesService } from '../messages/messages.service';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
@@ -86,7 +87,8 @@ export class ChatsController {
         })
     }
 
-    // Endpoint to create an individual chat between two users
+    // Endpoint to create a chat
+    // The type of chat can be either individual or group
     @Post('create/:typeChat')
     @Roles('user')
     async newChat(
@@ -157,6 +159,14 @@ export class ChatsController {
                         if (!u) throw new NotFoundException(`User with ID ${uid} not found`);
                         await this.membersService.addUserToChat(u.id, groupCreated.id);
                     }
+                    // Send 'group created' system message to the chat
+                    await this.messageService.sendSystemMessage(
+                        groupCreated.id,
+                        'GROUP_CREATED',
+                        {
+                            username: requester.username,
+                        }
+                    );
                     chatId = groupCreated.id; // Get the ID of the created chat
                     break;
                 // If the chat type is not valid, throw a bad request exception
