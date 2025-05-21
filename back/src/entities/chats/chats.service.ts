@@ -27,7 +27,7 @@ export class ChatsService {
     ): Promise<ChatResponseDto[] | null> {
         const memberEntries = await this.memberRepo.find({
             where: { user: { id: userId } },
-            relations: ['chat', 'chat.members', 'chat.members.user',],
+            relations: ['chat', 'chat.members', 'chat.members.user', 'chat.messages', 'chat.messages.user'],
         });
 
         // If no member entries are found, return an empty array
