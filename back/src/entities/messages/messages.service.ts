@@ -8,6 +8,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { ForbiddenException } from 'src/errors/forbiddenException';
 import { MessageResponseDto } from './dto/message-response.dto';
 import { PaginatedMessagesResponseDto } from './dto/paginated-messages-response.dto';
+import { MessageType } from 'src/common/enums/message-type.enum';
 
 @Injectable()
 export class MessagesService {
@@ -32,6 +33,24 @@ export class MessagesService {
             content: dto.content,
             chat: { id: dto.chatId },
             user: { id: senderId },
+        });
+
+        // Save message into DB
+        await this.messageRepo.save(message);
+
+        return message;
+    }
+
+    // Send a system message to a chat
+    async sendSystemMessage(
+        chatId: number,
+        content: string,
+    ): Promise<Message> {
+        const message = this.messageRepo.create({
+            user: undefined, // User is undefined for system messages
+            chat: { id: chatId }, // Chat id where the message will be sent
+            content, // Content of the message
+            type: MessageType.SYSTEM, // Type of the message (system)
         });
 
         // Save message into DB
