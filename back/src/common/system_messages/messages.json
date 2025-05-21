@@ -6,6 +6,15 @@
     "MEMBER_KICKED": "{username} was kicked by {admin}",
 
     "GROUP_NAME_CHANGED": "{admin} changed the group name to '{newName}'",
+    "GROUP_DESCRIPTION_CLEARED": "{admin} cleared the group description",
     "GROUP_DESCRIPTION_CHANGED": "{admin} changed the group description",
-    "GROUP_PIC_CHANGED": "{admin} changed the group picture"
+    "GROUP_DESCRIPTION_ADD": "{admin} added a group description",
+    "GROUP_PIC_DELETED": "{admin} deleted the group picture",
+    "GROUP_PIC_CHANGED": "{admin} changed the group picture",
+    "GROUP_PIC_ADDED": "{admin} added a group picture",
+
+    "MEMBER_PROMOTED_ADMIN": "{admin} promoted {newAdmin} to admin",
+    "MEMBER_DEMOTED_ADMIN": "{admin} demoted {oldAdmin} to member",
+    "MEMBER_DEMOTED_ITSELF": "{admin} changed their own role to member",
+    "MEMBER_NOW_OWNER": "{newOwner} is now the owner of the group"
 }
