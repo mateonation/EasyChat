@@ -1,6 +1,7 @@
 import { MemberResponseDto } from "../chatmembers/dto/member-response.dto";
 import { Chat } from "../chat.entity";
 import { ChatType } from "src/common/enums/chat-type.enum";
+import { MessageType } from "src/common/enums/message-type.enum";
 
 export class ChatResponseDto {
     id: number;
@@ -38,26 +39,32 @@ export class ChatResponseDto {
         let lastMessagePrefix = '';
         let lastMessageContent = '';
         if (lastMessage) {
-            const sender = lastMessage.user;
-            const senderIsCurrentUser = sender.id === currentUserId;
-
-            // Set the last message prefix based on the chat type and sender
-            if(chat.type === ChatType.GROUP) {
-                lastMessagePrefix = senderIsCurrentUser
-                    ? `<you>`
-                    : `${sender.username}`;
+            // If the last message is a system message, set the prefix accordingly
+            if (lastMessage.type === MessageType.SYSTEM) {
+                lastMessagePrefix = `<system>`; // Prefix for system messages
+            // If not a system message, set the prefix based on chat type, sender and the current user seeing it
             } else {
-                lastMessagePrefix = senderIsCurrentUser
-                    ? `<you>`
-                    : ``;
+                const sender = lastMessage.user;
+                const senderIsCurrentUser = sender.id === currentUserId;
+
+                // Set the last message prefix based on the chat type and sender
+                if (chat.type === ChatType.GROUP) {
+                    lastMessagePrefix = senderIsCurrentUser
+                        ? `<you>`
+                        : `${sender.username}`;
+                } else {
+                    lastMessagePrefix = senderIsCurrentUser
+                        ? `<you>`
+                        : ``;
+                }
             }
+
             // Set the last message content
             lastMessageContent = lastMessage.content;
-            
+
             // If the message is deleted -> placeholder for deleted message
-            if(lastMessage.isDeleted === true) {
-                lastMessageContent = '<msg_deleted>';
-            }
+            if (lastMessage.isDeleted === true) lastMessageContent = '<msg_deleted>';
+            else lastMessageContent = lastMessage.content;
         }
 
         return {
