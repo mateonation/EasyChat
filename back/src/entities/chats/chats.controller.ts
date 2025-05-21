@@ -66,25 +66,32 @@ export class ChatsController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        // Check if the user in session exists
-        if (!req.session.user?.id) return;
-        const requester = await this.usersService.findById(req.session.user.id);
-        if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
+        try {
+            // Check if the user in session exists
+            if (!req.session.user?.id) return;
+            const requester = await this.usersService.findById(req.session.user.id);
+            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
 
-        // Check if the chat exists
-        const chat = await this.chatsService.findById(chatId, requester.id);
-        if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+            // Check if the chat exists
+            const chat = await this.chatsService.findById(chatId, requester.id);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
-        // Check if the requester is a member of the chat
-        const member = await this.membersService.findChatMember(requester.id, chat.id);
-        if (!member) throw new ForbiddenException('You are not a member of this chat');
+            // Check if the requester is a member of the chat
+            const member = await this.membersService.findChatMember(requester.id, chat.id);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
 
-        // Return chat with it's members
-        return res.status(200).json({
-            statusCode: 200,
-            message: 'Chat info',
-            chat,
-        })
+            // Return chat with it's members
+            return res.status(200).json(chat);
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
     }
 
     // Endpoint to create a chat
@@ -205,7 +212,7 @@ export class ChatsController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        try{
+        try {
             // Validate the request body
             if (!dto.userIds || dto.userIds.length === 0) throw new BadRequestException('At least one user ID is required to add members to the chat');
 
@@ -221,7 +228,7 @@ export class ChatsController {
             // Check if the requester is a member of the chat
             const member = await this.membersService.findChatMember(requester.id, chat.id);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
-            
+
             // Check if it's a group
             if (!chat.type || chat.type !== 'group') throw new ConflictException('You can only add members to group chats');
 
@@ -335,8 +342,8 @@ export class ChatsController {
 
                         // Update their role to owner
                         await this.membersService.updateMemberRole(oldestMember.user.id, chat.id, ChatMemberRole.OWNER);
-                    
-                    // If there are no other members, delete chat
+
+                        // If there are no other members, delete chat
                     } else {
                         // If there are no other members, delete the chat
                         await this.chatsService.deleteChatById(chat.id);
@@ -369,11 +376,11 @@ export class ChatsController {
                     break;
                 // Admins can remove anyone but the owner
                 case 'admin':
-                    if(memberToRemove.role === 'owner') throw new ForbiddenException('You are not allowed to kick the owner out of the group')
+                    if (memberToRemove.role === 'owner') throw new ForbiddenException('You are not allowed to kick the owner out of the group')
                     break;
                 // Other members are not allowed to remove other ones
                 default:
-                    if(memberToRemove.role === 'owner') throw new ForbiddenException("You don't have enough permission to kick members out of this group")
+                    if (memberToRemove.role === 'owner') throw new ForbiddenException("You don't have enough permission to kick members out of this group")
                     break;
             }
 
@@ -434,14 +441,14 @@ export class ChatsController {
             if (!memberToEdit) throw new ConflictException(`${userToEdit.username} (ID: ${userId}) is not a member of this chat`);
 
             // Options if the user in request is changing it's role inside the group
-            if(requester.id === userToEdit.id) {
+            if (requester.id === userToEdit.id) {
                 switch (memberToEdit.role) {
                     // Owners cannot edit their own role manually
                     case 'owner':
                         throw new ForbiddenException('You are the owner of the group, changing your role in the group is not possible');
                     // Admins only can downgrade their role to member
                     case 'admin':
-                        if(role != ChatMemberRole.MEMBER) throw new ForbiddenException('You can only downgrade your role to member');
+                        if (role != ChatMemberRole.MEMBER) throw new ForbiddenException('You can only downgrade your role to member');
                         break;
                     // Members are not allowed to edit their own role
                     case 'member':
@@ -456,16 +463,16 @@ export class ChatsController {
             }
 
             // Role to be given must not be owner
-            if(role === ChatMemberRole.OWNER) throw new ForbiddenException("You can't assign 'owner' role to just anyone")
-            
+            if (role === ChatMemberRole.OWNER) throw new ForbiddenException("You can't assign 'owner' role to just anyone")
+
             // Prevent role change if the requester is a member
-            if(member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to edit someone else's role");
+            if (member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to edit someone else's role");
 
             await this.membersService.updateMemberRole(userToEdit.id, chat.id, role as ChatMemberRole);
             return res.status(200).json({
                 statusCode: 200,
                 message: `You have changed the role of "${userToEdit.username}" in "${chat.name}" to "${role}"`,
-            });             
+            });
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
                 return res.status(error.getStatus()).json(error.getResponse());
