@@ -5,10 +5,10 @@ import { ChatMember } from '../chats/chatmembers/chatmember.entity';
 import { Chat } from '../chats/chat.entity';
 import { Message } from './message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
-import { ForbiddenException } from 'src/errors/forbiddenException';
 import { MessageResponseDto } from './dto/message-response.dto';
 import { PaginatedMessagesResponseDto } from './dto/paginated-messages-response.dto';
 import { MessageType } from 'src/common/enums/message-type.enum';
+import { SystemMessageService } from 'src/common/system_messages/system_message.service';
 
 @Injectable()
 export class MessagesService {
@@ -26,9 +26,8 @@ export class MessagesService {
     // Send message to a chat
     async sendMessage(
         dto: SendMessageDto,
-        senderId?: number,
+        senderId: number,
     ): Promise<Message> {
-        if (!senderId) senderId = undefined;
         const message = this.messageRepo.create({
             content: dto.content,
             chat: { id: dto.chatId },
@@ -44,8 +43,11 @@ export class MessagesService {
     // Send a system message to a chat
     async sendSystemMessage(
         chatId: number,
-        content: string,
+        systemType: string,
+        params: Record<string, string>,
     ): Promise<Message> {
+        const content = SystemMessageService.getMessage(systemType, params);
+
         const message = this.messageRepo.create({
             user: undefined, // User is undefined for system messages
             chat: { id: chatId }, // Chat id where the message will be sent
