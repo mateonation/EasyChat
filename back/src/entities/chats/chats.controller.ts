@@ -20,6 +20,7 @@ export class ChatsController {
         private readonly chatsService: ChatsService,
         private readonly usersService: UsersService,
         private readonly membersService: ChatmembersService,
+        private readonly messageService: MessagesService,
     ) { }
 
     // Get a list of all chats for the authenticated user
