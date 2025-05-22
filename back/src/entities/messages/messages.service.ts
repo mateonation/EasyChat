@@ -27,7 +27,7 @@ export class MessagesService {
     async sendMessage(
         dto: SendMessageDto,
         senderId: number,
-    ): Promise<Message> {
+    ): Promise<MessageResponseDto> {
         const message = this.messageRepo.create({
             content: dto.content,
             chat: { id: dto.chatId },
@@ -37,7 +37,7 @@ export class MessagesService {
         // Save message into DB
         await this.messageRepo.save(message);
 
-        return message;
+        return MessageResponseDto.fromMessage(message);
     }
 
     // Send a system message to a chat
@@ -45,7 +45,7 @@ export class MessagesService {
         chatId: number,
         systemType: string,
         params: Record<string, string>,
-    ): Promise<Message> {
+    ): Promise<MessageResponseDto> {
         const content = SystemMessageService.getMessage(systemType, params);
 
         const message = this.messageRepo.create({
@@ -58,7 +58,7 @@ export class MessagesService {
         // Save message into DB
         await this.messageRepo.save(message);
 
-        return message;
+        return MessageResponseDto.fromMessage(message);
     }
 
     // Find a message by it's ID
