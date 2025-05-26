@@ -8,12 +8,14 @@ interface AuthContextType {
     user: User | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    socket: Socket | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
-    login(){ return Promise.resolve() },
-    logout(){ return Promise.resolve() },
+    login() { return Promise.resolve(); },
+    logout() { return Promise.resolve(); },
+    socket: null,
 });
 
 export const AuthProvider = ({children}: PropsWithChildren<object>) => {
@@ -65,7 +67,7 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
         if (user === null) localStorage.removeItem("user");
     };
 
-    return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, login, logout, socket }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuthContext = () => useContext(AuthContext);
