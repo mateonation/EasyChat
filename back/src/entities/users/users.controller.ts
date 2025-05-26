@@ -28,8 +28,8 @@ export class UsersController {
             if (!usernameRegex.test(saveUserDto.username)) throw new BadRequestException('Invalid characters in username');
 
             // If username is too short or too long, throw an error
-            if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough');
-            if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long');
+            if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough (min 3 characters)');
+            if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long (max 20 characters)');
 
             // Check if user with the same username already exists
             const existingUser = await this.usersService.findByUsername(saveUserDto.username);
