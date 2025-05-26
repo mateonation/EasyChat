@@ -21,6 +21,7 @@ export class AuthController {
             // Set user in session
             req.session.user = {
                 id: user.id,
+                username: user.username,
             };
             // Return 'success' response
             return res.status(200).json({
