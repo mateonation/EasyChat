@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
-import api from '../api/axios.ts';
+import auth from '../api/auth.ts';
 import { User } from '../types/userdata.dto.ts';
 
 interface AuthContextType {
@@ -27,7 +27,7 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
 
     const login = async (email: string, password: string) => {
         try{
-            const result = await api.post<{user: User}>('/auth/login', { email, password });
+            const result = await auth.post<{user: User}>('/login', { email, password });
             updateSession(result.data.user);
         } catch (error) {
             if(axios.isAxiosError(error) && error.response){
@@ -39,7 +39,7 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
 
     const logout = async () => {
         try {
-            await api.post('/auth/logout');
+            await auth.post('/logout');
             updateSession(null);
         } catch (error) {
             if(axios.isAxiosError(error) && error.response){
