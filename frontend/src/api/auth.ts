@@ -1,6 +1,8 @@
-import api from './axios';
+import axios from 'axios';
 
-export const fetchCurrentUser = async () => {
-    const res = await api.get('/users/me');
-    return res.data;
-};
+const auth = axios.create({
+    baseURL: import.meta.env.VITE_AUTH_URL,
+    withCredentials: true, // Enable sending cookies with requests
+});
+
+export default auth;
