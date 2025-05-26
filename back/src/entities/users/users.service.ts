@@ -64,11 +64,6 @@ export class UsersService {
 
     // Method to save a new user
     async save(saveUserDto: SaveUserDto): Promise<UserResponseDto> {
-        // Check if username is already taken
-        const existingUsername = await this.usersRepo.findOne({ where: { username: saveUserDto.username } });
-        if (existingUsername) {
-            throw new ConflictException('Username already taken');
-        }
         // Count total users in the DB
         const totalUsers = await this.usersRepo.count();
         // If the user being registered is the first one, register it as an admin, moderator and user
@@ -92,6 +87,15 @@ export class UsersService {
         // Save user to the DB
         await this.usersRepo.save(user);
         // Return user response dto
+        return UserResponseDto.fromUser(user);
+    }
+
+    // Method to return user data by username
+    async findByUsername(
+        username: string
+    ): Promise<UserResponseDto | null> {
+        const user = await this.usersRepo.findOne({ where: { username }, relations: ['roles'] });
+        if (!user) return null;
         return UserResponseDto.fromUser(user);
     }
 }
