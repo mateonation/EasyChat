@@ -12,6 +12,7 @@ import {
     Button,
     Link
 } from "@mui/material";
+import { ErrorResponse } from "../types/errorResponse.interface";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -20,23 +21,28 @@ const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
-    const [netError, setNetError] = useState(false);
+    const [netError, setNetError] = useState('');
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setError(false);
-            setNetError(false);
+            setNetError('');
             await auth.login(username, password);
-            navigate('/');
+            alert("Login successful!");
         } catch (err: unknown) {
             if (err !== null && typeof err === "object" && "message" in err) {
                 console.error(err);
-                setError(true);
-            } else {
-                console.error("An unexpected error occurred:", err);
-                setNetError(true);
-            }
+                const reason=(err as ErrorResponse).message;
+                switch (reason) {
+                    case 'Username or password are incorrect':
+                        setError(true);
+                        break;
+                    default:
+                        setNetError((err as ErrorResponse).message);
+                        break;
+                }
+            } else throw err;
         }
     };
 
@@ -62,11 +68,11 @@ const LoginPage = () => {
                     sx={{ mt: 2, }}
                 >
                     <TextField
-                        label='E-mail address'
-                        placeholder='ex: mateo@jacobo.es'
+                        label='Username'
+                        placeholder='Username'
                         fullWidth
                         required
-                        type="email"
+                        type="text"
                         autoFocus
                         value={username}
                         error={error}
@@ -97,7 +103,7 @@ const LoginPage = () => {
                     />
                     {netError &&
                         <Typography sx={{ mb: 2, color: "red", textAlign: "center", }}>
-                            Network error
+                            {netError}
                         </Typography>
                     }
                     <Button type="submit" variant="contained" fullWidth sx={{ mb: 2, }}>
