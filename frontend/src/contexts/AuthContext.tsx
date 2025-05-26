@@ -2,6 +2,7 @@ import axios from 'axios';
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
 import auth from '../api/auth.ts';
 import { User } from '../types/userdata.dto.ts';
+import { io, Socket } from 'socket.io-client';
 
 interface AuthContextType {
     user: User | null;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({children}: PropsWithChildren<object>) => {
     const [user, setUser] = useState<User | null>(null);
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
         if(user != null) return;
@@ -29,6 +31,9 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
         try{
             const result = await auth.post<{user: User}>('/login', { email, password });
             updateSession(result.data.user);
+            // Initialize socket connection after successful login
+            const newSocket = io(import.meta.env.VITE_BACKEND_URL, { withCredentials: true, });
+            setSocket(newSocket);
         } catch (error) {
             if(axios.isAxiosError(error) && error.response){
                 throw new Error(error.response.data.message); // Send message of the response to the component
@@ -41,6 +46,11 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
         try {
             await auth.post('/logout');
             updateSession(null);
+            // Disconnect socket if it exists
+            if (socket) {
+                socket.disconnect();
+                setSocket(null);
+            }
         } catch (error) {
             if(axios.isAxiosError(error) && error.response){
                 throw new Error(error.response.data.message); // Send message of the response to the component
