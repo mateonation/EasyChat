@@ -6,6 +6,7 @@ import { ConflictException } from 'src/errors/conflictException';
 import { NotFoundException } from 'src/errors/notFoundException';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
+import { BadRequestException } from 'src/errors/badRequestException';
 
 @UseGuards(RolesGuard)
 @Controller('api/users')
@@ -21,9 +22,15 @@ export class UsersController {
         @Res() res: Response,
     ){
         try{
-            // Chech if user with the same username already exists
+            // Validate username in body request
+            const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+            // If username contains invalid characters, throw an error
+            if (!usernameRegex.test(saveUserDto.username)) throw new BadRequestException('Username can only contain letters, numbers and underscores');
+
+            // Check if user with the same username already exists
             const existingUser = await this.usersService.findByUsername(saveUserDto.username);
             if (existingUser) throw new ConflictException('Username already taken');
+
             // Register user in service
             const user = await this.usersService.save(saveUserDto);
             // Return 'success' response
@@ -34,7 +41,7 @@ export class UsersController {
             });
         } catch (error) {
             // Handle conflict error
-            if (error instanceof ConflictException || error instanceof NotFoundException) {
+            if (error instanceof ConflictException || error instanceof NotFoundException || error instanceof BadRequestException) {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
         }
