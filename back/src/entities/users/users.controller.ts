@@ -25,7 +25,11 @@ export class UsersController {
             // Validate username in body request
             const usernameRegex = /^[a-zA-Z0-9_-]+$/;
             // If username contains invalid characters, throw an error
-            if (!usernameRegex.test(saveUserDto.username)) throw new BadRequestException('Username can only contain letters, numbers and underscores');
+            if (!usernameRegex.test(saveUserDto.username)) throw new BadRequestException('Invalid characters in username');
+
+            // If username is too short or too long, throw an error
+            if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough');
+            if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long');
 
             // Check if user with the same username already exists
             const existingUser = await this.usersService.findByUsername(saveUserDto.username);
