@@ -1,44 +1,39 @@
-import { createContext, PropsWithChildren, useState, useRef, useEffect, useContext, } from "react";
+import { createContext, useState, useEffect, useContext, } from "react";
 import { io, Socket } from "socket.io-client";
+import { useAuthContext } from './AuthContext';
 
 type SocketContextType = {
     socket: Socket | null;
-    connected: boolean;
 }
 
 const SocketContext = createContext<SocketContextType>({
     socket: null,
-    connected: false,
 });
 
-export const SocketProvider = ({ children }: PropsWithChildren) => {
-    const [connected, setConnected] = useState(false);
-    const socketRef = useRef<Socket | null>(null);
+export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
+    const { user } = useAuthContext();
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        const socket = io(import.meta.env.VITE_BACKEND_URL, {
+        if (!user) {
+            socket?.disconnect();
+            setSocket(null);
+            return;
+        }
+
+        const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
             withCredentials: true,
         });
 
-        socketRef.current = socket;
-
-        socket.on('connect', () => {
-            setConnected(true);
-            console.log('Socket connected:', socket.id);
-        });
-
-        socket.on('disconnect', () => {
-            setConnected(false);
-            console.log('Socket disconnected');
-        });
+        setSocket(newSocket);
 
         return () => {
-            socket.disconnect();
+            newSocket.disconnect();
         };
-    }, []);
+    }, [user]);
 
     return (
-        <SocketContext.Provider value={{ socket: socketRef.current, connected }}>
+        <SocketContext.Provider value={{ socket }}>
             {children}
         </SocketContext.Provider>
     );
