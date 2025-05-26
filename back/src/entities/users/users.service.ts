@@ -46,7 +46,7 @@ export class UsersService {
         const user = await this.usersRepo.findOne({ where: { username: loginUserDto.username }, relations: ['roles'] });
         // Check if user exists and password matches
         if (!user || !(await argon2.verify(user.password, loginUserDto.password))) {
-            throw new UnauthorizedException('Username or password is incorrect');
+            throw new UnauthorizedException('Username or password are incorrect');
         }
         // Return user response dto
         return UserResponseDto.fromUser(user);
