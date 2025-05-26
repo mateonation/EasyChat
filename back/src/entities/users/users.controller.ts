@@ -21,6 +21,9 @@ export class UsersController {
         @Res() res: Response,
     ){
         try{
+            // Chech if user with the same username already exists
+            const existingUser = await this.usersService.findByUsername(saveUserDto.username);
+            if (existingUser) throw new ConflictException('Username already taken');
             // Register user in service
             const user = await this.usersService.save(saveUserDto);
             // Return 'success' response
