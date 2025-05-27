@@ -82,6 +82,7 @@ export class UsersService {
         const user = this.usersRepo.create({
             username: saveUserDto.username,
             password: argon2psswrd,
+            birthDate: saveUserDto.birthDate,
             roles,
         });
         // Save user to the DB
