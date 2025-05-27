@@ -90,7 +90,7 @@ const RegisterPage = () => {
                 password: password,
             })
             alert(t('REGISTER_SUCCESSFUL'));
-            navigate('/login', { replace: true }); // Redirect to login page after successful registration
+            navigate(`${BASE}/login`, { replace: true }); // Redirect to login page after successful registration
         } catch (err: unknown) {
             // If an error occurred, empty the password fields
             setPassword('');
