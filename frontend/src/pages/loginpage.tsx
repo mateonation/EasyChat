@@ -34,6 +34,8 @@ const LoginPage = () => {
             setNetError(false);
             await auth.login(username, password);
             alert("Login successful!");
+            console.log("User logged: @", username, " [",new Date().toLocaleString(), "]");
+            navigate(`${BASE}/chats`, { replace: true });
         } catch (err: unknown) {
             if (err !== null && typeof err === "object" && "message" in err) {
                 setPassword(''); // Clear password field on error
