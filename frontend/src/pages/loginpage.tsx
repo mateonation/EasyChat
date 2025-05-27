@@ -71,8 +71,8 @@ const LoginPage = () => {
                     sx={{ mt: 2, }}
                 >
                     <TextField
-                        label={t('LOGIN_FORM_USERNAME')}
-                        placeholder={t('LOGIN_FORM_USERNAME_PLACEHOLDER')}
+                        label={t('FORM_USERNAME_LABEL')}
+                        placeholder={t('FORM_USERNAME_PLACEHOLDER')}
                         fullWidth
                         required
                         type="text"
@@ -88,8 +88,8 @@ const LoginPage = () => {
                         }}
                     />
                     <TextField
-                        label={t('LOGIN_FORM_PASSWORD')}
-                        placeholder={t('LOGIN_FORM_PASSWORD_PLACEHOLDER')}
+                        label={t('FORM_PASSWORD_LABEL')}
+                        placeholder={t('FORM_PASSWORD_PLACEHOLDER')}
                         fullWidth
                         required
                         type="password"
