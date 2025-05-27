@@ -133,6 +133,14 @@ const resources = {
             // ERROREAK GENERIKOAK
             ERR_NETWORK: "Sareko errorea",
             ERR_SERVER: "Zerbitzariaren errorea",
+
+            // FORMULARIOAREN EREMUAK
+            FORM_USERNAME_LABEL: "Erabiltzaile izena",
+            FORM_USERNAME_PLACEHOLDER: "Idatzi zure erabiltzaile izena",
+            FORM_PASSWORD_LABEL: "Pasahitza",
+            FORM_PASSWORD_PLACEHOLDER: "Idatzi zure pasahitza",
+            FORM_PASSWORD2_LABEL: "Berretsi pasahitza",
+            FORM_PASSWORD2_PLACEHOLDER: "Idatzi zure pasahitza berriro",
         }
     },
     // PORTUGUESE
