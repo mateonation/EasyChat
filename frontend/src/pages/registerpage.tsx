@@ -20,11 +20,14 @@ const BASE = import.meta.env.VITE_BASE_PATH;
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [birthDate, setBirthDate] = useState('');
     const [usernameValid, setUsernameValid] = useState(true);
     const [usernameText, setUsernameText] = useState('');
     const [password2, setPassword2] = useState('');
     const [passwordValid, setPasswordValid] = useState(true);
     const [passwordText, setPasswordText] = useState('');
+    const [birthDateValid, setBirthDateValid] = useState(true);
+    const [birthDateText, setBirthDateText] = useState('');
     const [netError, setNetError] = useState(false);
     const navigate = useNavigate();
 
@@ -35,6 +38,7 @@ const RegisterPage = () => {
         setNetError(false);
         setUsernameValid(true);
         setPasswordValid(true);
+        setBirthDateValid(true);
 
         // Validate username
         const usernameRegex = /^[a-zA-Z0-9_]+$/;
@@ -57,6 +61,26 @@ const RegisterPage = () => {
             setUsernameValid(false);
             setPassword('');
             setPassword2('');
+            return;
+        }
+
+        // Validate birth date
+        // Check if the user is over 18 years old
+        const isOver18 = (dateString: string): boolean => {
+            const today = new Date();
+            const birthDate = new Date(dateString);
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+
+            if (age > 18) return true;
+            if (age === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0))) return true;
+            return false;
+        };
+
+        if (!isOver18(birthDate)) {
+            setBirthDateText(t('FORM_BIRTHDATE_MINOR'));
+            setBirthDateValid(false);
             return;
         }
 
@@ -88,7 +112,10 @@ const RegisterPage = () => {
             await api.post('/users/register', {
                 username: username,
                 password: password,
+                birthDate: birthDate,
             })
+            console.log('User registered:');
+            console.log(username);
             alert(t('REGISTER_SUCCESSFUL'));
             navigate(`${BASE}/login`, { replace: true }); // Redirect to login page after successful registration
         } catch (err: unknown) {
@@ -98,8 +125,8 @@ const RegisterPage = () => {
             // Handle specific error cases if using axios
             if (axios.isAxiosError(err)) {
                 const reason = err.response?.data;
-                console.error(reason.message);
-                switch (reason.message) {
+                console.error(reason?.message);
+                switch (reason?.message) {
                     case 'Username already taken':
                         setUsernameText(t('REGISTER_USERNAME_IN_USE'));
                         setUsernameValid(false);
@@ -115,6 +142,21 @@ const RegisterPage = () => {
                     case 'Username too long (max 20 characters)':
                         setUsernameText(t('REGISTER_USERNAME_LONG'));
                         setUsernameValid(false);
+                        break;
+                    case 'Password not long enough (min 6 characters)':
+                        setPasswordText(t('REGISTER_PASSWORD_SHORT'));
+                        setPasswordValid(false);
+                        break;
+                    case 'Password too long (max 30 characters)':
+                        setPasswordText(t('REGISTER_PASSWORD_LONG'));
+                        setPasswordValid(false);
+                        break;
+                    case 'You must be 18 years old or older':
+                        setBirthDateText(t('FORM_BIRTHDATE_MINOR'));
+                        setBirthDateValid(false);
+                        break;
+                    default:
+                        setNetError(true); // Set a generic network error
                         break;
                 }
             } else setNetError(true); // If it's not an axios error, set a generic error
@@ -157,6 +199,26 @@ const RegisterPage = () => {
                             mb: 2,
                             input: {
                                 background: !usernameValid ? '#ffebee' : 'transparent'
+                            }
+                        }}
+                    />
+                    <TextField
+                        label={t('FORM_BIRTHDATE_LABEL')}
+                        placeholder={t('FORM_BIRTHDATE_LABEL')}
+                        fullWidth
+                        required
+                        type="date"
+                        value={birthDate}
+                        error={!birthDateValid}
+                        helperText={!birthDateValid ? birthDateText : ''}
+                        onChange={(e) => setBirthDate(e.target.value)}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        sx={{
+                            mb: 2,
+                            input: {
+                                background: !birthDateValid ? '#ffebee' : 'transparent'
                             }
                         }}
                     />
