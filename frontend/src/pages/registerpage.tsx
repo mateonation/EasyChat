@@ -93,12 +93,10 @@ const RegisterPage = () => {
             // If an error occurred, empty the password fields
             setPassword('');
             setPassword2('');
-            // Log the error and set network error state
-            console.error(err);
-            setNetError(true);
             // Handle specific error cases if using axios
             if (axios.isAxiosError(err)) {
                 const reason = err.response?.data;
+                console.error(reason.message);
                 switch (reason.message) {
                     case 'Username already taken':
                         setUsernameText(t('REGISTER_USERNAME_IN_USE'));
