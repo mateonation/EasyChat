@@ -7,6 +7,7 @@ import { NotFoundException } from 'src/errors/notFoundException';
 import { Roles } from 'src/guards/roles.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { BadRequestException } from 'src/errors/badRequestException';
+import { ForbiddenException } from 'src/errors/forbiddenException';
 
 @UseGuards(RolesGuard)
 @Controller('api/users')
@@ -38,7 +39,7 @@ export class UsersController {
             // Check user birth date
             const userIsOver18 = await this.usersService.isUserOver18(saveUserDto.birthDate);
             // If the user is under 18 years old, throw an error
-            if(!userIsOver18) throw new BadRequestException('You must be at least 18 years old to register an account');
+            if(!userIsOver18) throw new ForbiddenException('You must be 18 years old or older');
 
             // Check if user with the same username already exists
             const existingUser = await this.usersService.findByUsername(saveUserDto.username);
@@ -54,7 +55,7 @@ export class UsersController {
             });
         } catch (error) {
             // Handle conflict error
-            if (error instanceof ConflictException || error instanceof NotFoundException || error instanceof BadRequestException) {
+            if (error instanceof ConflictException || error instanceof NotFoundException || error instanceof BadRequestException || error instanceof ForbiddenException) {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
         }
