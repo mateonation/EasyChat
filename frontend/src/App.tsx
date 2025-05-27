@@ -1,6 +1,7 @@
 import './App.css'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import LoginPage from './pages/loginpage';
+import RegisterPage from './pages/registerpage';
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -20,11 +21,19 @@ const router = createBrowserRouter(
           [
             {
               index: true,
-              element: <Navigate to={`${BASE}/login`} replace/>,
+              element: <Navigate to={`${BASE}/home`} replace/>,
+            },
+            {
+              path: 'home',
+              element: <Navigate to={`${BASE}/login`} replace/>
             },
             {
               path: 'login',
               element: <LoginPage />
+            },
+            {
+              path: 'register',
+              element: <RegisterPage />
             }
           ]
         }
