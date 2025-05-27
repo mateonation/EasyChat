@@ -19,7 +19,9 @@ export class User {
     @CreateDateColumn()
     registerDate: Date;
 
-    @Column()
+    @Column({
+        type: 'date',
+    })
     birthDate: Date;
 
     @ManyToMany(() => Role, (role) => role.users, { cascade: true })
