@@ -5,12 +5,14 @@ export class UserResponseDto {
     id: number;
     username: string;
     registerDate: Date;
+    birthDate: Date;
     roles: string[];
 
     constructor(user: User) {
         this.id = user.id;
         this.username = user.username;
         this.registerDate = user.registerDate;
+        this.birthDate = user.birthDate;
         this.roles = user.roles?.map((role: Role) => role.name) || [];
     }
 
