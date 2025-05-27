@@ -15,6 +15,8 @@ import {
 import { ErrorResponse } from "../types/errorResponse.interface";
 import { useTranslation } from "react-i18next";
 
+const BASE = import.meta.env.VITE_BASE_PATH;
+
 const LoginPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -114,11 +116,12 @@ const LoginPage = () => {
                         {t('LOGIN_FORM_SUBMIT')}
                     </Button>
                 </Box>
-                <Link component={RouterLink} to="/register">
-                    <Typography sx={{ textAlign: "center", }}>
+                <Typography sx={{ textAlign: "center", }}>
+                    {t('LOGIN_REGISTER_LABEL')}<br />
+                    <Link component={RouterLink} to={`${BASE}/register`}>
                         {t('LOGIN_REGISTER_LINK')}
-                    </Typography>
-                </Link>
+                    </Link>
+                </Typography>
             </Paper>
         </Container>
     );
