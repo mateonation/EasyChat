@@ -31,6 +31,15 @@ export class UsersController {
             if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough (min 3 characters)');
             if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long (max 20 characters)');
 
+            // If password is too short or too long, throw an error
+            if (saveUserDto.password.length < 6) throw new BadRequestException('Password not long enough (min 6 characters)');
+            if (saveUserDto.password.length > 30) throw new BadRequestException('Password too long (max 30 characters)');
+
+            // Check user birth date
+            const userIsOver18 = await this.usersService.isUserOver18(saveUserDto.birthDate);
+            // If the user is under 18 years old, throw an error
+            if(!userIsOver18) throw new BadRequestException('You must be at least 18 years old to register an account');
+
             // Check if user with the same username already exists
             const existingUser = await this.usersService.findByUsername(saveUserDto.username);
             if (existingUser) throw new ConflictException('Username already taken');
