@@ -19,6 +19,9 @@ export class User {
     @CreateDateColumn()
     registerDate: Date;
 
+    @Column()
+    birthDate: Date;
+
     @ManyToMany(() => Role, (role) => role.users, { cascade: true })
     @JoinTable()
     roles: Role[];
