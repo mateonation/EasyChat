@@ -154,7 +154,7 @@ const RegisterPage = () => {
                         sx={{
                             mb: 2,
                             input: {
-                                background: usernameValid ? '#ffebee' : 'transparent'
+                                background: !usernameValid ? '#ffebee' : 'transparent'
                             }
                         }}
                     />
@@ -169,7 +169,7 @@ const RegisterPage = () => {
                         sx={{
                             mb: 2,
                             input: {
-                                background: passwordValid ? '#ffebee' : 'transparent'
+                                background: !passwordValid ? '#ffebee' : 'transparent'
                             }
                         }}
                     />
