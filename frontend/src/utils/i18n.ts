@@ -16,6 +16,8 @@ const resources = {
             FORM_PASSWORD_PLACEHOLDER: "Enter your password here",
             FORM_PASSWORD2_LABEL: "Repeat password",
             FORM_PASSWORD2_PLACEHOLDER: "Repeat your password here",
+            FORM_BIRTHDATE_LABEL: "Date of birth",
+            FORM_BIRTHDATE_MINOR: "You must be at least 18 years old to register an account",
 
             // LOGIN PAGE
             LOGIN_PAGE_TITLE: "Log in to your account",
@@ -53,6 +55,8 @@ const resources = {
             FORM_PASSWORD_PLACEHOLDER: "Introduce tu contraseña",
             FORM_PASSWORD2_LABEL: "Confirmar contraseña",
             FORM_PASSWORD2_PLACEHOLDER: "Introduce tu contraseña de nuevo",
+            FORM_BIRTHDATE_LABEL: "Fecha de nacimiento",
+            FORM_BIRTHDATE_MINOR: "Debes tener 18 años como mínimo para crear una cuenta",
 
             // PÁGINA DE INICIAR SESIÓN
             LOGIN_PAGE_TITLE: "Iniciar sesión",
@@ -97,6 +101,8 @@ const resources = {
             LOGIN_FORM_ERROR: "O nome de usuario ou o contrasinal non son correctos",
             LOGIN_REGISTER_LABEL: "Aínda non tes unha conta?",
             LOGIN_REGISTER_LINK: "Rexistrar unha nova",
+            FORM_BIRTHDATE_LABEL: "Data de nacemento",
+            FORM_BIRTHDATE_MINOR: "Debes ter polo menos 18 anos para rexistrar unha conta",
 
             // REGISTER PAGE
             REGISTER_PAGE_TITLE: "Rexistrar conta nova",
@@ -119,7 +125,7 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: "en",
+        lng: "gl",
 
         interpolation: {
             escapeValue: false
