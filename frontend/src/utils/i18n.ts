@@ -118,14 +118,55 @@ const resources = {
             REGISTER_LOGIN_LABEL: "Xa tes unha conta creada?",
             REGISTER_LOGIN_LINK: "Inicia sesión nela",
         }
-    }
+    },
+    // CATALAN
+    ca: {
+        translation: {
+            // ERROS GENERICS
+            ERR_NETWORK: "Error de xarxa",
+            ERR_SERVER: "Error de servidor",
+        }
+    },
+    // BASQUE
+    eu: {
+        translation: {
+            // ERROREAK GENERIKOAK
+            ERR_NETWORK: "Sareko errorea",
+            ERR_SERVER: "Zerbitzariaren errorea",
+        }
+    },
+    // PORTUGUESE
+    pt: {
+        translation: {
+            // ERROS GENÉRICOS
+            ERR_NETWORK: "Erro de rede",
+            ERR_SERVER: "Erro do servidor",
+        }
+    },
+    // FRENCH
+    fr: {
+        translation: {
+            // ERREURS GÉNÉRIQUES
+            ERR_NETWORK: "Erreur réseau",
+            ERR_SERVER: "Erreur serveur",
+        }
+    },
+    // ROMANIAN
+    ro: {
+        translation: {
+            // ERORI GENERICE
+            ERR_NETWORK: "Eroare de rețea",
+            ERR_SERVER: "Eroare de server",
+        }
+    },
+
 };
 
 i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: "gl",
+        lng: "en",
 
         interpolation: {
             escapeValue: false
