@@ -13,25 +13,28 @@ import {
     Link
 } from "@mui/material";
 import { ErrorResponse } from "../types/errorResponse.interface";
+import { useTranslation } from "react-i18next";
 
 const LoginPage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const auth = useAuthContext();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
-    const [netError, setNetError] = useState('');
+    const [netError, setNetError] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setError(false);
-            setNetError('');
+            setNetError(false);
             await auth.login(username, password);
             alert("Login successful!");
         } catch (err: unknown) {
             if (err !== null && typeof err === "object" && "message" in err) {
+                setPassword(''); // Clear password field on error
                 console.error(err);
                 const reason=(err as ErrorResponse).message;
                 switch (reason) {
@@ -39,7 +42,7 @@ const LoginPage = () => {
                         setError(true);
                         break;
                     default:
-                        setNetError((err as ErrorResponse).message);
+                        setNetError(true);
                         break;
                 }
             } else throw err;
@@ -60,7 +63,7 @@ const LoginPage = () => {
                     <LockOutline />
                 </Avatar>
                 <Typography component="h1" variant="h5" sx={{ textAlign: "center", }}>
-                    Log in to your account
+                    {t('LOGIN_PAGE_TITLE')}
                 </Typography>
                 <Box
                     component="form"
@@ -68,8 +71,8 @@ const LoginPage = () => {
                     sx={{ mt: 2, }}
                 >
                     <TextField
-                        label='Username'
-                        placeholder='Username'
+                        label={t('LOGIN_FORM_USERNAME')}
+                        placeholder={t('LOGIN_FORM_USERNAME_PLACEHOLDER')}
                         fullWidth
                         required
                         type="text"
@@ -85,14 +88,14 @@ const LoginPage = () => {
                         }}
                     />
                     <TextField
-                        label='Password'
-                        placeholder='Enter your password here'
+                        label={t('LOGIN_FORM_PASSWORD')}
+                        placeholder={t('LOGIN_FORM_PASSWORD_PLACEHOLDER')}
                         fullWidth
                         required
                         type="password"
                         value={password}
                         error={error}
-                        helperText={error ? 'Password or username are incorrect' : ''}
+                        helperText={error ? t('LOGIN_FORM_ERROR') : ''}
                         onChange={(e) => setPassword(e.target.value)}
                         sx={{
                             mb: 2,
@@ -101,18 +104,19 @@ const LoginPage = () => {
                             }
                         }}
                     />
-                    {netError &&
+                    {netError ?
                         <Typography sx={{ mb: 2, color: "red", textAlign: "center", }}>
-                            {netError}
+                            {t('ERR_SERVER')}
                         </Typography>
+                        : null
                     }
                     <Button type="submit" variant="contained" fullWidth sx={{ mb: 2, }}>
-                        LOGIN
+                        {t('LOGIN_FORM_SUBMIT')}
                     </Button>
                 </Box>
                 <Link component={RouterLink} to="/register">
                     <Typography sx={{ textAlign: "center", }}>
-                        Register a new user
+                        {t('LOGIN_REGISTER_LINK')}
                     </Typography>
                 </Link>
             </Paper>
