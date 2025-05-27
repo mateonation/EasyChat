@@ -17,7 +17,7 @@ export class UsersService {
     constructor(
         @InjectRepository(User) private usersRepo: Repository<User>,
         @InjectRepository(Role) private rolesRepo: Repository<Role>,
-    ) {}
+    ) { }
 
     // Autoinject predefined roles into the DB when initiating app if they do not exist
     async onModuleInit() {
@@ -28,9 +28,9 @@ export class UsersService {
         // If roles does not exist, create them
         if (existingRoles === 0) {
             console.log('Roles not found in DB, creating them...');
-            await this.rolesRepo.save(predefinedRoles.map(name=>({name})));
+            await this.rolesRepo.save(predefinedRoles.map(name => ({ name })));
             console.log(totalPreRoles + ' roles created.');
-        // If there are less existing roles than the predefined ones, create the missing ones
+            // If there are less existing roles than the predefined ones, create the missing ones
         } else if (existingRoles < totalPreRoles) {
             console.log('Some roles are missing in DB, creating them...');
             const existingRoleNames = (await this.rolesRepo.find()).map(role => role.name);
@@ -70,9 +70,9 @@ export class UsersService {
         // If not, only user
         const rolesToAssign = totalUsers === 0 ? ['admin', 'moderator', 'user'] : ['user'];
         const roles = await Promise.all(
-            rolesToAssign.map(async (name)=>{
+            rolesToAssign.map(async (name) => {
                 const role = await this.rolesRepo.findOne({ where: { name } });
-                if(!role) throw new NotFoundException("Role with id '" + name + "' not found");
+                if (!role) throw new NotFoundException("Role with id '" + name + "' not found");
                 return role;
             }),
         );
@@ -98,5 +98,19 @@ export class UsersService {
         const user = await this.usersRepo.findOne({ where: { username }, relations: ['roles'] });
         if (!user) return null;
         return UserResponseDto.fromUser(user);
+    }
+
+    // Method to check if user is over 18 years old
+    async isUserOver18(
+        birthDate: Date
+    ): Promise<boolean> {
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        if (age > 18) return true;
+        if (age === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0))) return true;
+        return false;
     }
 }
