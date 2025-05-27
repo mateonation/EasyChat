@@ -15,6 +15,8 @@ import {
     Link,
 } from "@mui/material";
 
+const BASE = import.meta.env.VITE_BASE_PATH;
+
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -134,7 +136,7 @@ const RegisterPage = () => {
                     <PersonAdd />
                 </Avatar>
                 <Typography component="h1" variant="h5" sx={{ textAlign: "center", }}>
-                    Register a new account
+                    {t('REGISTER_PAGE_TITLE')}
                 </Typography>
                 <Box
                     component="form"
@@ -148,6 +150,8 @@ const RegisterPage = () => {
                         required
                         type="text"
                         value={username}
+                        error={!usernameValid}
+                        helperText={!usernameValid ? usernameText : ''}
                         onChange={(e) => setUsername(e.target.value)}
                         sx={{
                             mb: 2,
@@ -157,12 +161,13 @@ const RegisterPage = () => {
                         }}
                     />
                     <TextField
-                        label='Password'
-                        placeholder='Enter a password here'
+                        label={t('FORM_PASSWORD_LABEL')}
+                        placeholder={t('FORM_PASSWORD_PLACEHOLDER')}
                         fullWidth
                         required
                         type="password"
                         value={password}
+                        error={!passwordValid}
                         onChange={(e) => setPassword(e.target.value)}
                         sx={{
                             mb: 2,
@@ -172,8 +177,8 @@ const RegisterPage = () => {
                         }}
                     />
                     <TextField
-                        label='Repeat password'
-                        placeholder='Repeat your password'
+                        label={t('FORM_PASSWORD2_LABEL')}
+                        placeholder={t('FORM_PASSWORD2_PLACEHOLDER')}
                         fullWidth
                         required
                         type="password"
@@ -194,12 +199,12 @@ const RegisterPage = () => {
                         </Typography>
                     }
                     <Button type="submit" variant="contained" fullWidth sx={{ mb: 2, }}>
-                        REGISTER USER
+                        {t('REGISTER_FORM_SUBMIT')}
                     </Button>
                 </Box>
                 <Typography sx={{ textAlign: "center", }}>
                     {t('REGISTER_LOGIN_LABEL')}<br />
-                    <Link component={RouterLink} to="/login">
+                    <Link component={RouterLink} to={`${BASE}/login`}>
                         {t('REGISTER_LOGIN_LINK')}
                     </Link>
                 </Typography>
