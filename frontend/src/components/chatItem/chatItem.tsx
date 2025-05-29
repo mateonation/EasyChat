@@ -3,6 +3,7 @@ import {
     ListItem,
     ListItemAvatar,
     ListItemText,
+    Typography,
 } from "@mui/material";
 import GroupIcon from '@mui/icons-material/Group';
 import { useNavigate } from "react-router-dom";
@@ -109,12 +110,31 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                 </Avatar>
             </ListItemAvatar>
             <ListItemText
-                primary={chat.name}
+                primary={
+                    <Typography
+                        variant="subtitle1"
+                        fontWeight="bold"
+                    >
+                        {chat.name}
+                    </Typography>
+                }
                 secondary={
                     <>
-                        {formatMessage()}
-                        <br />
-                        <span style={{ fontSize: '0.8rem', color: 'gray' }}>{formatDate(chat.lastMessageSentDate)}</span>
+                        <Typography
+                            variant="body2"
+                            component="span"
+                            color="text.secondary"
+                            sx={{ display: 'block' }}
+                        >
+                            {formatMessage()}
+                        </Typography>
+                        <Typography
+                            variant="caption"
+                            color="gray"
+                            sx={{ fontSize: '0.75rem' }}
+                        >
+                            {formatDate(chat.lastMessageSentDate)}
+                        </Typography>
                     </>
                 }
             />
