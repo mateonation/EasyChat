@@ -16,7 +16,13 @@ export class User {
     @Column()
     password: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ 
+        type: 'timestamp',
+        transformer: {
+            to: (value: Date) => value,
+            from: (value: Date) => new Date(value.toISOString()), // 
+        },
+    })
     registerDate: Date;
 
     @Column({

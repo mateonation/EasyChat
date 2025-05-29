@@ -23,6 +23,12 @@ export class ChatMember {
     })
     role: ChatMemberRole; // Role of the user in the group chat ('creator' and 'admin' are only used in group chats)
 
-    @CreateDateColumn()
+    @CreateDateColumn({ 
+        type: 'timestamp',
+        transformer: {
+            to: (value: Date) => value,
+            from: (value: Date) => new Date(value.toISOString()), // 
+        },
+    })
     joinDate: Date;
 }

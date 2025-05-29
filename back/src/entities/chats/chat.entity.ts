@@ -8,7 +8,13 @@ export class Chat {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ 
+        type: 'timestamp',
+        transformer: {
+            to: (value: Date) => value,
+            from: (value: Date) => new Date(value.toISOString()), // 
+        },
+    })
     creationDate: Date;
 
     @Column({
