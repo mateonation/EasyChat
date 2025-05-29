@@ -5,7 +5,7 @@ import { User } from '../types/userdata.dto.ts';
 
 interface AuthContextType {
     user: User | null;
-    login: (email: string, password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -25,9 +25,9 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
         setUser(JSON.parse(stored));
     }, [user, setUser]);
 
-    const login = async (email: string, password: string) => {
+    const login = async (username: string, password: string) => {
         try{
-            const result = await auth.post<{user: User}>('/login', { email, password });
+            const result = await auth.post<{user: User}>('/login', { username, password });
             updateSession(result.data.user);
         } catch (error) {
             if(axios.isAxiosError(error) && error.response){
