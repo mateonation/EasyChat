@@ -90,6 +90,15 @@ const ChatItem = ({ chat }: ChatItemProps) => {
         <ListItem
             component="li"
             onClick={handleClick}
+            sx={{
+                cursor: 'pointer',
+                borderRadius: 2,
+                transition: 'background-color 0.2s',
+                '&:hover': {
+                    backgroundColor: 'action.hover',
+                },
+                mb: 1,
+            }}
         >
             <ListItemIcon>
                 <ListItemAvatar>
