@@ -39,10 +39,7 @@ export class ChatsController {
             const chats = await this.chatsService.getChatsByUserId(requester.id);
             // If there are no chats for the user, return a message
             if (!chats || chats.length === 0) {
-                return res.status(200).json({
-                    statusCode: 200,
-                    message: 'You have no chats yet',
-                });
+                return res.status(200).json(chats || []); // Return an empty array if no chats found
             }
             // If there are chats, return them
             return res.status(200).json(chats);
