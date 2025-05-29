@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { ChatDto } from "../types/chat.dto"
 import api from "../api/axios";
-import { Box, CircularProgress, List, Typography } from "@mui/material";
+import { Box, CircularProgress, Fab, List, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { t } from "i18next";
 import ChatItem from "../components/chatItem";
 
@@ -9,6 +10,7 @@ const ChatsListPage = () => {
     const [chats, setChats] = useState<ChatDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
         api.get<ChatDto[]>('/chats/my')
@@ -27,6 +29,9 @@ const ChatsListPage = () => {
             })
             .finally(() => setLoading(false));
     }, []);
+
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
 
     // Render the list of chats or a loading indicator
     if (loading) {
@@ -92,6 +97,20 @@ const ChatsListPage = () => {
                     <ChatItem key={chat.id} chat={chat} />
                 ))}
             </List>
+            <Fab 
+                color="primary"
+                aria-label="Create new chat"
+                onClick={handleOpenModal}
+                sx={{
+                    position: 'fixed',
+                    bottom: 24,
+                    right: 24,
+                    zIndex: 1100,
+                    boxShadow: '0px 3px 7px rgba(0, 0, 0, 0.45)',
+                }}
+            >
+                <AddIcon />
+            </Fab>
         </Box>
     );
 };
