@@ -44,7 +44,9 @@ export class ChatResponseDto {
             // If the last message is a system message, set the prefix accordingly
             if (lastMessage.type === MessageType.SYSTEM) {
                 lastMessagePrefix = `<system>`; // Prefix for system messages
-            // If not a system message, set the prefix based on chat type, sender and the current user seeing it
+            } else if (!lastMessage.user) {
+                // If the user who sent the message does not exist
+                lastMessagePrefix = `<user_deleted>`;
             } else {
                 const sender = lastMessage.user;
                 const senderIsCurrentUser = sender.id === currentUserId;
