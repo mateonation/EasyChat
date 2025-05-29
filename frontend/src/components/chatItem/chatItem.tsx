@@ -1,4 +1,4 @@
-import { Avatar, ListItem, ListItemText } from "@mui/material";
+import { Avatar, ListItem, ListItemAvatar, ListItemIcon, ListItemText } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
@@ -24,12 +24,16 @@ const ChatItem = ({ chat }: ChatItemProps) => {
             component="li"
             onClick={handleClick}
         >
-            <Avatar
-                sx={{ width: 40, height: 40, marginRight: 2 }}
-                alt={chat.name.charAt(0).toUpperCase()}
-            >
-                {chat.name.charAt(0).toUpperCase()}
-            </Avatar>
+            <ListItemIcon>
+                <ListItemAvatar>
+                    <Avatar
+                        sx={{ width: 40, height: 40, marginRight: 2 }}
+                        alt={chat.name.charAt(0).toUpperCase()}
+                    >
+                        {chat.name.charAt(0).toUpperCase()}
+                    </Avatar>
+                </ListItemAvatar>
+            </ListItemIcon>
             <ListItemText 
                 primary={chat.name}
                 secondary={
