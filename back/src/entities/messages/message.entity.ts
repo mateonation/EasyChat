@@ -37,6 +37,10 @@ export class Message {
 
     @CreateDateColumn({ 
         type: 'timestamp',
+        transformer: {
+            to: (value: Date) => value,
+            from: (value: Date) => new Date(value.toISOString()), // 
+        },
     })
     sentDate: Date; // Date and timestamp when the message was sent
 }
