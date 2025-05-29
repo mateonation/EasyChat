@@ -14,6 +14,7 @@ interface ChatItemProps {
     chat: {
         id: number;
         name: string;
+        type: string;
         lastMessagePrefix: string;
         lastMessageContent: string;
         lastMessageSentDate: string;
@@ -59,20 +60,30 @@ const ChatItem = ({ chat }: ChatItemProps) => {
         return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear().toString().slice(2)}`;
     }
 
-    // Logic for the content of the message
+    // Logic to format the last message sent based on prefix and type of chat
     const formatMessage = () => {
         const prefix = chat.lastMessagePrefix;
         let prefixStr = prefix;
-
-        if(prefix === '<you>') prefixStr = t('CHAT_PREFIX_YOU');
-        else if(prefix === '<user_deleted>') prefixStr = t('CHAT_DELETED_USER');
-        else if(prefix === '<system>') prefixStr = "";
-
         let content = chat.lastMessageContent;
-        if (content === '<msg_deleted>') content = t('CHAT_MESSAGE_DELETED');
 
+        // If prefix says is a system message, format it in italics and return it
         if(prefix === '<system>') return <em>{content}</em>
 
+        // If chat is private and the prefix is empty, it is understood that the author of that message is the user itself, so we return the content directly
+        if(chat.type === 'private') {
+            if(prefix === '') return content;
+        }
+
+        // If prefix is <you>, it means the user sent the last message, so we format it as translated string like "You: content"
+        if(prefix === '<you>') prefixStr = t('CHAT_PREFIX_YOU');
+
+        // If the prefix says that the user was deleted, we format it as translated string like "Deleted User: content"
+        else if(prefix === '<user_deleted>') prefixStr = t('CHAT_DELETED_USER');
+
+        // If the content of the message is <msg_deleted> we replace it with a translated string
+        if (content === '<msg_deleted>') content = t('CHAT_MESSAGE_DELETED');
+
+        // For other cases, it's understood that the sender is another member of a group, so we format it as "MemberName: content"
         return <><strong>{prefixStr}:</strong> {content}</>
     }
     return (
