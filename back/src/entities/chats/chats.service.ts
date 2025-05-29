@@ -88,7 +88,7 @@ export class ChatsService {
     }
 
     // Search for an existing individual chat between two users
-    async findIndividualChat(
+    async findPrivateChat(
         user1id: number,
         user2id: number,
     ): Promise<ChatResponseDto | null> {
