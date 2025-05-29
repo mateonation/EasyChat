@@ -115,7 +115,7 @@ export class ChatsService {
         // Fetch the chat with its members
         const chat = await this.chatRepo.findOne({
             where: { id: select?.chatId },
-            relations: ['members', 'members.user', 'members.user.roles'],
+            relations: ['members', 'members.user', 'messages', 'messages.user'],
         });
 
         if (!chat) return null;
