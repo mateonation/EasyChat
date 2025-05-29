@@ -31,7 +31,8 @@ const ChatItem = ({ chat }: ChatItemProps) => {
     // Format the date of the last message based on the difference
     const formatDate = (isoDate: string) => {
         const now = new Date();
-        const date = new Date(isoDate);
+        const date = new Date(isoDate); // Parse the ISO date string into a Date object
+
         const diffMs = now.getTime() - date.getTime();
         const diffMinutes = Math.floor(diffMs / (1000 * 60));
         const diffHours = Math.floor(diffMinutes / 60);
