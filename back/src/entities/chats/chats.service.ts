@@ -42,7 +42,17 @@ export class ChatsService {
 
         // Map the unique chat objects to ChatResponseDto instances
         // This will convert each chat object to a ChatResponseDto
-        return uniqueChats.map(chat => ChatResponseDto.fromChat(chat, userId));
+        const chatDtos = uniqueChats.map(chat => ChatResponseDto.fromChat(chat, userId));
+
+        // Order the chats by last message sent date in descending order
+        chatDtos.sort((a, b) => {
+            const dateA = new Date(a.lastMessageSentDate ?? 0).getTime();
+            const dateB = new Date(b.lastMessageSentDate ?? 0).getTime();
+            return dateB - dateA; // Sort in descending order
+        });
+
+        // Return the array of ChatResponseDto instances ordered by last message sent date
+        return chatDtos;
     }
 
     // Function to modify data of a group chat
