@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: webchatdb
       MYSQL_USER: user
       MYSQL_PASSWORD: 1234
+      TZ: UTC
+    command: --default-time-zone='+00:00'
     ports:
       - "3306:3306"
     volumes:
