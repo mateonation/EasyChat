@@ -28,7 +28,7 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                 primary={chat.name}
                 secondary={
                     <>
-                        <strong>{chat.lastMessagePrefix}:</strong> {chat.lastMessageContent.slice(0, 15) + '...'}
+                        <strong>{chat.lastMessagePrefix}:</strong> {chat.lastMessageContent}
                         <br />
                         <span style={{ fontSize: '0.8rem', color: 'gray' }}>{new Date(chat.lastMessageSentDate).toLocaleString()}</span>
                     </>
