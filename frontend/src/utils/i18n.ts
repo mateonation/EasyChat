@@ -47,6 +47,9 @@ const resources = {
             CHATS_LIST_UNEXPECTED_FORMAT: "Unexpected response format",
             CHATS_LIST_EMPTY_STRING0: "You have no chats yet...",
             CHATS_LIST_EMPTY_STRING1: "why not create one now?",
+            CHAT_PREFIX_YOU: "You",
+            CHAT_DELETED_USER: "[Deleted]",
+            CHAT_MESSAGE_DELETED: "This message has been removed",
 
             // DATE AND TIMES
             DATE_TODAY: "Today",
@@ -119,6 +122,9 @@ const resources = {
             CHATS_LIST_UNEXPECTED_FORMAT: "Formato de respuesta inesperado",
             CHATS_LIST_EMPTY_STRING0: "Aún no tienes ningún chat...",
             CHATS_LIST_EMPTY_STRING1: "¿por qué no creas uno ahora?",
+            CHAT_PREFIX_YOU: "Tú",
+            CHAT_DELETED_USER: "[Eliminado]",
+            CHAT_MESSAGE_DELETED: "Este mensaje fue borrado",
 
             // DATE AND TIMES
             DATE_TODAY: "Hoy",
@@ -190,7 +196,10 @@ const resources = {
             CHATS_LIST_ERROR: "Erro ao cargar os chats",
             CHATS_LIST_UNEXPECTED_FORMAT: "Formato de resposta inesperábel",
             CHATS_LIST_EMPTY_STRING0: "Aínda non tes un chat...",
-            CHATS_LIST_EMPTY_STRING1: "por qué non crear un agora?",
+            CHATS_LIST_EMPTY_STRING1: "por qué non comezas un agora?",
+            CHAT_PREFIX_YOU: "Ti",
+            CHAT_DELETED_USER: "[Eliminado]",
+            CHAT_MESSAGE_DELETED: "Esta mensaxe borrouse",
 
             // DATE AND TIMES
             DATE_TODAY: "Hoxe",
