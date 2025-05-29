@@ -9,7 +9,7 @@ interface ChatItemProps {
         name: string;
         lastMessagePrefix: string;
         lastMessageContent: string;
-        lastMessageDate: string;
+        lastMessageSentDate: string;
     };
 }
 
@@ -30,7 +30,7 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                     <>
                         <strong>{chat.lastMessagePrefix}:</strong> {chat.lastMessageContent.slice(0, 15) + '...'}
                         <br />
-                        <span style={{ fontSize: '0.8rem', color: 'gray' }}>{new Date(chat.lastMessageDate).toLocaleString()}</span>
+                        <span style={{ fontSize: '0.8rem', color: 'gray' }}>{new Date(chat.lastMessageSentDate).toLocaleString()}</span>
                     </>
                 }
             />
