@@ -11,6 +11,7 @@ export class ChatResponseDto {
     description: string;
     lastMessagePrefix: string;
     lastMessageContent: string;
+    lastMessageSentDate: Date | null = null;
     members: MemberResponseDto[];
 
     constructor(chat: Chat) {
@@ -38,6 +39,7 @@ export class ChatResponseDto {
 
         let lastMessagePrefix = '';
         let lastMessageContent = '';
+        let lastMessageSentDate: Date | null = null;
         if (lastMessage) {
             // If the last message is a system message, set the prefix accordingly
             if (lastMessage.type === MessageType.SYSTEM) {
@@ -65,6 +67,9 @@ export class ChatResponseDto {
             // If the message is deleted -> placeholder for deleted message
             if (lastMessage.isDeleted === true) lastMessageContent = '<msg_deleted>';
             else lastMessageContent = lastMessage.content;
+
+            // Set the last message sent date
+            lastMessageSentDate = lastMessage.sentDate;
         }
 
         return {
@@ -75,6 +80,7 @@ export class ChatResponseDto {
             description: chat.description,
             lastMessagePrefix,
             lastMessageContent,
+            lastMessageSentDate,
             members: MemberResponseDto.fromMembers(chat.members),
         };
     }
