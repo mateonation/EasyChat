@@ -2,12 +2,12 @@ import { MemberDto } from "./member.dto";
 
 export interface ChatDto {
     id: number;
-    creationDate: Date;
+    creationDate: string;
     type: string;
     name: string;
     description: string;
     lastMessagePrefix: string;
     lastMessageContent: string;
-    lastMessageSentDate: Date | null;
+    lastMessageSentDate: string;
     members: MemberDto[];
 }
