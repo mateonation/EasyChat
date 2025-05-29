@@ -35,6 +35,8 @@ export class Message {
     })
     type: MessageType; // Type of the message (text, image, video, etc.)
 
-    @CreateDateColumn()
+    @CreateDateColumn({ 
+        type: 'timestamp',
+    })
     sentDate: Date; // Date and timestamp when the message was sent
 }
