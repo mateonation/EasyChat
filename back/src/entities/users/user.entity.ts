@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMan
 import { Role } from "./role/role";
 import { ChatMember } from '../chats/chatmembers/chatmember.entity';
 import { Message } from "../messages/message.entity";
+import { UtcDateTransformer } from "src/common/transformers/UtcDateTransformer";
 
 @Entity()
 export class User {
@@ -18,10 +19,7 @@ export class User {
 
     @CreateDateColumn({ 
         type: 'timestamp',
-        transformer: {
-            to: (value: Date) => value,
-            from: (value: Date) => new Date(value.toISOString()), // 
-        },
+        transformer: UtcDateTransformer,
     })
     registerDate: Date;
 

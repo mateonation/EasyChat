@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Un
 import { User } from "../../users/user.entity";
 import { Chat } from "../../chats/chat.entity";
 import { ChatMemberRole } from "src/common/enums/chat-members-roles.enum";
+import { UtcDateTransformer } from "src/common/transformers/UtcDateTransformer";
 
 @Entity()
 @Unique(["user", "chat"]) // Only an user can be member of a chat once
@@ -25,10 +26,7 @@ export class ChatMember {
 
     @CreateDateColumn({ 
         type: 'timestamp',
-        transformer: {
-            to: (value: Date) => value,
-            from: (value: Date) => new Date(value.toISOString()), // 
-        },
+        transformer: UtcDateTransformer,
     })
     joinDate: Date;
 }

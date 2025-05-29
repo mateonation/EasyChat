@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } f
 import { User } from "../users/user.entity";
 import { Chat } from "../chats/chat.entity";
 import { MessageType } from "src/common/enums/message-type.enum";
+import { UtcDateTransformer } from "src/common/transformers/UtcDateTransformer";
 
 @Entity()
 export class Message {
@@ -37,10 +38,7 @@ export class Message {
 
     @CreateDateColumn({ 
         type: 'timestamp',
-        transformer: {
-            to: (value: Date) => value,
-            from: (value: Date) => new Date(value.toISOString()), // 
-        },
+        transformer: UtcDateTransformer,
     })
     sentDate: Date; // Date and timestamp when the message was sent
 }
