@@ -1,4 +1,5 @@
 {
+    "PRIVCHAT_CREATED": "{username} created a private chat with {otherUser}",
     "GROUP_CREATED": "{username} created this group",
     "NEW_MEMBER": "{newMember} was added by {admin}",
     "NEW_MEMBERS": "{admin} added the following members: {newMembers}",

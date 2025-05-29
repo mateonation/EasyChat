@@ -137,6 +137,15 @@ export class ChatsController {
                     // Add both users to the chat
                     await this.membersService.addUserToChat(requester.id, chatCreated.id);
                     await this.membersService.addUserToChat(userToCreateChatWith.id, chatCreated.id);
+                    // Send 'chat created' system message to the chat
+                    await this.messageService.sendSystemMessage(
+                        chatCreated.id,
+                        'PRIVCHAT_CREATED',
+                        {
+                            username: requester.username,
+                            otherUser: userToCreateChatWith.username,
+                        }
+                    );
                     chatId = chatCreated.id; // Get the ID of the created chat
                     break;
                 // Create a group chat
