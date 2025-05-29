@@ -2,6 +2,7 @@ import './App.css'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import LoginPage from './pages/loginpage';
 import RegisterPage from './pages/registerpage';
+import ChatsListPage from './pages/chatlistpage';
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -34,7 +35,16 @@ const router = createBrowserRouter(
             {
               path: 'register',
               element: <RegisterPage />
-            }
+            },
+            {
+              path: 'chats',
+              children: [
+                {
+                  index: true,
+                  element: <ChatsListPage />
+                },
+              ]
+            },
           ]
         }
       ]
