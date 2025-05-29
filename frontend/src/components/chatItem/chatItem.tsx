@@ -1,10 +1,10 @@
-import { 
-    Avatar, 
-    ListItem, 
-    ListItemAvatar, 
-    ListItemIcon, 
+import {
+    Avatar,
+    ListItem,
+    ListItemAvatar,
     ListItemText,
 } from "@mui/material";
+import GroupIcon from '@mui/icons-material/Group';
 import { useNavigate } from "react-router-dom";
 import { t } from "i18next";
 
@@ -67,18 +67,18 @@ const ChatItem = ({ chat }: ChatItemProps) => {
         let content = chat.lastMessageContent;
 
         // If prefix says is a system message, format it in italics and return it
-        if(prefix === '<system>') return <em>{content}</em>
+        if (prefix === '<system>') return <em>{content}</em>
 
         // If chat is private and the prefix is empty, it is understood that the author of that message is the user itself, so we return the content directly
-        if(chat.type === 'private') {
-            if(prefix === '') return content;
+        if (chat.type === 'private') {
+            if (prefix === '') return content;
         }
 
         // If prefix is <you>, it means the user sent the last message, so we format it as translated string like "You: content"
-        if(prefix === '<you>') prefixStr = t('CHAT_PREFIX_YOU');
+        if (prefix === '<you>') prefixStr = t('CHAT_PREFIX_YOU');
 
         // If the prefix says that the user was deleted, we format it as translated string like "Deleted User: content"
-        else if(prefix === '<user_deleted>') prefixStr = t('CHAT_DELETED_USER');
+        else if (prefix === '<user_deleted>') prefixStr = t('CHAT_DELETED_USER');
 
         // If the content of the message is <msg_deleted> we replace it with a translated string
         if (content === '<msg_deleted>') content = t('CHAT_MESSAGE_DELETED');
@@ -100,17 +100,15 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                 mb: 1,
             }}
         >
-            <ListItemIcon>
-                <ListItemAvatar>
-                    <Avatar
-                        sx={{ width: 40, height: 40, marginRight: 2 }}
-                        alt={chat.name.charAt(0).toUpperCase()}
-                    >
-                        {chat.name.charAt(0).toUpperCase()}
-                    </Avatar>
-                </ListItemAvatar>
-            </ListItemIcon>
-            <ListItemText 
+            <ListItemAvatar>
+                <Avatar
+                    sx={{ width: 40, height: 40, marginRight: 2 }}
+                    alt={chat.name}
+                >
+                    {chat.type === 'group' ? <GroupIcon /> : chat.name.charAt(0).toUpperCase()}
+                </Avatar>
+            </ListItemAvatar>
+            <ListItemText
                 primary={chat.name}
                 secondary={
                     <>
