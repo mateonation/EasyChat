@@ -105,9 +105,10 @@ export class UsersService {
         birthDate: Date
     ): Promise<boolean> {
         const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        const dayDiff = today.getDate() - birthDate.getDate();
+        const birthDateUser = new Date(birthDate);
+        const age = today.getFullYear() - birthDateUser.getFullYear();
+        const monthDiff = today.getMonth() - birthDateUser.getMonth();
+        const dayDiff = today.getDate() - birthDateUser.getDate();
 
         if (age > 18) return true;
         if (age === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0))) return true;
