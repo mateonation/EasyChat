@@ -26,7 +26,6 @@ const ChatItem = ({ chat }: ChatItemProps) => {
         navigate(`${BASE}/chats/${chat.id}`);
     };
 
-
     // Format the date of the last message based on the difference
     const formatDate = (isoDate: string) => {
         const now = new Date();
@@ -59,6 +58,23 @@ const ChatItem = ({ chat }: ChatItemProps) => {
         // For older dates, return the full date in "MM/DD/YY" format
         return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear().toString().slice(2)}`;
     }
+
+    // Logic for the content of the message
+    const formatMessage = () => {
+        const prefix = chat.lastMessagePrefix;
+        let prefixStr = prefix;
+
+        if(prefix === '<you>') prefixStr = t('CHAT_PREFIX_YOU');
+        else if(prefix === '<user_deleted>') prefixStr = t('CHAT_DELETED_USER');
+        else if(prefix === '<system>') prefixStr = "";
+
+        let content = chat.lastMessageContent;
+        if (content === '<msg_deleted>') content = t('CHAT_MESSAGE_DELETED');
+
+        if(prefix === '<system>') return <em>{content}</em>
+
+        return <><strong>{prefixStr}:</strong> {content}</>
+    }
     return (
         <ListItem
             component="li"
@@ -78,7 +94,7 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                 primary={chat.name}
                 secondary={
                     <>
-                        <strong>{chat.lastMessagePrefix}:</strong> {chat.lastMessageContent}
+                        {formatMessage()}
                         <br />
                         <span style={{ fontSize: '0.8rem', color: 'gray' }}>{formatDate(chat.lastMessageSentDate)}</span>
                     </>
