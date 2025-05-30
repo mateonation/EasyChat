@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { predefinedRoles } from './role/predefinedRoles';
 import * as argon2 from 'argon2';
 import { UserResponseDto } from './dto/user-response.dto';
-import { ConflictException } from 'src/errors/conflictException';
 import { SaveUserDto } from './dto/save-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UnauthorizedException } from 'src/errors/unauthorizedException';
@@ -15,8 +14,11 @@ import { NotFoundException } from 'src/errors/notFoundException';
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User) private usersRepo: Repository<User>,
-        @InjectRepository(Role) private rolesRepo: Repository<Role>,
+        @InjectRepository(User) 
+        private usersRepo: Repository<User>,
+
+        @InjectRepository(Role) 
+        private rolesRepo: Repository<Role>,
     ) { }
 
     // Autoinject predefined roles into the DB when initiating app if they do not exist
@@ -41,13 +43,16 @@ export class UsersService {
     }
 
     // Authenticate and return user if credentials are valid
-    async authenticate(loginUserDto: LoginUserDto): Promise<UserResponseDto> {
+    async authenticate(
+        loginUserDto: LoginUserDto
+    ): Promise<UserResponseDto | null> {
         // Find user by username
-        const user = await this.usersRepo.findOne({ where: { username: loginUserDto.username }, relations: ['roles'] });
-        // Check if user exists and password matches
-        if (!user || !(await argon2.verify(user.password, loginUserDto.password))) {
-            throw new UnauthorizedException('Username or password are incorrect');
-        }
+        const user = await this.usersRepo.findOne({ 
+            where: { username: loginUserDto.username }, 
+            relations: ['roles'], 
+        });
+        // Check if user exists and password matches, if not, return null
+        if (!user || !(await argon2.verify(user.password, loginUserDto.password))) return null;
         // Return user response dto
         return UserResponseDto.fromUser(user);
     }
@@ -57,7 +62,10 @@ export class UsersService {
     async findById(
         id: number
     ): Promise<UserResponseDto | null> {
-        const user = await this.usersRepo.findOne({ where: { id }, relations: ['roles'] });
+        const user = await this.usersRepo.findOne({
+            where: { id },
+            relations: ['roles'],
+        });
         if (!user) return null;
         return UserResponseDto.fromUser(user);
     }
@@ -67,9 +75,9 @@ export class UsersService {
     async getByUsername(
         username: string
     ): Promise<UserResponseDto | null> {
-        const user = await this.usersRepo.findOne({ 
-            where: { username }, 
-            relations: ['roles'] 
+        const user = await this.usersRepo.findOne({
+            where: { username },
+            relations: ['roles'],
         });
         if (!user) return null;
         return UserResponseDto.fromUser(user);
