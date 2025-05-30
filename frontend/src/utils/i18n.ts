@@ -130,7 +130,6 @@ const resources = {
             GROUP_CREATE_ERROR_NAME: "Group's name must be at least 3 characters long and at most 50 characters long",
             GROUP_CREATE_ERROR_DESCRIPTION: "Group's description must be at most 255 characters long",
             CHAT_CREATE_ERROR_TYPE: "Chat type is required",
-            GROUP_CREATE_MISSING_MEMBERS: "You must add at least one member to the group chat",
 
             // MEMBERS
             MEMBER_ROLE_ADMIN: "Admin",
@@ -162,6 +161,32 @@ const resources = {
             // ERRORES GENÉRICOS
             ERR_NETWORK: "Error de red",
             ERR_SERVER: "Error del servidor",
+            ERR_UNEXPECTED: "Error inesperado",
+            ERR_UNEXPECTED_FORMAT: "Formato de respuesta inesperado",
+
+            // RESPUESTAS GENERICAS
+            GENERIC_QUESTION_YES: "Sí",
+            GENERIC_QUESTION_NO: "No",
+            GENERIC_QUESTION_CANCEL: "Cancelar",
+            GENERIC_QUESTION_CONFIRM: "Confirmar",
+            GENERIC_QUESTION_DELETE: "Eliminar",
+            GENERIC_QUESTION_REMOVE: "Borrar",
+            GENERIC_QUESTION_LEAVE: "Salir",
+            GENERIC_QUESTION_OK: "OK",
+            GENERIC_QUESTION_CLOSE: "Cerrar",
+            GENERIC_QUESTION_ADD: "Añadir",
+            GENERIC_QUESTION_EDIT: "Editar",
+            GENERIC_QUESTION_SAVE: "Guardar",
+            GENERIC_QUESTION_SUBMIT: "Enviar",
+
+            // MENSAJES GENERICOS
+            GENERIC_MSG_ERROR: "Error",
+            GENERIC_MSG_SUCCESS: "Éxito",
+            GENERIC_MSG_WARNING: "Advertencia",
+            GENERIC_MSG_INFO: "Info",
+            GENERIC_MSG_LOADING: "Cargando...",
+            GENERIC_MSG_NOT_FOUND: "No encontrado",
+            GENERIC_MSG_UNAUTHORIZED: "No autorizado",
 
             // CAMPOS DE FORMULARIO
             FORM_USERNAME_LABEL: "Nombre de usuario",
@@ -172,6 +197,22 @@ const resources = {
             FORM_PASSWORD2_PLACEHOLDER: "Introduce tu contraseña de nuevo",
             FORM_BIRTHDATE_LABEL: "Fecha de nacimiento",
             FORM_BIRTHDATE_MINOR: "Debes tener 18 años como mínimo para crear una cuenta",
+            FORM_CHAT_TYPE_LABEL: "Tipo de chat",
+            FORM_CHAT_TYPE_PLACEHOLDER: "Selecciona el tipo de chat",
+            FORM_GROUP_NAME_LABEL: "Nombre del grupo",
+            FORM_GROUP_NAME_PLACEHOLDER: "Escribe el nombre del grupo",
+            FORM_GROUP_DESCRIPTION_LABEL: "Descripción del grupo",
+            FORM_GROUP_DESCRIPTION_PLACEHOLDER: "Escribe una descripción del grupo",
+            FORM_MEMBERS_LABEL: "Miembros",
+            FORM_MEMBERS_PLACEHOLDER: "Añade members al grupo escribiendo sus nombres de usuario",
+            FORM_MEMBERS_ADD: "Añadir miembros",
+            FORM_SEARCH_LABEL: "Buscar",
+            FORM_SEARCH_CLEAR: "Vaciar búsqueda",
+            FORM_CHAT_SEARCH_LABEL: "Buscar chats",
+            FORM_CHAT_SEARCH_PLACEHOLDER: "Busca un chat por su nombre",
+            FORM_MESSAGE_SEARCH_LABEL: "Buscar mensajes",
+            FORM_MESSAGE_SEARCH_PLACEHOLDER: "Busca un mensaje por su contenido",
+            FORM_MESSAGE_PLACEHOLDER: "Escribe un mensaje...",
 
             // PÁGINA DE INICIAR SESIÓN
             LOGIN_PAGE_TITLE: "Iniciar sesión",
@@ -180,7 +221,7 @@ const resources = {
             LOGIN_REGISTER_LABEL: "¿Aún no tienes una cuenta?",
             LOGIN_REGISTER_LINK: "Crea una nueva",
 
-            // REGISTER PAGE
+            // PAGINA DE REGISTRO
             REGISTER_PAGE_TITLE: "Registrar cuenta",
             REGISTER_FORM_SUBMIT: "Crear cuenta",
             REGISTER_USERNAME_SHORT: "El nombre de usuario debe tener al menos 3 caracteres",
@@ -194,7 +235,7 @@ const resources = {
             REGISTER_LOGIN_LABEL: "¿Ya tienes una cuenta?",
             REGISTER_LOGIN_LINK: "Inicia sesión aquí",
             
-            // CHATS LIST PAGE
+            // PAGINA DE LISTA DE CHATS
             CHATS_LIST_PAGE_TITLE: "Mis chats",
             CHATS_LIST_LOADING: "Cargando chats...",
             CHATS_LIST_ERROR: "Error al cargar los chats",
@@ -205,7 +246,7 @@ const resources = {
             CHAT_DELETED_USER: "[Eliminado]",
             CHAT_MESSAGE_DELETED: "Este mensaje fue borrado",
 
-            // DATE AND TIMES
+            // FECHAS Y HORAS
             DATE_TODAY: "Hoy",
             DATE_YESTERDAY: "Ayer",
             DATE_NOW: "Ahora mismo",
@@ -229,6 +270,42 @@ const resources = {
             DATE_MULTIPLE_WEEKS: "Hace {{count}} semanas",
             DATE_MULTIPLE_MONTHS: "Hace {{count}} meses",
             DATE_MULTIPLE_YEARS: "Hace {{count}} años",
+            
+            // CREAR CHAT
+            CREATE_CHAT_TITLE: "Crear un chat nuevo",
+            CHAT_TYPE_PRIVATE: "Chat privado",
+            CHAT_TYPE_GROUP: "Chat grupal",
+            CHAT_TYPE_PUBLIC: "Chat público",
+            CHAT_CREATE: "Crear chat",
+            CHAT_CREATE_SUCCESS: "Chat creado correctamente",
+            CHAT_CREATE_ERROR: "Fallo al crear chat.",
+            CHAT_CREATE_ERROR_UNEXPECTED: "Error inesperado al crear el chat",
+            GROUP_CREATE_ERROR_NAME: "El nombre del grupo debe tener al menos 3 caracteres y como máximo 50 caracteres",
+            GROUP_CREATE_ERROR_DESCRIPTION: "La descripción del grupo debe tener como máximo 255 caracteres",
+            CHAT_CREATE_ERROR_TYPE: "El tipo de chat es requerido",
+
+            // MIEMBROS
+            MEMBER_ROLE_ADMIN: "Administrador",
+            MEMBER_ROLE_MEMBER: "Miembro",
+            MEMBER_ROLE_OWNER: "Propietario",
+            MEMBERS_ADD_ERROR: "Fallo al añadir miembros",
+            MEMBER_ALREADY_EXISTS: "{{username}} ya es un miembro de este chat",
+            MEMBERS_ADD_ERROR_UNEXPECTED: "Error inesperado al añadir miembros",
+            MEMBER_REMOVE_ERROR_UNEXPECTED: "Error inesperado al eliminar miembro",
+            MEMBERS_ADD_ERROR_NOT_ENOUGH: "Debes añadir al menos un miembro al grupo",
+            MEMBERS_ADD_ERROR_NOT_FOUND: "Algunos de los usuarios que intentaste añadir no fueron encontrados",
+            MEMBER_REMOVE_ERROR: "Fallo al eliminar el miembro",
+            MEMBER_REMOVE_OWNER_ERROR: "No puedes eliminar al propietario de este grupo",
+            MEMBER_REMOVAL_UNAUTHORIZED_ADMIN: "Debes ser un administrador para eliminar miembros de este grupo",
+            MEMBERS_ADD_SUCCESS: "Miembros añadidos correctamente",
+            
+            MEMBER_ERROR_INVALID: "Lista de miembros inválida",
+            MEMBER_ERROR_EMPTY: "La lista de miembros no puede estar vacía",
+            MEMBER_REMOVE_SUCCESS: "{{username}} fue eliminado del grupo correctamente",
+            MEMBER_ERROR_NOT_FOUND: "{{username}} no es un miembro de este grupo",
+            MEMBER_REMOVE_ITSELF_QUESTION: "¿Estás seguro de que quieres abandonar este grupo?",
+            MEMBER_REMOVE_ITSELF_SUCCESS: "Abandonaste el grupo",
+            MEMBER_REMOVE_ITSELF_ERROR: "Fallo al abandonar el grupo",
         }
     },
     // GALICIAN
@@ -237,6 +314,32 @@ const resources = {
             // ERROS XENÉRICOS
             ERR_NETWORK: "Erro da red",
             ERR_SERVER: "Erro do servidor",
+            ERR_UNEXPECTED: "Error inesperado",
+            ERR_UNEXPECTED_FORMAT: "Formato de resposta inesperado",
+
+            // RESPOSTAS XENÉRICAS
+            GENERIC_QUESTION_YES: "Sí",
+            GENERIC_QUESTION_NO: "Non",
+            GENERIC_QUESTION_CANCEL: "Cancelar",
+            GENERIC_QUESTION_CONFIRM: "Confirmar",
+            GENERIC_QUESTION_DELETE: "Remover",
+            GENERIC_QUESTION_REMOVE: "Borrar",
+            GENERIC_QUESTION_LEAVE: "Sair",
+            GENERIC_QUESTION_OK: "OK",
+            GENERIC_QUESTION_CLOSE: "Pechar",
+            GENERIC_QUESTION_ADD: "Engadir",
+            GENERIC_QUESTION_EDIT: "Editar",
+            GENERIC_QUESTION_SAVE: "Gardar",
+            GENERIC_QUESTION_SUBMIT: "Enviar",
+
+            // MENSAXES XENÉRICOS
+            GENERIC_MSG_ERROR: "Error",
+            GENERIC_MSG_SUCCESS: "Éxito",
+            GENERIC_MSG_WARNING: "Advertencia",
+            GENERIC_MSG_INFO: "Info",
+            GENERIC_MSG_LOADING: "Cargando...",
+            GENERIC_MSG_NOT_FOUND: "Non atopado",
+            GENERIC_MSG_UNAUTHORIZED: "Non autorizado",
 
             // CAMPOS DO FORMULARIO
             FORM_USERNAME_LABEL: "Nome de usuario",
@@ -245,6 +348,22 @@ const resources = {
             FORM_PASSWORD_PLACEHOLDER: "Escribe o teu contrasinal",
             FORM_PASSWORD2_LABEL: "Confirmar contrasinal",
             FORM_PASSWORD2_PLACEHOLDER: "Escribe o teu contrasinal unha vez máis",
+            FORM_CHAT_TYPE_LABEL: "Tipo de chat",
+            FORM_CHAT_TYPE_PLACEHOLDER: "Selecciona o tipo de chat",
+            FORM_GROUP_NAME_LABEL: "Nome do grupo",
+            FORM_GROUP_NAME_PLACEHOLDER: "Nome do chat grupal",
+            FORM_GROUP_DESCRIPTION_LABEL: "Descripción do grupo",
+            FORM_GROUP_DESCRIPTION_PLACEHOLDER: "Engádelle unha descripción ao grupo",
+            FORM_MEMBERS_LABEL: "Membros",
+            FORM_MEMBERS_PLACEHOLDER: "Engade membros ao grupo escribindo os seus nomes de usuario",
+            FORM_MEMBERS_ADD: "Engadir membros",
+            FORM_SEARCH_LABEL: "Buscar",
+            FORM_SEARCH_CLEAR: "Baleirar búsqueda",
+            FORM_CHAT_SEARCH_LABEL: "Buscar chats",
+            FORM_CHAT_SEARCH_PLACEHOLDER: "Busca un chat polo seu nome",
+            FORM_MESSAGE_SEARCH_LABEL: "Buscar mensaxes",
+            FORM_MESSAGE_SEARCH_PLACEHOLDER: "Busca unha mensaxe polo seu contenido",
+            FORM_MESSAGE_PLACEHOLDER: "Escribe unha mensaxe...",
 
             // PÁXINA DE INICIAR SESIÓN
             LOGIN_PAGE_TITLE: "Iniciar sesión",
@@ -304,6 +423,42 @@ const resources = {
             DATE_MULTIPLE_WEEKS: "Fai {{count}} semanas",
             DATE_MULTIPLE_MONTHS: "Fai {{count}} meses",
             DATE_MULTIPLE_YEARS: "Fai {{count}} anos",
+            
+            // CREAR CHAT
+            CREATE_CHAT_TITLE: "Crear un chat novo",
+            CHAT_TYPE_PRIVATE: "Chat privado",
+            CHAT_TYPE_GROUP: "Chat grupal",
+            CHAT_TYPE_PUBLIC: "Chat público",
+            CHAT_CREATE: "Crear chat",
+            CHAT_CREATE_SUCCESS: "Chat creado correctamente",
+            CHAT_CREATE_ERROR: "Erro ao crear chat.",
+            CHAT_CREATE_ERROR_UNEXPECTED: "Erro inesperado ao crear o chat",
+            GROUP_CREATE_ERROR_NAME: "O nome do grupo debe ter polo menos 3 caracteres e como máximo 50 caracteres",
+            GROUP_CREATE_ERROR_DESCRIPTION: "A descripción do grupo debe ter como máximo 255 caracteres",
+            CHAT_CREATE_ERROR_TYPE: "Tipo do chat requerido",
+
+            // MEMBROS
+            MEMBER_ROLE_ADMIN: "Administrador",
+            MEMBER_ROLE_MEMBER: "Membro",
+            MEMBER_ROLE_OWNER: "Propietario",
+            MEMBERS_ADD_ERROR: "Erro ao engadir membros",
+            MEMBER_ALREADY_EXISTS: "{{username}} xa é un membro deste grupo",
+            MEMBERS_ADD_ERROR_UNEXPECTED: "Erro inesperado ao engadir membros",
+            MEMBER_REMOVE_ERROR_UNEXPECTED: "Erro inesperado ao eliminar membro",
+            MEMBERS_ADD_ERROR_NOT_ENOUGH: "Tes que engadir polo menos un membro ao grupo",
+            MEMBERS_ADD_ERROR_NOT_FOUND: "Algúns dos usuarios que tentaches engadir non foron atopados",
+            MEMBER_REMOVE_ERROR: "Erro ao eliminar o membro",
+            MEMBER_REMOVE_OWNER_ERROR: "Non podes eliminar ao propietario deste grupo",
+            MEMBER_REMOVAL_UNAUTHORIZED_ADMIN: "Tes que ser administrador para eliminar membros deste grupo",
+            MEMBERS_ADD_SUCCESS: "Membros engadidos correctamente",
+            
+            MEMBER_ERROR_INVALID: "Lista de membros inválida",
+            MEMBER_ERROR_EMPTY: "A lista de membros non pode estar baleira",
+            MEMBER_REMOVE_SUCCESS: "{{username}} foi eliminado do grupo",
+            MEMBER_ERROR_NOT_FOUND: "{{username}} non é un membro deste grupo",
+            MEMBER_REMOVE_ITSELF_QUESTION: "Seguro que queres abandonar este grupo?",
+            MEMBER_REMOVE_ITSELF_SUCCESS: "Abandonaches o grupo",
+            MEMBER_REMOVE_ITSELF_ERROR: "Erro ao abandonar o grupo",
         }
     },
     // CATALAN
