@@ -21,5 +21,14 @@ export const Theme: ThemeOptions = {
     warning: {
       main: '#ccd200',
     },
+    background: {
+      default: '#f5f5f5',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#000000',
+      secondary: '#555555',
+      disabled: '#aaaaaa',
+    },
   },
 };
