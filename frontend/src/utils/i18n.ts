@@ -45,7 +45,6 @@ const resources = {
             FORM_PASSWORD2_LABEL: "Repeat password",
             FORM_PASSWORD2_PLACEHOLDER: "Repeat your password here",
             FORM_BIRTHDATE_LABEL: "Date of birth",
-            FORM_BIRTHDATE_MINOR: "You must be at least 18 years old to register an account",
             FORM_CHAT_TYPE_LABEL: "Chat type",
             FORM_CHAT_TYPE_PLACEHOLDER: "Select the type of chat you want to create",
             FORM_GROUP_NAME_LABEL: "Group name",
@@ -73,16 +72,18 @@ const resources = {
             // REGISTER PAGE
             REGISTER_PAGE_TITLE: "Create a new account",
             REGISTER_FORM_SUBMIT: "Register",
-            REGISTER_USERNAME_SHORT: "Username must be at least 3 characters long",
-            REGISTER_USERNAME_LONG: "Username must be at most 20 characters long",
-            REGISTER_USERNAME_NOT_VALID: "Username can only contain letters, numbers, and underscores",
-            REGISTER_USERNAME_IN_USE: "This username has been already taken. Please, use another one",
-            REGISTER_PASSWORD_SHORT: "Password must be at least 6 characters long",
-            REGISTER_PASSWORD_LONG: "Password must be at most 30 characters long",
-            REGISTER_PASSWORD_MISMATCH: "Passwords do not match",
             REGISTER_SUCCESSFUL: "Congratulations! You have registered your account successfully. You can now log in to it",
             REGISTER_LOGIN_LABEL: "Already have an account?",
             REGISTER_LOGIN_LINK: "Log in here",
+
+            // FORM MESSAGES
+            MINIMUM_LENGTH: "'{{field}}' must have {{length}} characters at least",
+            MAXIMUM_LENGTH: "'{{field}}' must have {{length}} characters at most",
+            INVALID_FIELD: "'{{field}}' can only contain letters, numbers, and underscores",
+            INVALID_FIELD_ALT: "'{{field}}' can only contain letters, numbers, underscores and spaces",
+            ALREADY_IN_USE: "'{{data}}' already in use",
+            PASSWORD_MISMATCH: "Passwords do not match",
+            BIRTHDATE_INVALID: "You must be at least 18 years old",
 
             // CHATS LIST PAGE
             CHATS_LIST_PAGE_TITLE: "My chats",
@@ -200,7 +201,6 @@ const resources = {
             FORM_PASSWORD2_LABEL: "Confirmar contraseña",
             FORM_PASSWORD2_PLACEHOLDER: "Introduce tu contraseña de nuevo",
             FORM_BIRTHDATE_LABEL: "Fecha de nacimiento",
-            FORM_BIRTHDATE_MINOR: "Debes tener 18 años como mínimo para crear una cuenta",
             FORM_CHAT_TYPE_LABEL: "Tipo de chat",
             FORM_CHAT_TYPE_PLACEHOLDER: "Selecciona el tipo de chat",
             FORM_GROUP_NAME_LABEL: "Nombre del grupo",
@@ -228,17 +228,19 @@ const resources = {
             // PAGINA DE REGISTRO
             REGISTER_PAGE_TITLE: "Registrar cuenta",
             REGISTER_FORM_SUBMIT: "Crear cuenta",
-            REGISTER_USERNAME_SHORT: "El nombre de usuario debe tener al menos 3 caracteres",
-            REGISTER_USERNAME_LONG: "El nombre de usuario no debe tener más de 20 caracteres",
-            REGISTER_USERNAME_NOT_VALID: "El nombre de usuario solo puede contener letras, números y guiones bajos",
-            REGISTER_USERNAME_IN_USE: "Este nombre de usuario no está libre. Por favor, usa otro",
-            REGISTER_PASSWORD_SHORT: "Tu contraseña debe tener al menos 6 caracteres",
-            REGISTER_PASSWORD_LONG: "Tu contraseña no puede exceder los 30 caracteres",
-            REGISTER_PASSWORD_MISMATCH: "Las contraseñas no coinciden",
             REGISTER_SUCCESSFUL: "¡Felicidades! Tu cuenta fue registrada con éxito. Ahora puedes iniciar sesión en ella",
             REGISTER_LOGIN_LABEL: "¿Ya tienes una cuenta?",
             REGISTER_LOGIN_LINK: "Inicia sesión aquí",
             
+            // FORM MESSAGES
+            MINIMUM_LENGTH: "'{{field}}' debe tener {{length}} caracteres como mínimo",
+            MAXIMUM_LENGTH: "'{{field}}' no puede tener más de {{length}} caracteres",
+            INVALID_FIELD: "'{{field}}' solo puede tener letras, números y guiones bajos",
+            INVALID_FIELD_ALT: "'{{field}}' solo puede tener letras, números, guiones bajos y espacios",
+            ALREADY_IN_USE: "'{{data}}' ya está en uso",
+            PASSWORD_MISMATCH: "Las contraseñas no coinciden",
+            BIRTHDATE_INVALID: "Debes tener 18 años como mínimo",
+
             // PAGINA DE LISTA DE CHATS
             CHATS_LIST_PAGE_TITLE: "Mis chats",
             CHATS_LIST_LOADING: "Cargando chats...",
@@ -378,22 +380,23 @@ const resources = {
             LOGIN_REGISTER_LABEL: "Aínda non tes unha conta?",
             LOGIN_REGISTER_LINK: "Rexistrar unha nova",
             FORM_BIRTHDATE_LABEL: "Data de nacemento",
-            FORM_BIRTHDATE_MINOR: "Debes ter polo menos 18 anos para rexistrar unha conta",
 
             // REGISTER PAGE
             REGISTER_PAGE_TITLE: "Rexistrar conta nova",
             REGISTER_FORM_SUBMIT: "Crear usuario",
-            REGISTER_USERNAME_SHORT: "O nome de usuario debe ter 3 caracteres como mínimo",
-            REGISTER_USERNAME_LONG: "O nome de usuario non pode ter máis de 20 caracteres",
-            REGISTER_USERNAME_NOT_VALID: "O nome de usuario só pode conter letras, números, e guións baixos",
-            REGISTER_USERNAME_IN_USE: "Este nome de usuario non está disponíbel. Por favor, usa outro",
-            REGISTER_PASSWORD_SHORT: "O teu contrasinal debe ter 6 caracteres como mínimo",
-            REGISTER_PASSWORD_LONG: "O teu contrasinal non pode exceder os 30 caracteres",
-            REGISTER_PASSWORD_MISMATCH: "Os contrasinais non coinciden",
             REGISTER_SUCCESSFUL: "Noraboa! Rexistráchesche correctamente. Agora podes iniciar sesión na túa conta",
             REGISTER_LOGIN_LABEL: "Xa tes unha conta creada?",
             REGISTER_LOGIN_LINK: "Inicia sesión nela",
             
+            // FORM MESSAGES
+            MINIMUM_LENGTH: "'{{field}}' debe ter {{length}} caracteres como mínimo",
+            MAXIMUM_LENGTH: "'{{field}}' non pode ter máis de {{length}} caracteres",
+            INVALID_FIELD: "'{{field}}' só pode ter letras, números e guións baixos",
+            INVALID_FIELD_ALT: "'{{field}}' só pode ter letras, números, guións baixos e espazos",
+            ALREADY_IN_USE: "'{{data}}' actualmente en uso",
+            PASSWORD_MISMATCH: "Os contrasinais non coinciden",
+            BIRTHDATE_INVALID: "Debes ter polo menos 18 anos",
+
             // CHATS LIST PAGE
             CHATS_LIST_PAGE_TITLE: "Chats",
             CHATS_LIST_LOADING: "Cargando chats...",
