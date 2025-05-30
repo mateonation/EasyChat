@@ -120,7 +120,7 @@ export class ChatsController {
                     // Check if the user provided in the request exists
                     const userToCreateChatWith = await this.usersService.findByUsername(dto.usernames[0]) // User to create chat with
                     if (!userToCreateChatWith) throw new NotFoundException(`User (ID: ${dto.usernames[0]}) not found`);
-                    // If an individual chat between the two users already exists, return it instead of creating a new one
+                    // If an private chat between the two users already exists, return it instead of creating a new one
                     const existingChat = await this.chatsService.findPrivateChat(requester.id, userToCreateChatWith.id);
                     if (existingChat) { // If chat already exists, return it
                         return res.status(200).json({
@@ -148,6 +148,9 @@ export class ChatsController {
                 // Create a group chat
                 // A group chat can have multiple members and can be created by any user
                 case 'group':
+                    // If body of request does not contain name, throw an exception
+                    if (!dto.name) throw new BadRequestException('A name is required to create a group chat');
+
                     // Filter out the requester username from the list of users
                     const unames = dto.usernames.filter((username) => username !== requester.username);
                     if (unames.length === 0) throw new BadRequestException('You must provide at least one user ID to create a group chat');
@@ -166,8 +169,8 @@ export class ChatsController {
                     const groupCreated = await this.chatsService.createChat();
                     // Update chat with group chat properties given by the requester
                     await this.chatsService.updateGroup(groupCreated.id, {
-                        name: dto.name ?? `Group ${groupCreated.id}`,
-                        description: dto.description ?? `Group chat created by user ${requester.username}.`,
+                        name: dto.name,
+                        description: dto.description,
                     });
                     // Add the requester to the group
                     await this.membersService.addUserToChat(requester.id, groupCreated.id);
