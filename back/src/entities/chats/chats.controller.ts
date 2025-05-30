@@ -103,17 +103,17 @@ export class ChatsController {
     ) {
         try {
             if (!req.session.user?.id) return;
-            if (!typeChat) throw new BadRequestException('Type of chat is required. Use "individual" or "group"');
+            if (!typeChat) throw new BadRequestException('Type of chat is required. Use "private" or "group"');
             if (!dto.usernames || dto.usernames.length === 0) throw new BadRequestException('At least one user ID is required to create a chat');
             let chatId: number;
             // Check if the user in session exists
             const requester = await this.usersService.findById(req.session.user.id);
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
             switch (typeChat) {
-                // Create an individual chat
-                // An individual chat only has two members and cannot be repeated
+                // Create a private chat
+                // An private chat only has two members and cannot be repeated
                 // If the chat already exists between two users, it will return it
-                case 'individual':
+                case 'private':
                     if (dto.usernames.length !== 1) throw new BadRequestException('You must provide exactly one user ID to create an individual chat');
                     // Throw bad request exception if the user tries to create a chat with themselves
                     if (requester.username === dto.usernames[0]) throw new BadRequestException('You cannot create a chat with yourself');
