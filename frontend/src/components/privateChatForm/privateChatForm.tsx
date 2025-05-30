@@ -4,7 +4,7 @@ import { Avatar, Box, Button, CircularProgress, IconButton, InputAdornment, List
 import { Search, Close as CloseIcon } from "@mui/icons-material";
 import { User } from "../../types/userdata.dto";
 import { t } from "i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
     const [username, setUsername] = useState('');
@@ -46,9 +46,16 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
     };
 
     return (
+        <AnimatePresence mode="wait">
         <Box>
             {!selectedUser && (
-                <>
+                <motion.div
+                    key="search-form"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                >
                     <TextField
                         label={t("FORM_USERNAME_LABEL")}
                         placeholder={t("FORM_USERNAME_LABEL")}
@@ -123,7 +130,7 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                             </motion.div>
                         )
                     )}
-                </>
+                </motion.div>
             )}
 
             {selectedUser && (
@@ -175,5 +182,6 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                 {t("CHAT_CREATE")}
             </Button>
         </Box>
+        </AnimatePresence>
     );
 }
