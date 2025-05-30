@@ -62,6 +62,19 @@ export class UsersService {
         return UserResponseDto.fromUser(user);
     }
 
+    // Get user by username
+    // Return with UserResponseDto
+    async getByUsername(
+        username: string
+    ): Promise<UserResponseDto | null> {
+        const user = await this.usersRepo.findOne({ 
+            where: { username }, 
+            relations: ['roles'] 
+        });
+        if (!user) return null;
+        return UserResponseDto.fromUser(user);
+    }
+
     // Method to save a new user
     async save(saveUserDto: SaveUserDto): Promise<UserResponseDto> {
         // Count total users in the DB
