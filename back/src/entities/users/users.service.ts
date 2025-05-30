@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Not, Repository } from 'typeorm';
 import { predefinedRoles } from './role/predefinedRoles';
 import * as argon2 from 'argon2';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -116,7 +116,7 @@ export class UsersService {
         return UserResponseDto.fromUser(user);
     }
 
-    // Method to return user data by username
+    // Method to get user by username
     async findByUsername(
         username: string
     ): Promise<UserResponseDto | null> {
@@ -143,6 +143,24 @@ export class UsersService {
     // Method to find all users in the DB
     async getAllUsers(): Promise<UserResponseDto[]> {
         const users = await this.usersRepo.find({ relations: ['roles'] });
+        return users.map(user => UserResponseDto.fromUser(user));
+    }
+
+    // Method to search users by username
+    // The search avoids returning a user with a specific ID if provided
+    async searchUsersByUsername(
+        query: string,
+        idToAvoid?: number
+    ): Promise<UserResponseDto[]> {
+        const users = await this.usersRepo.find({
+            where: { 
+                username: ILike(`%${query}%`),
+                ...(idToAvoid ? { id: Not(idToAvoid) } : {}), // Avoid returning the user with the given ID
+            },
+            relations: ['roles'],
+            order: { username: 'ASC' }, // Sort by username in ascending order
+        });
+
         return users.map(user => UserResponseDto.fromUser(user));
     }
 }
