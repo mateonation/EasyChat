@@ -123,7 +123,7 @@ export class UsersController {
     }
 
     // Endpoint to retrieve data from a user by their id number
-    @Get(':userId')
+    @Get('id/:userId')
     @Roles('user')
     async viewUserData(
         @Param('userId') uid: number,
@@ -151,7 +151,7 @@ export class UsersController {
     }
 
     // Endpoint to retrieve data from a user by their username
-    @Get(':username')
+    @Get('username/:username')
     @Roles('user')
     async viewUserByUsername(
         @Param('username') username: string,
