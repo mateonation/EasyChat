@@ -238,6 +238,39 @@ const RegisterPage = () => {
                         }));
                         setUsernameValid(false);
                         break;
+                    case 'Invalid characters in first name':
+                        setFirstNameText(t('INVALID_FIELD_ALT', {
+                            field: t('FORM_FIRSTNAME_LABEL'),
+                        }));
+                        setFirstNameValid(false);
+                        break;
+                    case 'First name not long enough (min 2 characters)':
+                        setFirstNameText(t('MINIMUM_LENGTH', {
+                            field: t('FORM_FIRSTNAME_LABEL'),
+                            length: 2,
+                        }));
+                        setFirstNameValid(false);
+                        break;
+                    case 'First name too long (max 20 characters)':
+                        setFirstNameText(t('MAXIMUM_LENGTH', {
+                            field: t('FORM_FIRSTNAME_LABEL'),
+                            length: 20,
+                        }));
+                        setFirstNameValid(false);
+                        break;
+                    case 'Invalid characters in last name':
+                        setLastNameText(t('INVALID_FIELD_ALT', {
+                            field: t('FORM_LASTNAME_LABEL'),
+                        }));
+                        setLastNameValid(false);
+                        break;
+                    case 'Last name too long (max 35 characters)':
+                        setLastNameText(t('MAXIMUM_LENGTH', {
+                            field: t('FORM_LASTNAME_LABEL'),
+                            length: 35,
+                        }));
+                        setLastNameValid(false);
+                        break;
                     case 'Password not long enough (min 6 characters)':
                         setPasswordText(t('MINIMUM_LENGTH', {
                             field: t('FORM_PASSWORD_LABEL'),
