@@ -13,6 +13,7 @@ import { AddMembersDto } from './chatmembers/dto/add-members.dto';
 import { ConflictException } from 'src/errors/conflictException';
 import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
 import { MessagesService } from '../messages/messages.service';
+import { UpdateMemberRoleDto } from './chatmembers/dto/update-member-role.dto';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
@@ -257,7 +258,7 @@ export class ChatsController {
                 if (alreadyAMember) throw new ConflictException(`${user.username} already a member`);
 
                 // Collect user IDs to be added
-                userIds.push(user.id); 
+                userIds.push(user.id);
             }
 
             // Add users to the chat
@@ -421,12 +422,11 @@ export class ChatsController {
     }
 
     // Edit the user role in a group chat
-    @Patch(':chatId/:editId/role')
+    @Patch(':chatId/member/role')
     @Roles('user')
     async editRole(
         @Param('chatId') chatId: number,
-        @Param('editId') editId: number,
-        @Body('role') role: string,
+        @Body() dto: UpdateMemberRoleDto,
         @Req() req: Request,
         @Res() res: Response,
     ) {
@@ -442,34 +442,34 @@ export class ChatsController {
             if (!chat || chat.type !== 'group') throw new ConflictException('You can only remove members from group chats');
 
             // User to have its role changed must be a member of the group
-            const memberToEdit = await this.membersService.findChatMember(editId, chatId);
+            const memberToEdit = await this.membersService.findChatMember(dto.editId, chatId);
             if (!memberToEdit) throw new NotFoundException(`User is not a member of this chat`);
 
             // If user in request is changing it's role inside the group
-            if (reqId === editId) {
+            if (reqId === dto.editId) {
                 switch (memberToEdit.role) {
                     // The only users allowed to change their own role are admins and only to downgrade it to member
                     case 'admin':
-                        if (role != ChatMemberRole.MEMBER) throw new ForbiddenException('You can only downgrade your role to member');
+                        if (dto.role != ChatMemberRole.MEMBER) throw new ForbiddenException('You can only downgrade your role to member');
                         break;
                     // Other members cannot change their own role
                     default:
                         throw new ForbiddenException('Cannot change your own role in this group');
                 };
                 // Let the requester change it's role in group
-                await this.membersService.updateMemberRole(editId, chatId, role as ChatMemberRole);
+                await this.membersService.updateMemberRole(dto.editId, chatId, dto.role as ChatMemberRole);
                 // Send system message of member role change
                 await this.messageService.sendSystemMessage(
                     chatId,
                     'MEMBER_NEW_ROLE',
                     {
                         username: member.user.username,
-                        newRole: role,
+                        newRole: dto.role,
                     }
                 );
                 return res.status(200).json({
                     statusCode: 200,
-                    message: `You have changed your role in "${chat.name}" to "${role}"`,
+                    message: `You have changed your role in "${chat.name}" to "${dto.role}"`,
                 });
             }
 
@@ -478,13 +478,13 @@ export class ChatsController {
             if (member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to edit someone else's role");
 
             // Role to be given must not be owner
-            if (role === ChatMemberRole.OWNER) throw new ForbiddenException("You can't assign 'owner' to other user")
+            if (dto.role === ChatMemberRole.OWNER) throw new ForbiddenException("You can't assign 'owner' to other user")
 
             // If the role to grant is the same as the current one, throw a bad request exception
-            if (memberToEdit.role === role) throw new BadRequestException('User is already a '+ role);
+            if (memberToEdit.role === dto.role) throw new BadRequestException('User is already a ' + dto.role);
 
             // Update user role in the group chat
-            await this.membersService.updateMemberRole(editId, chatId, role as ChatMemberRole);
+            await this.membersService.updateMemberRole(dto.editId, chatId, dto.role as ChatMemberRole);
 
             // Send system message of member role change by other user
             await this.messageService.sendSystemMessage(
@@ -492,13 +492,13 @@ export class ChatsController {
                 'MEMBER_NEW_ROLE_BY_OTHER',
                 {
                     user1: memberToEdit.user.username,
-                    newRole: role,
+                    newRole: dto.role,
                     user2: member.user.username,
                 }
             );
             return res.status(200).json({
                 statusCode: 200,
-                message: `You changed the role of "${memberToEdit.user.username}" to "${role}"`,
+                message: `You changed the role of "${memberToEdit.user.username}" to "${dto.role}"`,
             });
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
