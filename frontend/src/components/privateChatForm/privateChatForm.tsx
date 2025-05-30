@@ -1,9 +1,10 @@
 import { useState } from "react";
 import api from "../../api/axios";
-import { Avatar, Box, Button, CircularProgress, DialogActions, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, CircularProgress, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Typography } from "@mui/material";
 import { Search, Close as CloseIcon } from "@mui/icons-material";
 import { User } from "../../types/userdata.dto";
 import { t } from "i18next";
+import { motion } from "framer-motion";
 
 export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
     const [username, setUsername] = useState('');
@@ -74,80 +75,92 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                         </Box>
                     ) : (
                         results.length > 0 && (
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    maxHeight: 300,
-                                    overflowY: "auto",
-                                    mt: 2,
-                                    borderRadius: 2,
-                                }}    
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                <List dense>
-                                    {results.map((user) => (
-                                        <ListItem
-                                            key={user.id}
-                                            component="li"
-                                            onClick={() => {
-                                                setSelectedUser(user);
-                                                setResults([]);
-                                            }}
-                                            sx={{
-                                                cursor: "pointer",
-                                                "&:hover": {
-                                                    backgroundColor: "action.hover",
-                                                },
-                                                transition: "background-color 0.2s",
-                                                padding: 1.5,
-                                                borderRadius: 1,
-                                                display: "flex",
-                                                alignItems: "center",
-                                            }}
-                                        >
-                                            <ListItemAvatar>
-                                                <Avatar>
-                                                    {user.username[0].toUpperCase()}
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText primary={user.username} />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Paper>
+                                <Paper
+                                    elevation={3}
+                                    sx={{
+                                        maxHeight: 160,
+                                        overflowY: "auto",
+                                        mt: 2,
+                                        borderRadius: 2,
+                                    }}
+                                >
+                                    <List dense>
+                                        {results.map((user) => (
+                                            <ListItem
+                                                key={user.id}
+                                                component="li"
+                                                onClick={() => {
+                                                    setSelectedUser(user);
+                                                    setResults([]);
+                                                }}
+                                                sx={{
+                                                    cursor: "pointer",
+                                                    "&:hover": {
+                                                        backgroundColor: "action.hover",
+                                                    },
+                                                    transition: "background-color 0.2s",
+                                                    padding: 1.5,
+                                                    borderRadius: 1,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                }}
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar>
+                                                        {user.username[0].toUpperCase()}
+                                                    </Avatar>
+                                                </ListItemAvatar>
+                                                <ListItemText primary={user.username} />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Paper>
+                            </motion.div>
                         )
                     )}
                 </>
             )}
 
             {selectedUser && (
-                <Box
-                    display="flex"
-                    alignItems="center"
-                    gap={2}
-                    mt={2}
-                    p={1}
-                    sx={{
-                        padding: 2,
-                        borderRadius: 2,
-                        backgroundColor: "action.selected",
-                    }}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
                 >
-                    <Avatar>
-                        {selectedUser.username[0].toUpperCase()}
-                    </Avatar>
-                    <Typography
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
+                        mt={2}
+                        p={1}
                         sx={{
-                            flexGrow: 1,
+                            padding: 2,
+                            borderRadius: 2,
+                            backgroundColor: "action.selected",
                         }}
                     >
-                        {selectedUser.username}
-                    </Typography>
-                    <IconButton
-                        onClick={handleRemoveUser}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </Box>
+                        <Avatar>
+                            {selectedUser.username[0].toUpperCase()}
+                        </Avatar>
+                        <Typography
+                            sx={{
+                                flexGrow: 1,
+                            }}
+                        >
+                            {selectedUser.username}
+                        </Typography>
+                        <IconButton
+                            onClick={handleRemoveUser}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                </motion.div>
             )}
 
             <Button
@@ -155,8 +168,8 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                 onClick={handleCreateChat}
                 disabled={!selectedUser || loading}
                 fullWidth
-                sx={{ 
-                    mt: 3 
+                sx={{
+                    mt: 3
                 }}
             >
                 {t("CHAT_CREATE")}
