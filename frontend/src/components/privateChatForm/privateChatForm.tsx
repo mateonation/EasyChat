@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../api/axios";
-import { Avatar, Box, Button, CircularProgress, DialogActions, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, TextField, Typography } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Avatar, Box, Button, CircularProgress, DialogActions, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Typography } from "@mui/material";
+import { Search, Close as CloseIcon } from "@mui/icons-material";
 import { User } from "../../types/userdata.dto";
 import { t } from "i18next";
 
@@ -38,6 +38,12 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
         }
     };
 
+    const handleRemoveUser = () => {
+        setSelectedUser(null);
+        setUsername('');
+        setResults([]);
+    };
+
     return (
         <Box>
             {!selectedUser && (
@@ -67,34 +73,48 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                             <CircularProgress />
                         </Box>
                     ) : (
-                        <List>
-                            {results.map((user) => (
-                                <ListItem
-                                    key={user.id}
-                                    component="li"
-                                    onClick={() => {
-                                        setSelectedUser(user);
-                                        setResults([]);
-                                    }}
-                                    sx={{
-                                        padding: 2,
-                                        cursor: "pointer",
-                                        "&:hover": {
-                                            backgroundColor: "action.hover",
-                                        },
-                                        borderRadius: 2,
-                                        transition: "background-color 0.2s",
-                                    }}
-                                >
-                                    <ListItemAvatar>
-                                        <Avatar>{user.username[0].toUpperCase()}</Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={user.username}
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
+                        results.length > 0 && (
+                            <Paper
+                                elevation={3}
+                                sx={{
+                                    maxHeight: 300,
+                                    overflowY: "auto",
+                                    mt: 2,
+                                    borderRadius: 2,
+                                }}    
+                            >
+                                <List dense>
+                                    {results.map((user) => (
+                                        <ListItem
+                                            key={user.id}
+                                            component="li"
+                                            onClick={() => {
+                                                setSelectedUser(user);
+                                                setResults([]);
+                                            }}
+                                            sx={{
+                                                cursor: "pointer",
+                                                "&:hover": {
+                                                    backgroundColor: "action.hover",
+                                                },
+                                                transition: "background-color 0.2s",
+                                                padding: 1.5,
+                                                borderRadius: 1,
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    {user.username[0].toUpperCase()}
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText primary={user.username} />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Paper>
+                        )
                     )}
                 </>
             )}
@@ -105,28 +125,41 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                     alignItems="center"
                     gap={2}
                     mt={2}
+                    p={1}
                     sx={{
                         padding: 2,
                         borderRadius: 2,
                         backgroundColor: "action.selected",
-                        transition: "background-color 0.2s",
                     }}
                 >
-                    <Avatar>{selectedUser.username[0].toUpperCase()}</Avatar>
-                    <Typography>
+                    <Avatar>
+                        {selectedUser.username[0].toUpperCase()}
+                    </Avatar>
+                    <Typography
+                        sx={{
+                            flexGrow: 1,
+                        }}
+                    >
                         {selectedUser.username}
                     </Typography>
+                    <IconButton
+                        onClick={handleRemoveUser}
+                    >
+                        <CloseIcon />
+                    </IconButton>
                 </Box>
             )}
 
             <Button
                 variant="contained"
                 onClick={handleCreateChat}
-                disabled={!selectedUser}
+                disabled={!selectedUser || loading}
                 fullWidth
-                sx={{ mt: 3 }}
+                sx={{ 
+                    mt: 3 
+                }}
             >
-                {t("CREATE_CHAT")}
+                {t("CHAT_CREATE")}
             </Button>
         </Box>
     );
