@@ -49,6 +49,8 @@ const RegisterPage = () => {
         setFirstNameValid(true);
         setLastNameValid(true);
 
+        let formValid = true; // Local flag validation if the register form is correct
+
         // Validate username
         const textRegex = /^[a-zA-Z0-9_]+$/;
         if (!textRegex.test(username)) {
@@ -56,29 +58,21 @@ const RegisterPage = () => {
                 field: t('FORM_USERNAME_LABEL'),
             }));
             setUsernameValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
-        }
-        if (username.length < 3) {
+            formValid = false; 
+        } else if (username.length < 3) {
             setUsernameText(t('MINIMUM_LENGTH', {
                 field: t('FORM_USERNAME_LABEL'),
                 length: 3,
             }));
             setUsernameValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
-        }
-        if (username.length > 20) {
+            formValid = false; 
+        } else if (username.length > 20) {
             setUsernameText(t('MAXIMUM_LENGTH', {
                 field: t('FORM_USERNAME_LABEL'),
                 length: 20,
             }));
             setUsernameValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
+            formValid = false; 
         }
         // First and last name can have spaces, so we use a different regex
         const textRegexAlt = /^[a-zA-Z0-9_ ]+$/;
@@ -87,50 +81,37 @@ const RegisterPage = () => {
                 field: t('FORM_FIRSTNAME_LABEL'), 
             }));
             setFirstNameValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
-        }
-        if (firstName.length < 2) {
+            formValid = false; 
+        } else if (firstName.length < 2) {
             setFirstNameText(t('MINIMUM_LENGTH', { 
                 field: t('FORM_FIRSTNAME_LABEL'),
                 length: 2,
             }));
             setFirstNameValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
-        }
-        if (firstName.length > 20) {
+            formValid = false; 
+        } else if (firstName.length > 20) {
             setFirstNameText(t('MAXIMUM_LENGTH', { 
                 field: t('FORM_FIRSTNAME_LABEL'),
                 length: 20,
             }));
             setFirstNameValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
+            formValid = false; 
         }
         // Validate last name if provided
-        if (lastName !=="") {
+        if (lastName != "") {
             if (!textRegexAlt.test(lastName)) {
                 setLastNameText(t('INVALID_FIELD_ALT', { 
                     field: t('FORM_LASTNAME_LABEL'), 
                 }));
                 setLastNameValid(false);
-                setPassword('');
-                setPassword2('');
-                return;
-            }
-            if (lastName.length > 35) {
+                formValid = false; 
+            } else if (lastName.length > 35) {
                 setLastNameText(t('MAXIMUM_LENGTH', { 
                     field: t('FORM_LASTNAME_LABEL'),
                     length: 35,
                 }));
                 setLastNameValid(false);
-                setPassword('');
-                setPassword2('');
-                return;
+                formValid = false; 
             }
         }
 
@@ -151,9 +132,7 @@ const RegisterPage = () => {
         if (!isOver18(birthDate)) {
             setBirthDateText(t('BIRTHDATE_INVALID'));
             setBirthDateValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
+            formValid = false; 
         }
 
         // Validate password
@@ -163,35 +142,33 @@ const RegisterPage = () => {
                 length: 6,
             }));
             setPasswordValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
-        }
-        if (password.length > 30) {
+            formValid = false; 
+        } else if (password.length > 30) {
             setPasswordText(t('MAXIMUM_LENGTH', {
                 field: t('FORM_PASSWORD_LABEL'),
                 length: 30,
             }));
             setPasswordValid(false);
-            setPassword('');
-            setPassword2('');
-            return;
-        }
-        if (password !== password2) {
+            formValid = false; 
+        } else if (password !== password2) {
             setPasswordText(t('PASSWORD_MISMATCH'));
             setPasswordValid(false);
+            formValid = false; 
+        }
+
+        // If the form is not valid, reset the password fields and return early
+        if (!formValid) {
             setPassword('');
-            setPassword2('');
+            setPassword2(''); 
             return;
         }
 
-        // If all validations pass, proceed with registration
         try {
             setLoading(true); // Set loading state to true
             // Make the API call to register the user
             await api.post('/users/register', {
                 firstName: firstName,
-                lastName: lastName,
+                lastName: lastName? lastName : null, // Allow last name to be optional
                 username: username,
                 password: password,
                 birthDate: birthDate,
