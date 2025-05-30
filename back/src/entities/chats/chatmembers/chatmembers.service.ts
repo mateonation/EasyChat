@@ -26,7 +26,11 @@ export class ChatmembersService {
         chatId: number,
     ): Promise<ChatMember | null> {
         const user = this.memberRepo.findOne({
-            where: { user: { id: userId }, chat: { id: chatId } },
+            where: { 
+                user: { id: userId }, 
+                chat: { id: chatId }, 
+            },
+            relations: ['user'],
         });
         if (!user) return null;
         return user;
