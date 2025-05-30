@@ -1,4 +1,4 @@
-import { Controller, Body, Res, Post, Get, Req, UseGuards, Param } from '@nestjs/common';
+import { Controller, Body, Res, Post, Get, Req, UseGuards, Param, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { SaveUserDto } from './dto/save-user.dto';
@@ -166,6 +166,32 @@ export class UsersController {
 
             // Return user data
             return res.status(200).json(user);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+        }
+        // If error is not handled by service, return 500
+        return res.status(500).json({
+            statusCode: 500,
+            message: 'Internal server error',
+        });
+    }
+
+    // Endpoint to search for users by username
+    @Get('search')
+    @Roles('user')
+    async searchUsers(
+        @Query('username') username: string,
+        @Res() res: Response,
+        @Req() req: Request,
+    ) {
+        try {
+            // Get the ID of the logged in user to ignore them in search results
+            if(!req.session.user?.id) return;
+            const idToIgnore = req.session.user.id;
+            const query = await this.usersService.searchUsersByUsername(username, idToIgnore);
+            return res.status(200).json(query);
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof BadRequestException) {
                 return res.status(error.getStatus()).json(error.getResponse());
