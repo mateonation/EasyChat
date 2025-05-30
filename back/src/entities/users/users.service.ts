@@ -76,7 +76,9 @@ export class UsersService {
     }
 
     // Method to save a new user
-    async save(saveUserDto: SaveUserDto): Promise<UserResponseDto> {
+    async save(
+        saveUserDto: SaveUserDto
+    ): Promise<UserResponseDto> {
         // Count total users in the DB
         const totalUsers = await this.usersRepo.count();
         // If the user being registered is the first one, register it as an admin, moderator and user
@@ -94,6 +96,8 @@ export class UsersService {
         // Create a new user object
         const user = this.usersRepo.create({
             username: saveUserDto.username,
+            firstName: saveUserDto.firstName,
+            lastName: saveUserDto.lastName || undefined, // Last name can be undefined if not provided
             password: argon2psswrd,
             birthDate: saveUserDto.birthDate,
             roles,
