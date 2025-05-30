@@ -30,6 +30,7 @@ const RegisterPage = () => {
     const [birthDateText, setBirthDateText] = useState('');
     const [netError, setNetError] = useState(false);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -81,6 +82,8 @@ const RegisterPage = () => {
         if (!isOver18(birthDate)) {
             setBirthDateText(t('FORM_BIRTHDATE_MINOR'));
             setBirthDateValid(false);
+            setPassword('');
+            setPassword2('');
             return;
         }
 
@@ -109,19 +112,24 @@ const RegisterPage = () => {
 
         // If all validations pass, proceed with registration
         try {
+            setLoading(true); // Set loading state to true
+            // Make the API call to register the user
             await api.post('/users/register', {
                 username: username,
                 password: password,
                 birthDate: birthDate,
-            })
+            });
             console.log('User registered:');
             console.log(username);
             alert(t('REGISTER_SUCCESSFUL'));
+            setLoading(false);
             navigate(`${BASE}/login`, { replace: true }); // Redirect to login page after successful registration
         } catch (err: unknown) {
             // If an error occurred, empty the password fields
             setPassword('');
             setPassword2('');
+            // And set loading to false
+            setLoading(false);
             // Handle specific error cases if using axios
             if (axios.isAxiosError(err)) {
                 const reason = err.response?.data;
@@ -165,25 +173,38 @@ const RegisterPage = () => {
 
     return (
         <Container maxWidth="xs">
-            <Paper elevation={12} sx={{
-                marginTop: 8,
-                padding: 2,
-            }}>
-                <Avatar sx={{
-                    mx: "auto",
-                    mb: 2,
-                    textAlign: "center",
-                    bgcolor: "primary.main",
-                }}>
+            <Paper 
+                elevation={12} 
+                sx={{
+                    marginTop: 8,
+                    padding: 2,
+                }}
+            >
+                <Avatar 
+                    sx={{
+                        mx: "auto",
+                        mb: 2,
+                        textAlign: "center",
+                        bgcolor: "primary.main",
+                    }}
+                >
                     <PersonAdd />
                 </Avatar>
-                <Typography component="h1" variant="h5" sx={{ textAlign: "center", }}>
+                <Typography 
+                    component="h1" 
+                    variant="h5" 
+                    sx={{ 
+                        textAlign: "center", 
+                    }}
+                >
                     {t('REGISTER_PAGE_TITLE')}
                 </Typography>
                 <Box
                     component="form"
                     onSubmit={handleRegister}
-                    sx={{ mt: 2, }}
+                    sx={{ 
+                        mt: 2, 
+                    }}
                 >
                     <TextField
                         label={t('FORM_USERNAME_LABEL')}
@@ -193,6 +214,7 @@ const RegisterPage = () => {
                         type="text"
                         value={username}
                         error={!usernameValid}
+                        disabled={loading} // Disable field if loading
                         helperText={!usernameValid ? usernameText : ''}
                         onChange={(e) => setUsername(e.target.value)}
                         sx={{
@@ -210,6 +232,7 @@ const RegisterPage = () => {
                         type="date"
                         value={birthDate}
                         error={!birthDateValid}
+                        disabled={loading} // Disable field if loading
                         helperText={!birthDateValid ? birthDateText : ''}
                         onChange={(e) => setBirthDate(e.target.value)}
                         InputLabelProps={{
@@ -230,6 +253,7 @@ const RegisterPage = () => {
                         type="password"
                         value={password}
                         error={!passwordValid}
+                        disabled={loading} // Disable field if loading
                         onChange={(e) => setPassword(e.target.value)}
                         sx={{
                             mb: 2,
@@ -246,6 +270,7 @@ const RegisterPage = () => {
                         type="password"
                         value={password2}
                         error={!passwordValid}
+                        disabled={loading} // Disable field if loading
                         helperText={!passwordValid ? passwordText : ''}
                         onChange={(e) => setPassword2(e.target.value)}
                         sx={{
@@ -256,17 +281,38 @@ const RegisterPage = () => {
                         }}
                     />
                     {netError &&
-                        <Typography sx={{ mb: 2, color: "red", textAlign: "center", }}>
+                        <Typography 
+                            sx={{ 
+                                mb: 2, 
+                                color: "red", 
+                                textAlign: "center", 
+                            }}
+                        >
                             {t('ERR_SERVER')}
                         </Typography>
                     }
-                    <Button type="submit" variant="contained" fullWidth sx={{ mb: 2, }}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        fullWidth
+                        disabled={loading} // Disable button if loading
+                        sx={{
+                            mb: 2,
+                        }}
+                    >
                         {t('REGISTER_FORM_SUBMIT')}
                     </Button>
                 </Box>
-                <Typography sx={{ textAlign: "center", }}>
+                <Typography
+                    sx={{ 
+                        textAlign: "center", 
+                    }}
+                >
                     {t('REGISTER_LOGIN_LABEL')}<br />
-                    <Link component={RouterLink} to={`${BASE}/login`}>
+                    <Link 
+                        component={RouterLink} 
+                        to={`${BASE}/login`}
+                    >
                         {t('REGISTER_LOGIN_LINK')}
                     </Link>
                 </Typography>
