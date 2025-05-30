@@ -52,6 +52,15 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                         }}
                         fullWidth
                         margin="normal"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={handleSearch}>
+                                        <Search />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                     {loading ? (
                         <Box display="flex" justifyContent="center" mt={2}>
@@ -61,7 +70,7 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                         <List>
                             {results.map((user) => (
                                 <ListItem
-                                    key={ user.id }
+                                    key={user.id}
                                     component="li"
                                     onClick={() => {
                                         setSelectedUser(user);
@@ -69,9 +78,9 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                                     }}
                                     sx={{
                                         padding: 2,
-                                        cursor: "pointer", 
-                                        "&:hover": { 
-                                            backgroundColor: "action.hover", 
+                                        cursor: "pointer",
+                                        "&:hover": {
+                                            backgroundColor: "action.hover",
                                         },
                                         borderRadius: 2,
                                         transition: "background-color 0.2s",
@@ -91,10 +100,10 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
             )}
 
             {selectedUser && (
-                <Box 
-                    display="flex" 
-                    alignItems="center" 
-                    gap={2} 
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={2}
                     mt={2}
                     sx={{
                         padding: 2,
