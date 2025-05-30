@@ -139,4 +139,10 @@ export class UsersService {
         if (age === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0))) return true;
         return false;
     }
+
+    // Method to find all users in the DB
+    async getAllUsers(): Promise<UserResponseDto[]> {
+        const users = await this.usersRepo.find({ relations: ['roles'] });
+        return users.map(user => UserResponseDto.fromUser(user));
+    }
 }
