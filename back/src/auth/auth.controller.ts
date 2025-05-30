@@ -18,6 +18,10 @@ export class AuthController {
         try{
             // Authenticate user
             const user = await this.usersService.authenticate(loginUserDto);
+
+            // If user is not found or credentials are invalid, throw unauthorized exception
+            if (!user) throw new UnauthorizedException('Invalid credentials');
+
             // Set user in session
             req.session.user = {
                 id: user.id,
