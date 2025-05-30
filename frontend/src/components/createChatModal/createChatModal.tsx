@@ -20,10 +20,13 @@ export default function CreateChatModal({ open, onClose }: Props) {
             fullWidth
             maxWidth="sm"
         >
-            <DialogTitle>{t('CREATE_CHAT_TITLE')}</DialogTitle>
-            <DialogContent>
-                <FormControl fullWidth margin="normal">
-                    <InputLabel id="chat-type-select">
+            <DialogTitle
+                component="header"
+                id="create-chat-dialog-title"
+            >{t('CREATE_CHAT_TITLE')}</DialogTitle>
+            <DialogContent aria-labelledby="create-chat-dialog-title">
+                <FormControl component="form" fullWidth margin="normal" aria-labelledby="chat-type-select">
+                    <InputLabel id="chat-type-label">
                         {t('FORM_CHAT_TYPE_LABEL')}
                     </InputLabel>
                     <Select
@@ -31,6 +34,8 @@ export default function CreateChatModal({ open, onClose }: Props) {
                         onChange={(e) => setChatType(e.target.value as ChatType)}
                         labelId="chat-type-select"
                         label={t('FORM_CHAT_TYPE_LABEL')}
+                        id="chat-type-select"
+                        aria-describedby="chat-type-description"
                     >
                         <MenuItem value="private">{t('CHAT_TYPE_PRIVATE')}</MenuItem>
                         <MenuItem value="group">{t('CHAT_TYPE_GROUP')}</MenuItem>

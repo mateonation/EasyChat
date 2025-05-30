@@ -57,6 +57,8 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                     transition={{ duration: 0.3 }}
                 >
                     <TextField
+                        id="user-search"
+                        aria-label={t("FORM_USERNAME_LABEL")}
                         label={t("FORM_USERNAME_LABEL")}
                         placeholder={t("FORM_USERNAME_LABEL")}
                         value={username}
@@ -69,7 +71,10 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={handleSearch}>
+                                    <IconButton 
+                                        onClick={handleSearch}
+                                        aria-label={t("GENERIC_ANSWER_SEARCH")}
+                                    >
                                         <Search />
                                     </IconButton>
                                 </InputAdornment>
@@ -95,6 +100,8 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                                         mt: 2,
                                         borderRadius: 2,
                                     }}
+                                    role="listbox"
+                                    aria-label="results"
                                 >
                                     <List dense>
                                         {results.map((user) => (
@@ -150,6 +157,8 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                             borderRadius: 2,
                             backgroundColor: "action.selected",
                         }}
+                        role="group"
+                        aria-label={t("GENERIC_ANSWER_SELECT")}
                     >
                         <Avatar>
                             {selectedUser.username[0].toUpperCase()}
@@ -163,6 +172,7 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                         </Typography>
                         <IconButton
                             onClick={handleRemoveUser}
+                            aria-label={t("GENERIC_ANSWER_REMOVE")}
                         >
                             <CloseIcon />
                         </IconButton>
