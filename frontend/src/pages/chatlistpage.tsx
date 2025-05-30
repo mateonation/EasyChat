@@ -5,6 +5,8 @@ import { Box, CircularProgress, Fab, List, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { t } from "i18next";
 import ChatItem from "../components/chatItem";
+import ChatIcon from '@mui/icons-material/Chat';
+import CreateChatModal from "../components/createChatModal";
 
 const ChatsListPage = () => {
     const [chats, setChats] = useState<ChatDto[]>([]);
@@ -65,21 +67,6 @@ const ChatsListPage = () => {
         );
     }
 
-    if (chats.length === 0) {
-        return (
-            <Typography
-                align="center"
-                variant="h6"
-                mt={4}
-                sx={{ fontSize: '1.5rem', color: 'info.main' }}
-            >
-                {t('CHATS_LIST_EMPTY_STRING0')}
-                <br />
-                {t('CHATS_LIST_EMPTY_STRING1')}
-            </Typography>
-        );
-    }
-
     return (
         <Box
             p={2}
@@ -90,16 +77,31 @@ const ChatsListPage = () => {
             >
                 {t('CHATS_LIST_PAGE_TITLE')}
             </Typography>
-            <List
-                component="ul"
+            {chats.length === 0 ? (
+                <Typography
+                align="center"
+                mt={4}
+                sx={{ color: 'text.secondary' }}
             >
-                {chats.map(chat => (
-                    <ChatItem key={chat.id} chat={chat} />
-                ))}
-            </List>
+                <ChatIcon fontSize="large" />
+                <br />
+                {t('CHATS_LIST_EMPTY_STRING0')}
+                <br />
+                {t('CHATS_LIST_EMPTY_STRING1')}
+            </Typography>
+            ) : (
+                <List
+                    component="ul"
+                >
+                    {chats.map(chat => (
+                        <ChatItem key={chat.id} chat={chat} />
+                    ))}
+                </List>
+            )}
+            
             <Fab 
                 color="primary"
-                aria-label="Create new chat"
+                aria-label={t('CREATE_CHAT_TITLE')}
                 onClick={handleOpenModal}
                 sx={{
                     position: 'fixed',
@@ -111,6 +113,11 @@ const ChatsListPage = () => {
             >
                 <AddIcon />
             </Fab>
+
+            <CreateChatModal
+                open={openModal}
+                onClose={handleCloseModal}
+            />
         </Box>
     );
 };
