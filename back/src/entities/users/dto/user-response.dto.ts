@@ -4,6 +4,8 @@ import { User } from "../user.entity";
 export class UserResponseDto {
     id: number;
     username: string;
+    firstName: string;
+    lastName: string | null; // Last name can be optional
     registerDate: Date;
     birthDate: Date;
     roles: string[];
@@ -11,6 +13,8 @@ export class UserResponseDto {
     constructor(user: User) {
         this.id = user.id;
         this.username = user.username;
+        this.firstName = user.firstName;
+        this.lastName = user.lastName || null; // Last name can be null if not provided
         this.registerDate = user.registerDate;
         this.birthDate = user.birthDate;
         this.roles = user.roles?.map((role: Role) => role.name) || [];
