@@ -52,21 +52,29 @@ const RegisterPage = () => {
         // Validate username
         const textRegex = /^[a-zA-Z0-9_]+$/;
         if (!textRegex.test(username)) {
-            setUsernameText(t('REGISTER_USERNAME_NOT_VALID'));
+            setUsernameText(t('INVALID_FIELD', {
+                field: t('FORM_USERNAME_LABEL'),
+            }));
             setUsernameValid(false);
             setPassword('');
             setPassword2('');
             return;
         }
         if (username.length < 3) {
-            setUsernameText(t('REGISTER_USERNAME_SHORT'));
+            setUsernameText(t('MINIMUM_LENGTH', {
+                field: t('FORM_USERNAME_LABEL'),
+                length: 3,
+            }));
             setUsernameValid(false);
             setPassword('');
             setPassword2('');
             return;
         }
         if (username.length > 20) {
-            setUsernameText(t('REGISTER_USERNAME_LONG'));
+            setUsernameText(t('MAXIMUM_LENGTH', {
+                field: t('FORM_USERNAME_LABEL'),
+                length: 20,
+            }));
             setUsernameValid(false);
             setPassword('');
             setPassword2('');
@@ -141,7 +149,7 @@ const RegisterPage = () => {
         };
 
         if (!isOver18(birthDate)) {
-            setBirthDateText(t('FORM_BIRTHDATE_MINOR'));
+            setBirthDateText(t('BIRTHDATE_INVALID'));
             setBirthDateValid(false);
             setPassword('');
             setPassword2('');
@@ -150,21 +158,27 @@ const RegisterPage = () => {
 
         // Validate password
         if (password.length < 6) {
-            setPasswordText(t('REGISTER_PASSWORD_SHORT'));
+            setPasswordText(t('MINIMUM_LENGTH', {
+                field: t('FORM_PASSWORD_LABEL'),
+                length: 6,
+            }));
             setPasswordValid(false);
             setPassword('');
             setPassword2('');
             return;
         }
         if (password.length > 30) {
-            setPasswordText(t('REGISTER_PASSWORD_LONG'));
+            setPasswordText(t('MAXIMUM_LENGTH', {
+                field: t('FORM_PASSWORD_LABEL'),
+                length: 30,
+            }));
             setPasswordValid(false);
             setPassword('');
             setPassword2('');
             return;
         }
         if (password !== password2) {
-            setPasswordText(t('REGISTER_PASSWORD_MISMATCH'));
+            setPasswordText(t('PASSWORD_MISMATCH'));
             setPasswordValid(false);
             setPassword('');
             setPassword2('');
@@ -199,31 +213,47 @@ const RegisterPage = () => {
                 console.error(reason?.message);
                 switch (reason?.message) {
                     case 'Username already taken':
-                        setUsernameText(t('REGISTER_USERNAME_IN_USE'));
+                        setUsernameText(t('ALREADY_IN_USE', {
+                            data: username,
+                        }));
                         setUsernameValid(false);
                         break;
                     case 'Invalid characters in username':
-                        setUsernameText(t('REGISTER_USERNAME_NOT_VALID'));
+                        setUsernameText(t('INVALID_FIELD', {
+                            field: t('FORM_USERNAME_LABEL'),
+                        }));
                         setUsernameValid(false);
                         break;
                     case 'Username not long enough (min 3 characters)':
-                        setUsernameText(t('REGISTER_USERNAME_SHORT'));
+                        setUsernameText(t('MINIMUM_LENGTH', {
+                            field: t('FORM_USERNAME_LABEL'),
+                            length: 3,
+                        }));
                         setUsernameValid(false);
                         break;
                     case 'Username too long (max 20 characters)':
-                        setUsernameText(t('REGISTER_USERNAME_LONG'));
+                        setUsernameText(t('MAXIMUM_LENGTH', {
+                            field: t('FORM_USERNAME_LABEL'),
+                            length: 20,
+                        }));
                         setUsernameValid(false);
                         break;
                     case 'Password not long enough (min 6 characters)':
-                        setPasswordText(t('REGISTER_PASSWORD_SHORT'));
+                        setPasswordText(t('MINIMUM_LENGTH', {
+                            field: t('FORM_PASSWORD_LABEL'),
+                            length: 6,
+                        }));
                         setPasswordValid(false);
                         break;
                     case 'Password too long (max 30 characters)':
-                        setPasswordText(t('REGISTER_PASSWORD_LONG'));
+                        setPasswordText(t('MAXIMUM_LENGTH', {
+                            field: t('FORM_PASSWORD_LABEL'),
+                            length: 30,
+                        }));
                         setPasswordValid(false);
                         break;
                     case 'You must be 18 years old or older':
-                        setBirthDateText(t('FORM_BIRTHDATE_MINOR'));
+                        setBirthDateText(t('BIRTHDATE_INVALID'));
                         setBirthDateValid(false);
                         break;
                     default:
