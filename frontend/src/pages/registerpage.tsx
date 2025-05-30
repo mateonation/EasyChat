@@ -17,6 +17,9 @@ import {
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
+const textRegex = /^[a-zA-Z0-9_]+$/; // Regex for valid characters in username
+const textRegexAlt = /^[\p{L} ]+$/u; // Regex for valid unicode characters
+
 const RegisterPage = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -52,7 +55,6 @@ const RegisterPage = () => {
         let formValid = true; // Local flag validation if the register form is correct
 
         // Validate username
-        const textRegex = /^[a-zA-Z0-9_]+$/;
         if (!textRegex.test(username)) {
             setUsernameText(t('INVALID_FIELD', {
                 field: t('FORM_USERNAME_LABEL'),
@@ -74,8 +76,7 @@ const RegisterPage = () => {
             setUsernameValid(false);
             formValid = false; 
         }
-        // First and last name can have spaces, so we use a different regex
-        const textRegexAlt = /^[a-zA-Z0-9_ ]+$/;
+        // Validate first name
         if (!textRegexAlt.test(firstName)) {
             setFirstNameText(t('INVALID_FIELD_ALT', { 
                 field: t('FORM_FIRSTNAME_LABEL'), 

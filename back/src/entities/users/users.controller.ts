@@ -23,8 +23,8 @@ export class UsersController {
         @Res() res: Response,
     ){
         try{
-            // Validate username in body request
-            const textRegex = /^[a-zA-Z0-9_-]+$/;
+            const textRegex = /^[a-zA-Z0-9_]+$/; // Regex for valid characters in username
+            const textRegexAlt = /^[\p{L} ]+$/u; // Regex for valid unicode characters - first and last name
 
             // If username contains invalid characters, throw an error
             if (!textRegex.test(saveUserDto.username)) throw new BadRequestException('Invalid characters in username');
@@ -32,9 +32,6 @@ export class UsersController {
             // If username is too short or too long, throw an error
             if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough (min 3 characters)');
             if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long (max 20 characters)');
-
-            // Validate first name in body request
-            const textRegexAlt = /^[a-zA-Z0-9_ ]+$/;
 
             // If first name contains invalid characters, throw an error
             if (!textRegexAlt.test(saveUserDto.firstName)) throw new BadRequestException('Invalid characters in first name');
