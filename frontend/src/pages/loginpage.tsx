@@ -23,7 +23,11 @@ const LoginPage = () => {
     const auth = useAuthContext();
 
     const [username, setUsername] = useState('');
+    const [usernameText, setUsernameText] = useState('');
+    const [usernameValid, setUsernameValid] = useState(true);
     const [password, setPassword] = useState('');
+    const [passwordText, setPasswordText] = useState('');
+    const [passwordValid, setPasswordValid] = useState(true);
     const [error, setError] = useState(false);
     const [netError, setNetError] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -31,12 +35,63 @@ const LoginPage = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            setLoading(true);
+            let valid = true;
             setError(false);
             setNetError(false);
+            setUsernameValid(true);
+            setPasswordValid(true);
+
+            // Validate username
+            const textRegex = /^[a-zA-Z0-9_]+$/;
+            if (!textRegex.test(username)) {
+                setUsernameText(t('INVALID_FIELD', {
+                    field: t('FORM_USERNAME_LABEL'),
+                }));
+                setUsernameValid(false);
+                valid = false;
+            } else if (username.length < 3) {
+                setUsernameText(t('MINIMUM_LENGTH', {
+                    field: t('FORM_USERNAME_LABEL'),
+                    length: 3,
+                }));
+                setUsernameValid(false);
+                valid = false;
+            } else if (username.length > 20) {
+                setUsernameText(t('MAXIMUM_LENGTH', {
+                    field: t('FORM_USERNAME_LABEL'),
+                    length: 20,
+                }));
+                setUsernameValid(false);
+                valid = false;
+            }
+
+            // Validate password
+            if (password.length < 6) {
+                setPasswordText(t('MINIMUM_LENGTH', {
+                    field: t('FORM_PASSWORD_LABEL'),
+                    length: 6,
+                }));
+                setPasswordValid(false);
+                valid = false;
+            } else if (password.length > 30) {
+                setPasswordText(t('MAXIMUM_LENGTH', {
+                    field: t('FORM_PASSWORD_LABEL'),
+                    length: 30,
+                }));
+                setPasswordValid(false);
+                valid = false;
+            }
+
+            // If validation check failed, empty password field and return before sending request 
+            if (!valid) {
+                setPassword('');
+                setError(true);
+                return;
+            }
+            setLoading(true);
             await auth.login(username, password);
             alert("Login successful!");
-            console.log("User logged: @", username, " [",new Date().toLocaleString(), "]");
+            console.log("User logged: @", username, " [", new Date().toLocaleString(), "]");
             setLoading(false);
             navigate(`${BASE}/chats`, { replace: true });
         } catch (err: unknown) {
@@ -44,9 +99,10 @@ const LoginPage = () => {
             if (err !== null && typeof err === "object" && "message" in err) {
                 setPassword(''); // Clear password field on error
                 console.error(err);
-                const reason=(err as ErrorResponse).message;
+                const reason = (err as ErrorResponse).message;
                 switch (reason) {
                     case 'Username or password are incorrect':
+                        setPasswordText(t('LOGIN_FORM_ERROR'));
                         setError(true);
                         break;
                     default:
@@ -86,13 +142,14 @@ const LoginPage = () => {
                         type="text"
                         autoFocus
                         value={username}
-                        error={error}
+                        error={!usernameValid || error}
                         disabled={loading} // Disable username field if loading
+                        helperText={!usernameValid ? usernameText : ''}
                         onChange={(e) => setUsername(e.target.value)}
                         sx={{
                             mb: 2,
                             input: {
-                                background: error ? '#ffebee' : 'transparent'
+                                background: error ? '#ffebee' : !usernameValid ? '#fff3e0' : 'transparent'
                             }
                         }}
                     />
@@ -103,20 +160,20 @@ const LoginPage = () => {
                         required
                         type="password"
                         value={password}
-                        error={error}
+                        error={!passwordValid || error}
                         disabled={loading} // Disable password field if loading
-                        helperText={error ? t('LOGIN_FORM_ERROR') : ''}
+                        helperText={!passwordValid ? passwordText : error ? t('LOGIN_FORM_ERROR') : ''}
                         onChange={(e) => setPassword(e.target.value)}
                         sx={{
                             mb: 2,
                             input: {
-                                background: error ? '#ffebee' : 'transparent'
+                                background: error ? '#ffebee' : !passwordValid ? '#fff3e0' : 'transparent'
                             }
                         }}
                     />
                     {netError ?
-                        <Typography 
-                            sx={{ 
+                        <Typography
+                            sx={{
                                 mb: 2,
                                 color: "red",
                                 textAlign: "center",
@@ -126,10 +183,10 @@ const LoginPage = () => {
                         </Typography>
                         : null
                     }
-                    <Button 
+                    <Button
                         type="submit"
                         variant="contained"
-                        fullWidth 
+                        fullWidth
                         sx={{
                             mb: 2,
                         }}
@@ -138,14 +195,14 @@ const LoginPage = () => {
                         {t('LOGIN_FORM_SUBMIT')}
                     </Button>
                 </Box>
-                <Typography 
+                <Typography
                     sx={{
                         textAlign: "center",
                     }}
                 >
                     {t('LOGIN_REGISTER_LABEL')}<br />
-                    <Link 
-                        component={RouterLink} 
+                    <Link
+                        component={RouterLink}
                         to={`${BASE}/register`}
                     >
                         {t('LOGIN_REGISTER_LINK')}
