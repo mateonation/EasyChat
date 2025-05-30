@@ -218,7 +218,7 @@ export class ChatsController {
     }
 
     // Add members to a group chat
-    @Post(':chatId/members/add')
+    @Post(':chatId/member')
     @Roles('user')
     async addToGroup(
         @Param('chatId') chatId: number,
@@ -303,11 +303,11 @@ export class ChatsController {
     }
 
     // Remove a member from a group chat
-    @Delete(':chatId/member/:rmId/rm')
+    @Delete(':chatId/member')
     @Roles('user')
     async removeFromGroup(
         @Param('chatId') chatId: number,
-        @Param('rmId') rmId: number,
+        @Body('rmId') rmId: number,
         @Req() req: Request,
         @Res() res: Response,
     ) {
