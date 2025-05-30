@@ -220,14 +220,14 @@ export class ChatsController {
     ) {
         try {
             // Validate the request body
-            if (!dto.userIds || dto.userIds.length === 0) throw new BadRequestException('At least one user ID is required to add members to the chat');
+            if (!dto.usernames || dto.usernames.length === 0) throw new BadRequestException('At least one user ID is required to add members to the chat');
 
             // Check if the user in session exists
             if (!req.session.user?.id) return;
             const requester = await this.usersService.findById(req.session.user.id);
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
 
-            // Check if the chat exists + 
+            // Check if the chat exists
             const chat = await this.chatsService.findById(chatId, requester.id);
             if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
@@ -241,35 +241,32 @@ export class ChatsController {
             // Check if the requester is a creator or admin of the chat
             if (member.role === 'member') throw new ForbiddenException('You are not allowed to add members to this chat');
 
-            // Create an array to store usernames of the users to be added
-            const addedUsernames: string[] = [];
-
+            const userIds: number[] = [];
             // Check if the users to be added exist
-            for (const uid of dto.userIds) {
-                const user = await this.usersService.findById(uid);
-                if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
+            for (const username of dto.usernames) {
+                const user = await this.usersService.getByUsername(username);
+                if (!user) throw new NotFoundException(`${username} not found`);
 
                 const alreadyAMember = await this.membersService.findChatMember(user.id, chat.id);
-                if (alreadyAMember) throw new ConflictException(`${user.username} (ID: ${uid}) is already a member of this chat`);
+                if (alreadyAMember) throw new ConflictException(`${user.username} is already a member of this chat`);
 
-                // Add the username to the array
-                addedUsernames.push(user.username);
+                // Collect user IDs to be added
+                userIds.push(user.id); 
             }
 
             // Add users to the chat
-            for (const uid of dto.userIds) {
-                const user = await this.usersService.findById(uid);
-                if (!user) throw new NotFoundException(`User with ID ${uid} not found`);
-                await this.membersService.addUserToChat(user.id, chat.id);
+            for (const uid of userIds) {
+                await this.membersService.addUserToChat(uid, chat.id);
             }
-            if (addedUsernames.length > 1) {
+
+            if (userIds.length > 1) {
                 // Send system message of new members added to the group
                 await this.messageService.sendSystemMessage(
                     chatId,
                     'NEW_MEMBERS',
                     {
                         admin: requester.username,
-                        newMembers: addedUsernames.join(', '),
+                        newMembers: dto.usernames.join(', '),
                     }
                 );
             } else {
@@ -278,7 +275,7 @@ export class ChatsController {
                     chatId,
                     'NEW_MEMBER',
                     {
-                        newMember: addedUsernames[0],
+                        newMember: dto.usernames[0],
                         admin: requester.username,
                     }
                 );
