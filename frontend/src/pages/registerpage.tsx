@@ -18,9 +18,15 @@ import {
 const BASE = import.meta.env.VITE_BASE_PATH;
 
 const RegisterPage = () => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [birthDate, setBirthDate] = useState('');
+    const [firstNameValid, setFirstNameValid] = useState(true);
+    const [firstNameText, setFirstNameText] = useState('');
+    const [lastNameValid, setLastNameValid] = useState(true);
+    const [lastNameText, setLastNameText] = useState('');
     const [usernameValid, setUsernameValid] = useState(true);
     const [usernameText, setUsernameText] = useState('');
     const [password2, setPassword2] = useState('');
@@ -40,10 +46,12 @@ const RegisterPage = () => {
         setUsernameValid(true);
         setPasswordValid(true);
         setBirthDateValid(true);
+        setFirstNameValid(true);
+        setLastNameValid(true);
 
         // Validate username
-        const usernameRegex = /^[a-zA-Z0-9_]+$/;
-        if (!usernameRegex.test(username)) {
+        const textRegex = /^[a-zA-Z0-9_]+$/;
+        if (!textRegex.test(username)) {
             setUsernameText(t('REGISTER_USERNAME_NOT_VALID'));
             setUsernameValid(false);
             setPassword('');
@@ -63,6 +71,59 @@ const RegisterPage = () => {
             setPassword('');
             setPassword2('');
             return;
+        }
+        // First and last name can have spaces, so we use a different regex
+        const textRegexAlt = /^[a-zA-Z0-9_ ]+$/;
+        if (!textRegexAlt.test(firstName)) {
+            setFirstNameText(t('INVALID_FIELD_ALT', { 
+                field: t('FORM_FIRSTNAME_LABEL'), 
+            }));
+            setFirstNameValid(false);
+            setPassword('');
+            setPassword2('');
+            return;
+        }
+        if (firstName.length < 2) {
+            setFirstNameText(t('MINIMUM_LENGTH', { 
+                field: t('FORM_FIRSTNAME_LABEL'),
+                length: 2,
+            }));
+            setFirstNameValid(false);
+            setPassword('');
+            setPassword2('');
+            return;
+        }
+        if (firstName.length > 20) {
+            setFirstNameText(t('MAXIMUM_LENGTH', { 
+                field: t('FORM_FIRSTNAME_LABEL'),
+                length: 20,
+            }));
+            setFirstNameValid(false);
+            setPassword('');
+            setPassword2('');
+            return;
+        }
+        // Validate last name if provided
+        if (lastName !=="") {
+            if (!textRegexAlt.test(lastName)) {
+                setLastNameText(t('INVALID_FIELD_ALT', { 
+                    field: t('FORM_LASTNAME_LABEL'), 
+                }));
+                setLastNameValid(false);
+                setPassword('');
+                setPassword2('');
+                return;
+            }
+            if (lastName.length > 35) {
+                setLastNameText(t('MAXIMUM_LENGTH', { 
+                    field: t('FORM_LASTNAME_LABEL'),
+                    length: 35,
+                }));
+                setLastNameValid(false);
+                setPassword('');
+                setPassword2('');
+                return;
+            }
         }
 
         // Validate birth date
@@ -115,6 +176,8 @@ const RegisterPage = () => {
             setLoading(true); // Set loading state to true
             // Make the API call to register the user
             await api.post('/users/register', {
+                firstName: firstName,
+                lastName: lastName,
                 username: username,
                 password: password,
                 birthDate: birthDate,
@@ -173,14 +236,14 @@ const RegisterPage = () => {
 
     return (
         <Container maxWidth="xs">
-            <Paper 
-                elevation={12} 
+            <Paper
+                elevation={12}
                 sx={{
                     marginTop: 8,
                     padding: 2,
                 }}
             >
-                <Avatar 
+                <Avatar
                     sx={{
                         mx: "auto",
                         mb: 2,
@@ -190,11 +253,11 @@ const RegisterPage = () => {
                 >
                     <PersonAdd />
                 </Avatar>
-                <Typography 
-                    component="h1" 
-                    variant="h5" 
-                    sx={{ 
-                        textAlign: "center", 
+                <Typography
+                    component="h1"
+                    variant="h5"
+                    sx={{
+                        textAlign: "center",
                     }}
                 >
                     {t('REGISTER_PAGE_TITLE')}
@@ -202,10 +265,50 @@ const RegisterPage = () => {
                 <Box
                     component="form"
                     onSubmit={handleRegister}
-                    sx={{ 
-                        mt: 2, 
+                    sx={{
+                        mt: 2,
                     }}
                 >
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        sx={{ mb: 2, }}
+                    >
+                        <TextField
+                            label={t('FORM_FIRSTNAME_LABEL')}
+                            placeholder={t('FORM_FIRSTNAME_LABEL')}
+                            required
+                            type="text"
+                            value={firstName}
+                            error={!firstNameValid}
+                            disabled={loading} // Disable field if loading
+                            helperText={!firstNameValid ? firstNameText : ''}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            sx={{
+                                mr: 1,
+                                input: {
+                                    background: !firstNameValid ? '#ffebee' : 'transparent'
+                                }
+                            }}
+                        />
+                        <TextField
+                            label={t('FORM_LASTNAME_LABEL')}
+                            placeholder={t('FORM_LASTNAME_LABEL')}
+                            type="text"
+                            value={lastName}
+                            error={!lastNameValid}
+                            disabled={loading} // Disable field if loading
+                            helperText={!lastNameValid ? lastNameText : ''}
+                            onChange={(e) => setLastName(e.target.value)}
+                            sx={{
+                                ml: 1,
+                                input: {
+                                    background: !lastNameValid ? '#ffebee' : 'transparent'
+                                }
+                            }}
+                        />
+                    </Box>
                     <TextField
                         label={t('FORM_USERNAME_LABEL')}
                         placeholder={t('FORM_USERNAME_PLACEHOLDER')}
@@ -281,11 +384,11 @@ const RegisterPage = () => {
                         }}
                     />
                     {netError &&
-                        <Typography 
-                            sx={{ 
-                                mb: 2, 
-                                color: "red", 
-                                textAlign: "center", 
+                        <Typography
+                            sx={{
+                                mb: 2,
+                                color: "red",
+                                textAlign: "center",
                             }}
                         >
                             {t('ERR_SERVER')}
@@ -304,13 +407,13 @@ const RegisterPage = () => {
                     </Button>
                 </Box>
                 <Typography
-                    sx={{ 
-                        textAlign: "center", 
+                    sx={{
+                        textAlign: "center",
                     }}
                 >
                     {t('REGISTER_LOGIN_LABEL')}<br />
-                    <Link 
-                        component={RouterLink} 
+                    <Link
+                        component={RouterLink}
                         to={`${BASE}/login`}
                     >
                         {t('REGISTER_LOGIN_LINK')}
