@@ -24,13 +24,33 @@ export class UsersController {
     ){
         try{
             // Validate username in body request
-            const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+            const textRegex = /^[a-zA-Z0-9_-]+$/;
+
             // If username contains invalid characters, throw an error
-            if (!usernameRegex.test(saveUserDto.username)) throw new BadRequestException('Invalid characters in username');
+            if (!textRegex.test(saveUserDto.username)) throw new BadRequestException('Invalid characters in username');
 
             // If username is too short or too long, throw an error
             if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough (min 3 characters)');
             if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long (max 20 characters)');
+
+            // Validate first name in body request
+            const textRegexAlt = /^[a-zA-Z0-9_ ]+$/;
+
+            // If first name contains invalid characters, throw an error
+            if (!textRegexAlt.test(saveUserDto.firstName)) throw new BadRequestException('Invalid characters in first name');
+
+            // If first name is too short or too long, throw an error
+            if (saveUserDto.firstName.length < 2) throw new BadRequestException('First name not long enough (min 2 characters)');
+            if (saveUserDto.firstName.length > 20) throw new BadRequestException('First name too long (max 20 characters)');
+            
+            // If last name is provided, validate it
+            if (saveUserDto.lastName) {
+                // If last name contains invalid characters, throw an error
+                if (!textRegexAlt.test(saveUserDto.lastName)) throw new BadRequestException('Invalid characters in last name');
+
+                // If last name is too long, throw an error
+                if (saveUserDto.lastName.length > 35) throw new BadRequestException('Last name too long (max 35 characters)');
+            }
 
             // If password is too short or too long, throw an error
             if (saveUserDto.password.length < 6) throw new BadRequestException('Password not long enough (min 6 characters)');
