@@ -511,4 +511,88 @@ export class ChatsController {
             });
         }
     }
+
+    // Update name and description of a group chat
+    @Patch(':chatId')
+    @Roles('user')
+    async updateGroupChat(
+        @Param('chatId') chatId: number,
+        @Body() dto: GroupParamsDto,
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+        try {
+            // User in session must exist and be a member of the chat
+            if (!req.session.user?.id) return;
+            const reqId = req.session.user.id;
+            const member = await this.membersService.findChatMember(reqId, chatId);
+            if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+            // Chat must be a group
+            const chat = await this.chatsService.findById(chatId, reqId);
+            if (!chat || chat.type !== 'group') throw new ConflictException('You can only update group chats');
+
+            // Users with member role cannot edit group chat details
+            if (member.role === ChatMemberRole.OWNER) throw new ForbiddenException("You don't have permission to update this group chat");
+
+            // Validate the new name and description
+            if (!dto.name && !dto.description) throw new BadRequestException('At least one of name or description must be provided');
+
+            // Change group chat properties
+            await this.chatsService.updateGroup(chatId, dto);
+
+            // If name was changed, send system message to the chat
+            if (dto.name && dto.name !== chat.name) {
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'GROUP_NAME_CHANGED',
+                    {
+                        admin: member.user.username,
+                        newName: dto.name,
+                    }
+                );
+            }
+            // If description was blank and now is set, send system message to chat indicating description was added
+            if (chat.description === "" && dto.description) {
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'GROUP_DESCRIPTION_ADD',
+                    {
+                        admin: member.user.username,
+                    }
+                );
+            // If description was changed, send system message to chat indicating description was changed
+            } else if (dto.description && dto.description !== chat.description) {
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'GROUP_DESCRIPTION_CHANGED',
+                    {
+                        admin: member.user.username,
+                    }
+                );
+            // If description was cleared, send system message to chat indicating description was cleared
+            } else if(dto.description === "" && chat.description) {
+                await this.messageService.sendSystemMessage(
+                    chatId,
+                    'GROUP_DESCRIPTION_CLEARED',
+                    {
+                        admin: member.user.username,
+                    }
+                );
+            }
+            return res.status(200).json({
+                statusCode: 200,
+                message: 'Group chat updated successfully',
+            });
+        } catch (error) {
+            if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof ConflictException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+            // If error is not handled by service, return 500
+            return res.status(500).json({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
 }
