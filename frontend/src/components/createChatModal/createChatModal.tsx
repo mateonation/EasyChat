@@ -24,7 +24,6 @@ export default function CreateChatModal({ open, onClose }: Props) {
                     value={chatType}
                     onChange={(e) => setChatType(e.target.value as ChatType)}
                     fullWidth
-                    native
                     variant="outlined"
                     label={t('FORM_CHAT_TYPE_LABEL')}
                 >
