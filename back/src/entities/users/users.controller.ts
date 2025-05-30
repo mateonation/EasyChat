@@ -1,4 +1,4 @@
-import { Controller, Body, Res, Post, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Body, Res, Post, Get, Req, UseGuards, Param } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UsersService } from './users.service';
 import { SaveUserDto } from './dto/save-user.dto';
@@ -14,15 +14,15 @@ import { ForbiddenException } from 'src/errors/forbiddenException';
 export class UsersController {
     constructor(
         private readonly usersService: UsersService
-    ) {}
+    ) { }
 
     // Endpoint to register a new user
     @Post('register')
     async register(
         @Body() saveUserDto: SaveUserDto,
         @Res() res: Response,
-    ){
-        try{
+    ) {
+        try {
             const textRegex = /^[a-zA-Z0-9_]+$/; // Regex for valid characters in username
             const textRegexAlt = /^[\p{L} ]+$/u; // Regex for valid unicode characters - first and last name
 
@@ -39,7 +39,7 @@ export class UsersController {
             // If first name is too short or too long, throw an error
             if (saveUserDto.firstName.length < 2) throw new BadRequestException('First name not long enough (min 2 characters)');
             if (saveUserDto.firstName.length > 20) throw new BadRequestException('First name too long (max 20 characters)');
-            
+
             // If last name is provided, validate it
             if (saveUserDto.lastName) {
                 // If last name contains invalid characters, throw an error
@@ -56,7 +56,7 @@ export class UsersController {
             // Check user birth date
             const userIsOver18 = await this.usersService.isUserOver18(saveUserDto.birthDate);
             // If the user is under 18 years old, throw an error
-            if(!userIsOver18) throw new ForbiddenException('You must be 18 years old or older');
+            if (!userIsOver18) throw new ForbiddenException('You must be 18 years old or older');
 
             // Check if user with the same username already exists
             const existingUser = await this.usersService.findByUsername(saveUserDto.username);
@@ -88,8 +88,8 @@ export class UsersController {
     async getLoggedUser(
         @Res() res: Response,
         @Req() req: Request,
-    ){
-        try{
+    ) {
+        try {
             if (!req.session.user?.id) return;
             // Get user info from service
             const user = await this.usersService.findById(req.session.user.id);
@@ -115,10 +115,92 @@ export class UsersController {
     @Roles('admin')
     admin(
         @Res() res: Response,
-    ){
+    ) {
         return res.status(200).json({
             statusCode: 200,
             message: 'You are an admin'
         })
+    }
+
+    // Endpoint to retrieve data from a user by their id number
+    @Get(':userId')
+    @Roles('user')
+    async viewUserData(
+        @Param('userId') uid: number,
+        @Res() res: Response,
+    ) {
+        try {
+            // Search for user by ID
+            const user = await this.usersService.findById(uid);
+
+            // If user is not found, throw NotFoundException
+            if (!user) throw new NotFoundException('User not found');
+
+            // Return user data
+            return res.status(200).json(user);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+        }
+        // If error is not handled by service, return 500
+        return res.status(500).json({
+            statusCode: 500,
+            message: 'Internal server error',
+        });
+    }
+
+    // Endpoint to retrieve data from a user by their username
+    @Get(':username')
+    @Roles('user')
+    async viewUserByUsername(
+        @Param('username') username: string,
+        @Res() res: Response,
+    ) {
+        try {
+            // Search for user by username
+            const user = await this.usersService.getByUsername(username);
+
+            // If user is not found, throw NotFoundException
+            if (!user) throw new NotFoundException('User not found');
+
+            // Return user data
+            return res.status(200).json(user);
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+        }
+        // If error is not handled by service, return 500
+        return res.status(500).json({
+            statusCode: 500,
+            message: 'Internal server error',
+        });
+    }
+
+    // Endpoint to get the list of all users (ADMIN ONLY)
+    @Get('all')
+    @Roles('admin')
+    async getAllUsers(
+        @Res() res: Response,
+    ) {
+        try {
+            // Get all users from service
+            const users = await this.usersService.getAllUsers();
+            // Return 'success' response
+            return res.status(200).json({
+                statusCode: 200,
+                users,
+            });
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof BadRequestException) {
+                return res.status(error.getStatus()).json(error.getResponse());
+            }
+        }
+        // If error is not handled by service, return 500
+        return res.status(500).json({
+            statusCode: 500,
+            message: 'Internal server error',
+        });
     }
 }
