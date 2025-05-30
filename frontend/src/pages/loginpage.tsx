@@ -26,17 +26,21 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
     const [netError, setNetError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            setLoading(true);
             setError(false);
             setNetError(false);
             await auth.login(username, password);
             alert("Login successful!");
             console.log("User logged: @", username, " [",new Date().toLocaleString(), "]");
+            setLoading(false);
             navigate(`${BASE}/chats`, { replace: true });
         } catch (err: unknown) {
+            setLoading(false);
             if (err !== null && typeof err === "object" && "message" in err) {
                 setPassword(''); // Clear password field on error
                 console.error(err);
@@ -83,6 +87,7 @@ const LoginPage = () => {
                         autoFocus
                         value={username}
                         error={error}
+                        disabled={loading} // Disable username field if loading
                         onChange={(e) => setUsername(e.target.value)}
                         sx={{
                             mb: 2,
@@ -99,6 +104,7 @@ const LoginPage = () => {
                         type="password"
                         value={password}
                         error={error}
+                        disabled={loading} // Disable password field if loading
                         helperText={error ? t('LOGIN_FORM_ERROR') : ''}
                         onChange={(e) => setPassword(e.target.value)}
                         sx={{
@@ -109,18 +115,39 @@ const LoginPage = () => {
                         }}
                     />
                     {netError ?
-                        <Typography sx={{ mb: 2, color: "red", textAlign: "center", }}>
+                        <Typography 
+                            sx={{ 
+                                mb: 2,
+                                color: "red",
+                                textAlign: "center",
+                            }}
+                        >
                             {t('ERR_SERVER')}
                         </Typography>
                         : null
                     }
-                    <Button type="submit" variant="contained" fullWidth sx={{ mb: 2, }}>
+                    <Button 
+                        type="submit"
+                        variant="contained"
+                        fullWidth 
+                        sx={{
+                            mb: 2,
+                        }}
+                        disabled={loading} // Disable button if loading
+                    >
                         {t('LOGIN_FORM_SUBMIT')}
                     </Button>
                 </Box>
-                <Typography sx={{ textAlign: "center", }}>
+                <Typography 
+                    sx={{
+                        textAlign: "center",
+                    }}
+                >
                     {t('LOGIN_REGISTER_LABEL')}<br />
-                    <Link component={RouterLink} to={`${BASE}/register`}>
+                    <Link 
+                        component={RouterLink} 
+                        to={`${BASE}/register`}
+                    >
                         {t('LOGIN_REGISTER_LINK')}
                     </Link>
                 </Typography>
