@@ -15,6 +15,15 @@ export class User {
     username: string;
 
     @Column()
+    firstName: string;
+
+    @Column({
+        nullable: true, // Last name is optional
+        default: null, // Default to null if not provided
+    })
+    lastName: string;
+
+    @Column()
     password: string;
 
     @CreateDateColumn({ 
