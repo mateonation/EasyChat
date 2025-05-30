@@ -36,6 +36,8 @@ const resources = {
             GENERIC_MSG_UNAUTHORIZED: "Unauthorized",
 
             // FORM FIELDS
+            FORM_FIRSTNAME_LABEL: "First name",
+            FORM_LASTNAME_LABEL: "Last name",
             FORM_USERNAME_LABEL: "Username",
             FORM_USERNAME_PLACEHOLDER: "Enter your username here",
             FORM_PASSWORD_LABEL: "Password",
@@ -189,6 +191,8 @@ const resources = {
             GENERIC_MSG_UNAUTHORIZED: "No autorizado",
 
             // CAMPOS DE FORMULARIO
+            FORM_FIRSTNAME_LABEL: "Nombre",
+            FORM_LASTNAME_LABEL: "Apellidos",
             FORM_USERNAME_LABEL: "Nombre de usuario",
             FORM_USERNAME_PLACEHOLDER: "Introduce tu nombre de usuario",
             FORM_PASSWORD_LABEL: "Contraseña",
@@ -342,6 +346,8 @@ const resources = {
             GENERIC_MSG_UNAUTHORIZED: "Non autorizado",
 
             // CAMPOS DO FORMULARIO
+            FORM_FIRSTNAME_LABEL: "Nome",
+            FORM_LASTNAME_LABEL: "Apelidos",
             FORM_USERNAME_LABEL: "Nome de usuario",
             FORM_USERNAME_PLACEHOLDER: "Escribe o teu nome de usuario",
             FORM_PASSWORD_LABEL: "Contrasinal",
