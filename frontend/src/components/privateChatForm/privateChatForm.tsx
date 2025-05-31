@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../api/axios";
-import { Avatar, Box, Button, CircularProgress, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Typography } from "@mui/material";
-import { Search, Close as CloseIcon } from "@mui/icons-material";
+import { Avatar, Box, Button, CircularProgress, DialogActions, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Typography } from "@mui/material";
+import { Search, Close } from "@mui/icons-material";
 import { User } from "../../types/userdata.dto";
 import { t } from "i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,151 +47,153 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
 
     return (
         <AnimatePresence mode="wait">
-        <Box>
-            {!selectedUser && (
-                <motion.div
-                    key="search-form"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <TextField
-                        id="user-search"
-                        aria-label={t("FORM_USERNAME_LABEL")}
-                        label={t("FORM_USERNAME_LABEL")}
-                        placeholder={t("FORM_USERNAME_LABEL")}
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") handleSearch();
-                        }}
-                        fullWidth
-                        margin="normal"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton 
-                                        onClick={handleSearch}
-                                        aria-label={t("GENERIC_ANSWER_SEARCH")}
-                                    >
-                                        <Search />
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    {loading ? (
-                        <Box display="flex" justifyContent="center" mt={2}>
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        results.length > 0 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <Paper
-                                    elevation={3}
-                                    sx={{
-                                        maxHeight: 160,
-                                        overflowY: "auto",
-                                        mt: 2,
-                                        borderRadius: 2,
-                                    }}
-                                    role="listbox"
-                                    aria-label="results"
-                                >
-                                    <List dense>
-                                        {results.map((user) => (
-                                            <ListItem
-                                                key={user.id}
-                                                component="li"
-                                                onClick={() => {
-                                                    setSelectedUser(user);
-                                                    setResults([]);
-                                                }}
-                                                sx={{
-                                                    cursor: "pointer",
-                                                    "&:hover": {
-                                                        backgroundColor: "action.hover",
-                                                    },
-                                                    transition: "background-color 0.2s",
-                                                    padding: 1.5,
-                                                    borderRadius: 1,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                }}
-                                            >
-                                                <ListItemAvatar>
-                                                    <Avatar>
-                                                        {user.username[0].toUpperCase()}
-                                                    </Avatar>
-                                                </ListItemAvatar>
-                                                <ListItemText primary={user.username} />
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                </Paper>
-                            </motion.div>
-                        )
-                    )}
-                </motion.div>
-            )}
-
-            {selectedUser && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                        mt={2}
-                        p={1}
-                        sx={{
-                            padding: 2,
-                            borderRadius: 2,
-                            backgroundColor: "action.selected",
-                        }}
-                        role="group"
-                        aria-label={t("GENERIC_ANSWER_SELECT")}
+            <Box>
+                {!selectedUser && (
+                    <motion.div
+                        key="search-form"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
                     >
-                        <Avatar>
-                            {selectedUser.username[0].toUpperCase()}
-                        </Avatar>
-                        <Typography
-                            sx={{
-                                flexGrow: 1,
+                        <TextField
+                            id="user-search"
+                            aria-label={t("FORM_USERNAME_LABEL")}
+                            label={t("FORM_USERNAME_LABEL")}
+                            placeholder={t("FORM_USERNAME_LABEL")}
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") handleSearch();
                             }}
-                        >
-                            {selectedUser.username}
-                        </Typography>
-                        <IconButton
-                            onClick={handleRemoveUser}
-                            aria-label={t("GENERIC_ANSWER_REMOVE")}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                    </Box>
-                </motion.div>
-            )}
+                            fullWidth
+                            margin="normal"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={handleSearch}
+                                            aria-label={t("GENERIC_ANSWER_SEARCH")}
+                                        >
+                                            <Search />
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                        {loading ? (
+                            <Box display="flex" justifyContent="center" mt={2}>
+                                <CircularProgress />
+                            </Box>
+                        ) : (
+                            results.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <Paper
+                                        elevation={3}
+                                        sx={{
+                                            maxHeight: 160,
+                                            overflowY: "auto",
+                                            mt: 2,
+                                            borderRadius: 2,
+                                        }}
+                                        role="listbox"
+                                        aria-label="results"
+                                    >
+                                        <List dense>
+                                            {results.map((user) => (
+                                                <ListItem
+                                                    key={user.id}
+                                                    component="li"
+                                                    onClick={() => {
+                                                        setSelectedUser(user);
+                                                        setResults([]);
+                                                    }}
+                                                    sx={{
+                                                        cursor: "pointer",
+                                                        "&:hover": {
+                                                            backgroundColor: "action.hover",
+                                                        },
+                                                        transition: "background-color 0.2s",
+                                                        padding: 1.5,
+                                                        borderRadius: 1,
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                    }}
+                                                    role="option"
+                                                >
+                                                    <ListItemAvatar>
+                                                        <Avatar>
+                                                            {user.username[0].toUpperCase()}
+                                                        </Avatar>
+                                                    </ListItemAvatar>
+                                                    <ListItemText primary={user.username} />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    </Paper>
+                                </motion.div>
+                            )
+                        )}
+                    </motion.div>
+                )}
 
-            <Button
-                variant="contained"
-                onClick={handleCreateChat}
-                disabled={!selectedUser || loading}
-                fullWidth
-                sx={{
-                    mt: 3
-                }}
-            >
-                {t("CHAT_CREATE")}
-            </Button>
-        </Box>
+                {selectedUser && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            gap={2}
+                            mt={2}
+                            p={1}
+                            sx={{
+                                padding: 2,
+                                borderRadius: 2,
+                                backgroundColor: "action.selected",
+                            }}
+                            role="group"
+                            aria-label={`${t('GENERIC_ANSWER_SELECT')}: ${selectedUser.username}`}
+                        >
+                            <Avatar>
+                                {selectedUser.username[0].toUpperCase()}
+                            </Avatar>
+                            <Typography
+                                sx={{
+                                    flexGrow: 1,
+                                }}
+                            >
+                                {selectedUser.username}
+                            </Typography>
+                            <IconButton
+                                onClick={handleRemoveUser}
+                                aria-label={t("GENERIC_ANSWER_REMOVE")}
+                            >
+                                <Close />
+                            </IconButton>
+                        </Box>
+                    </motion.div>
+                )}
+
+                <DialogActions>
+                    <Button
+                        variant="contained"
+                        onClick={handleCreateChat}
+                        disabled={!selectedUser || loading}
+                        sx={{
+                            mt: 3
+                        }}
+                    >
+                        {t("CHAT_CREATE")}
+                    </Button>
+                </DialogActions>
+            </Box>
         </AnimatePresence>
     );
 }
