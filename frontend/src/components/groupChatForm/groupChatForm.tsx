@@ -4,8 +4,14 @@ import { Avatar, Box, Button, DialogActions, IconButton, InputAdornment, List, L
 import { Close, Search } from "@mui/icons-material";
 import { t } from "i18next";
 import { User } from "../../types/userdata.dto";
+import { ChatDto } from "../../types/chat.dto";
 
-export default function GroupChatForm({ onClose }: { onClose: () => void }) {
+interface Props {
+    onClose: () => void;
+    onChatCreated: (chat: ChatDto) => void;
+}
+
+export default function GroupChatForm({ onClose, onChatCreated }: Props) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [query, setQuery] = useState("");
@@ -19,29 +25,51 @@ export default function GroupChatForm({ onClose }: { onClose: () => void }) {
         setSearchResults(filteredResults);
     };
 
-    const addUser = (
-        user: User,
-    ) => {
+    const addUser = (user: User) => {
         setSelectedUsers([...selectedUsers, user]); // Add to selected users
         setSearchResults([]); // Clear search results
         setQuery(""); // Reset query input
     }
 
-    const removeUser = (
-        uid: number,
-    ) => {
+    const removeUser = (uid: number) => {
         setSelectedUsers(selectedUsers.filter((u) => u.id !== uid));
     }
 
     const createGroup = async () => {
-        const usernames = selectedUsers.map((u) => u.username);
-        const res = await api.post("/chats/create/group", {
-            name,
-            description,
-            usernames,
-        });
-        alert("Group created");
-        onClose();
+        try{
+            // Alert if group name is empty (this alert should not appear, but just in case)
+            if (!name.trim()) {
+                alert(t('FORM_GROUP_NAME_REQUIRED'));
+                return;
+            }
+
+            // Return if no users are selected
+            if (selectedUsers.length === 0) return;
+
+            // Save selected users in a const
+            const usernames = selectedUsers.map((u) => u.username);
+
+            // Make API call to create group chat
+            const res = await api.post("/chats/create/group", {
+                name,
+                description,
+                usernames,
+            });
+
+            // Get chat from response
+            const newChat: ChatDto = res.data.chat;
+
+            // Send new chat to parent component
+            onChatCreated(newChat);
+
+            // Close modal
+            onClose();
+        } catch (error) {
+            console.error("Failed to create group chat:", error);
+            alert("Failed to create group chat. Please try again.");
+            return;
+        }
+        
     };
 
     return (

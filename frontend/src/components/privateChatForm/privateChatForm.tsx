@@ -10,9 +10,10 @@ import { ChatDto } from "../../types/chat.dto";
 interface Props {
     onClose: () => void;
     userChats: ChatDto[];
+    onChatCreated: (chat: ChatDto) => void;
 }
 
-export default function PrivateChatForm({ onClose, userChats }: Props) {
+export default function PrivateChatForm({ onClose, userChats, onChatCreated }: Props) {
     const [username, setUsername] = useState('');
     const [results, setResults] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -49,14 +50,24 @@ export default function PrivateChatForm({ onClose, userChats }: Props) {
 
         // If not, then create it
         try {
-            await api.post('/chats/create/private', {
+            // Make API call to create private chat
+            const res = await api.post('/chats/create/private', {
                 usernames: [selectedUser.username],
             });
-            alert('Chat created');
+
+            // Get chat from response
+            const newChat: ChatDto = res.data.chat;
+
+            // Send new chat to parent component
+            onChatCreated(newChat); 
+            
+            // Close modal
             onClose();
         } catch (error) {
             console.error("Error creating chat:", error);
-            alert('Error al crear el chat');
+            alert(t("FAILED_TO_CREATE", {
+                field: t("CHAT"),
+            }));
         }
     };
 
