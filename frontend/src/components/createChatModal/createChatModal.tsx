@@ -9,10 +9,11 @@ import { ChatDto } from "../../types/chat.dto";
 interface Props {
     open: boolean;
     onClose: () => void;
+    onChatCreated: (chat: ChatDto) => void;
     userChats: ChatDto[];
 }
 
-export default function CreateChatModal({ open, onClose, userChats }: Props) {
+export default function CreateChatModal({ open, onClose, onChatCreated, userChats }: Props) {
     const [chatType, setChatType] = useState<ChatType>('private');
 
     return (
@@ -44,9 +45,16 @@ export default function CreateChatModal({ open, onClose, userChats }: Props) {
                     </Select>
                 </FormControl>
                 {chatType === 'private' ? (
-                    <PrivateChatForm onClose={onClose} userChats={userChats} />
+                    <PrivateChatForm 
+                        onClose={onClose} 
+                        userChats={userChats}
+                        onChatCreated={onChatCreated} 
+                    />
                 ) : (
-                    <GroupChatForm onClose={onClose} />
+                    <GroupChatForm 
+                        onClose={onClose}
+                        onChatCreated={onChatCreated} 
+                    />
                 )}
             </DialogContent>
         </Dialog>
