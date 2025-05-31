@@ -1,6 +1,9 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+// Get the saved language from localStorage or default to English
+const SAV_LANG = localStorage.getItem("lang") || "en";
+
 const resources = {
     // ENGLISH
     en: {
@@ -561,7 +564,8 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: "en",
+        fallbackLng: "en", // Fallback language
+        lng: SAV_LANG, // Use language saved in local storage
 
         interpolation: {
             escapeValue: false
