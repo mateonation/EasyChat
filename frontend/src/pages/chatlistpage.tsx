@@ -37,6 +37,11 @@ const ChatsListPage = () => {
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
 
+    // If a new chat is created, update the list with the new one and move it to the top
+    const handleChatCreated = (newChat: ChatDto) => {
+        setChats((prevChats) => [newChat, ...prevChats]);
+    };
+
     // Render the list of chats or a loading indicator
     if (loading) {
         <Box
@@ -120,6 +125,7 @@ const ChatsListPage = () => {
             <CreateChatModal
                 open={openModal}
                 onClose={handleCloseModal}
+                onChatCreated={handleChatCreated}
                 userChats={chats}
             />
         </Box>
