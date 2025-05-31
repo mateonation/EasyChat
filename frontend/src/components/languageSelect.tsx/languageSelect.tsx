@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import i18n from "../../utils/i18n";
+import { useTranslation } from 'react-i18next';
 import { t } from "i18next";
 
 // Languages array to select languages
@@ -22,6 +23,7 @@ const languages = [
 ]
 const LanguageSelect = () => {
     const [language, setLanguage] = useState(i18n.language || 'en');
+    const { t } = useTranslation();
 
     useEffect(() => {
         const savedLang = localStorage.getItem("lang");
@@ -32,6 +34,7 @@ const LanguageSelect = () => {
     }, []);
 
     const handleLangChange = (event: SelectChangeEvent) => {
+        console.log("language selected:", event.target.value);
         const newLang = event.target.value;
         setLanguage(newLang);
         i18n.changeLanguage(newLang);
@@ -44,12 +47,10 @@ const LanguageSelect = () => {
             size="small"
         >
             <Select
-                labelId={t('LANGUAGE_SELECT_LABEL')}
                 id="language-select"
                 value={language}
                 onChange={handleLangChange}
-                aria-label={t('LANGUAGE_SELECT_LABEL')}
-                label={t('LANGUAGE_SELECT_LABEL')}
+                aria-label={t('LANGUAGE_LABEL')}
             >
                 {languages.map(lang => (
                     <MenuItem
