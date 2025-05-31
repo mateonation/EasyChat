@@ -4,13 +4,15 @@ import { Dialog, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, 
 import { t } from "i18next";
 import PrivateChatForm from "../privateChatForm";
 import GroupChatForm from "../groupChatForm";
+import { ChatDto } from "../../types/chat.dto";
 
 interface Props {
     open: boolean;
     onClose: () => void;
+    userChats: ChatDto[];
 }
 
-export default function CreateChatModal({ open, onClose }: Props) {
+export default function CreateChatModal({ open, onClose, userChats }: Props) {
     const [chatType, setChatType] = useState<ChatType>('private');
 
     return (
@@ -42,7 +44,7 @@ export default function CreateChatModal({ open, onClose }: Props) {
                     </Select>
                 </FormControl>
                 {chatType === 'private' ? (
-                    <PrivateChatForm onClose={onClose} />
+                    <PrivateChatForm onClose={onClose} userChats={userChats} />
                 ) : (
                     <GroupChatForm onClose={onClose} />
                 )}

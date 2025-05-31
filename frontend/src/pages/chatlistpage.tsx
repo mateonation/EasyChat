@@ -3,12 +3,14 @@ import { ChatDto } from "../types/chat.dto"
 import api from "../api/axios";
 import { Box, CircularProgress, Fab, List, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 import ChatItem from "../components/chatItem";
 import ChatIcon from '@mui/icons-material/Chat';
 import CreateChatModal from "../components/createChatModal";
+import LanguageSelect from "../components/languageSelect.tsx";
 
 const ChatsListPage = () => {
+    const { t } = useTranslation();
     const [chats, setChats] = useState<ChatDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -77,6 +79,7 @@ const ChatsListPage = () => {
             >
                 {t('CHATS_LIST_PAGE_TITLE')}
             </Typography>
+            <LanguageSelect />
             {chats.length === 0 ? (
                 <Typography
                 align="center"
@@ -117,6 +120,7 @@ const ChatsListPage = () => {
             <CreateChatModal
                 open={openModal}
                 onClose={handleCloseModal}
+                userChats={chats}
             />
         </Box>
     );
