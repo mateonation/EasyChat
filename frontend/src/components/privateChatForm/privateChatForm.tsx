@@ -5,12 +5,19 @@ import { Search, Close } from "@mui/icons-material";
 import { User } from "../../types/userdata.dto";
 import { t } from "i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChatDto } from "../../types/chat.dto";
 
-export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
+interface Props {
+    onClose: () => void;
+    userChats: ChatDto[];
+}
+
+export default function PrivateChatForm({ onClose, userChats }: Props) {
     const [username, setUsername] = useState('');
     const [results, setResults] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
+    const [chatExists, setChatExists] = useState(false);
 
     const handleSearch = async () => {
         if (!username.trim()) return;
@@ -27,6 +34,20 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
 
     const handleCreateChat = async () => {
         if (!selectedUser) return;
+        
+        // Check for an existing private chat with the same name as the selected user's username
+        const existingChat = userChats.find(chat =>
+            chat.name === selectedUser.username 
+            && chat.type === 'private'
+        );
+
+        // If it exists, set the chatExists state to true and return
+        if (existingChat) {
+            setChatExists(true);
+            return;
+        }
+
+        // If not, then create it
         try {
             await api.post('/chats/create/private', {
                 usernames: [selectedUser.username],
@@ -43,6 +64,7 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
         setSelectedUser(null);
         setUsername('');
         setResults([]);
+        if (chatExists) setChatExists(false);
     };
 
     return (
@@ -178,6 +200,21 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                                 <Close />
                             </IconButton>
                         </Box>
+                        {chatExists && (
+                            <Typography
+                                color="error"
+                                component="p"
+                                variant="caption"
+                                sx={{
+                                    mt: 1,
+                                }}
+                            >
+                                {t("PRIVATE_CHAT_EXISTS", {
+                                    user: selectedUser.username
+                                }
+                                )}
+                            </Typography>
+                        )}
                     </motion.div>
                 )}
 
@@ -185,7 +222,7 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                     <Button
                         variant="contained"
                         onClick={handleCreateChat}
-                        disabled={!selectedUser || loading}
+                        disabled={!selectedUser || loading || chatExists}
                         sx={{
                             mt: 2,
                         }}
