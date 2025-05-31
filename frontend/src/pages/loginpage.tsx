@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { ErrorResponse } from "../types/errorResponse.interface";
 import { useTranslation } from "react-i18next";
+import LanguageSelect from "../components/languageSelect.tsx";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -119,10 +120,19 @@ const LoginPage = () => {
                 marginTop: 8,
                 padding: 2,
             }}>
+                <Box 
+                    sx={{
+                        float: "right",
+                        position: "absolute",
+                    }}
+                >
+                    <LanguageSelect />
+                </Box>
                 <Avatar sx={{
                     mx: "auto",
                     mb: 2,
                     textAlign: "center",
+                    bgcolor: "secondary.main",
                 }}>
                     <LockOutline />
                 </Avatar>

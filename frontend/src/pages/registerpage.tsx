@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { t } from "i18next"; // Ensure t is imported from your i18n library
 import api from "../api/axios";
 import axios from "axios";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -14,6 +13,8 @@ import {
     Button,
     Link,
 } from "@mui/material";
+import LanguageSelect from "../components/languageSelect.tsx";
+import { useTranslation } from "react-i18next";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -21,6 +22,7 @@ const textRegex = /^[a-zA-Z0-9_]+$/; // Regex for valid characters in username
 const textRegexAlt = /^[\p{L} ]+$/u; // Regex for valid unicode characters
 
 const RegisterPage = () => {
+    const { t } = useTranslation();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
@@ -284,12 +286,20 @@ const RegisterPage = () => {
                     padding: 2,
                 }}
             >
+                <Box 
+                    sx={{
+                        float: "right",
+                        position: "absolute",
+                    }}
+                >
+                    <LanguageSelect />
+                </Box>
                 <Avatar
                     sx={{
                         mx: "auto",
                         mb: 2,
                         textAlign: "center",
-                        bgcolor: "primary.main",
+                        bgcolor: "secondary.main",
                     }}
                 >
                     <PersonAdd />
