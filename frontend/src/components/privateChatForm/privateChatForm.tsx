@@ -187,7 +187,7 @@ export default function PrivateChatForm({ onClose }: { onClose: () => void }) {
                         onClick={handleCreateChat}
                         disabled={!selectedUser || loading}
                         sx={{
-                            mt: 3
+                            mt: 2,
                         }}
                     >
                         {t("CHAT_CREATE")}
