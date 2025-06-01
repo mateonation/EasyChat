@@ -1,51 +1,69 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+import {
+    MessageBody, 
+    OnGatewayConnection, 
+    OnGatewayDisconnect, 
+    SubscribeMessage, 
+    WebSocketGateway, 
+    WebSocketServer 
+} from "@nestjs/websockets";
+import { Server } from "socket.io";
+import { SessionSocket } from "src/types/session-socket";
+import { MessagesService } from "../messages/messages.service";
+import { SendMessageDto } from "../messages/dto/send-message.dto";
 
 @WebSocketGateway({
     cors: {
-        origin: ['http://localhost:5173'],
+        origin: true,
         credentials: true,
     },
 })
 
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-
     @WebSocketServer()
     server: Server;
 
-    handleConnection(client: Socket) {
-        const session = client.request?.session;
-        if(!session?.user) {
+    constructor(
+        private readonly messagesService: MessagesService
+    ) { }
+
+    handleConnection(client: SessionSocket) {
+        const user = client.request.session.user;
+        if(!user) {
             client.disconnect();
             return;
         }
-        console.log(`Client connected: ${client.id}, User id: ${session.user.id}`);
+        console.log(`User connected: ${user.username}`);
     }
 
-    handleDisconnect(client: Socket) {
-        console.log(`Client disconnected: ${client.id}`);
+    handleDisconnect(client: SessionSocket) {
+        console.log(`User disconnected: ${client.request.session.user.username}`);
     }
 
-    @SubscribeMessage('sendAMessage')
-    handleSendAMessage(
-        @MessageBody() payload: { 
-            chatId: number, 
-            message: string, 
-        },
-        @ConnectedSocket() client: Socket,
+    @SubscribeMessage('sendMessage')
+    async handleSendMessage(
+        @MessageBody()
+        dto: SendMessageDto,
+        client: SessionSocket,
     ) {
-        const username = client.request?.session?.user?.username;
-        this.server.to(String(payload.chatId)).emit('messageReceived', {
-            username,
-            message: payload.message,
-        });
+        const user = client.request.session.user;
+        if (!user) return;
+        
+        try {
+            // Save message in DB
+            const savedMessage = await this.messagesService.sendMessage(dto, user.id);
+
+            // Then emit the message to the chat
+            this.server.to(`chat_${dto.chatId}`).emit('newMessage', savedMessage);
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     }
 
     @SubscribeMessage('joinChat')
     handleJoinChat(
         @MessageBody() chatId: number, 
-        @ConnectedSocket() client: Socket
+        client: SessionSocket,
     ) {
-        client.join(String(chatId));
+        client.join(`chat_${chatId}`);
     }
 }
