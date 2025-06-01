@@ -41,11 +41,7 @@ export class MessagesController {
 
             // Send the message and return it
             const message = await this.messagesService.sendMessage(dto, req.session.user.id);
-            return res.status(201).json({
-                statusCode: 201,
-                message: 'Message sent successfully',
-                data: message,
-            });
+            return res.status(201).json(message);
         } catch (error) {
             console.log(error);
             // Handle conflict error
