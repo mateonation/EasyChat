@@ -4,13 +4,13 @@ export const Theme: ThemeOptions = {
   palette: {
     mode: 'light',
     primary: {
-      main: '#0adbb8',
+      main: '#2177aa',
     },
     secondary: {
-      main: '#e600c2',
+      main: '#e56400',
     },
     error: {
-      main: '#ff2c15',
+      main: '#dc0631',
     },
     success: {
       main: '#67ea6c',
@@ -20,15 +20,6 @@ export const Theme: ThemeOptions = {
     },
     warning: {
       main: '#ccd200',
-    },
-    background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#000000',
-      secondary: '#555555',
-      disabled: '#aaaaaa',
     },
   },
 };
