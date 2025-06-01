@@ -96,9 +96,7 @@ export default function PrivateChatForm({ onClose, userChats, onChatCreated }: P
                             placeholder={t("FORM_USERNAME_LABEL")}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") handleSearch();
-                            }}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
                             fullWidth
                             margin="normal"
                             InputProps={{

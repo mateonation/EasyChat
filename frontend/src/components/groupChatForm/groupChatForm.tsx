@@ -106,10 +106,12 @@ export default function GroupChatForm({ onClose, onChatCreated }: Props) {
             </Typography>
                 <Box mt={2}>
                         <TextField
+                            id="user-search"
                             label={t("FORM_USERNAME_LABEL")}
                             placeholder={t('FORM_MEMBERS_PLACEHOLDER')}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
                             fullWidth
                             InputProps={{
                                 endAdornment: (
