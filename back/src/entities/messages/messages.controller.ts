@@ -101,7 +101,7 @@ export class MessagesController {
     @Roles('user')
     async getMessagesByChatId(
         @Param('chatId', ParseIntPipe) chatId: number,
-        @Query('offset', ParseIntPipe) offset: number = 0,
+        @Query('page', ParseIntPipe) page: number = 1,
         @Res() res: Response,
         @Req() req: Request,
     ) {
@@ -109,18 +109,12 @@ export class MessagesController {
             if (!req.session.user?.id) return;
             const requesterId = req.session.user.id;
 
-            // Check if chat exists
-            const chat = await this.chatsService.findById(chatId, req.session.user.id);
-            if (!chat) {
-                throw new NotFoundException('Chat not found');
-            }
-
             // Check if user is a member of the chat
             const member = await this.membersService.findChatMember(requesterId, chatId);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Get messages by chat ID and return them
-            const response = await this.messagesService.findMessagesByChatId(chatId, offset);
+            const response = await this.messagesService.findMessagesByChatId(chatId, page);
             return res.status(200).json(response);
         } catch (error) {
             console.log(error);
