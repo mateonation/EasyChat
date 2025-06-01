@@ -2,20 +2,18 @@ import { MessageResponseDto } from "./message-response.dto";
 
 export class PaginatedMessagesResponseDto {
     messages: MessageResponseDto[]; // Array of messages
+    total: number; // Total number of messages in el chat
     hasMore: boolean; // Indicates if there are more messages to be loaded
-
-    constructor(messages: MessageResponseDto[], hasMore: boolean,) {
-        this.messages = messages;
-        this.hasMore = hasMore;
-    }
 
     static from(
         messages: MessageResponseDto[], 
-        totalCount: number, // Total number of messages in the chat
-        offset: number, // Current offset (page number)
-        limit: number, // Number of messages per page
+        total: number,
+        hasMore: boolean,
     ): PaginatedMessagesResponseDto {
-        const hasMore = offset + limit < totalCount;
-        return new PaginatedMessagesResponseDto(messages, hasMore);
+        const dto = new PaginatedMessagesResponseDto();
+        dto.messages = messages;
+        dto.total = total;
+        dto.hasMore = hasMore;
+        return dto;
     }
 }
