@@ -27,7 +27,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) { }
 
     handleConnection(client: SessionSocket) {
-        const user = client.request.session.user;
+        const user = client.request.session?.user;
         if(!user) {
             client.disconnect();
             return;
