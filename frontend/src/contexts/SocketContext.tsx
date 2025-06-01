@@ -1,42 +1,28 @@
-import { createContext, useState, useEffect, useContext, } from "react";
+import { createContext, useEffect, useContext, useRef, } from "react";
 import { io, Socket } from "socket.io-client";
-import { useAuthContext } from './AuthContext';
 
-type SocketContextType = {
-    socket: Socket | null;
-}
+const SocketContext = createContext<Socket | null>(null);
 
-const SocketContext = createContext<SocketContextType>({
-    socket: null,
-});
+export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-    const { user } = useAuthContext();
-    const [socket, setSocket] = useState<Socket | null>(null);
+    const socketRef = useRef<Socket | null>(null);
 
     useEffect(() => {
-        if (!user) {
-            socket?.disconnect();
-            setSocket(null);
-            return;
-        }
-
-        const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
-            withCredentials: true,
+        const socket = io("http://localhost:3000", {
+            withCredentials: true, // permite el uso de cookies para sesiones
         });
 
-        setSocket(newSocket);
+        socketRef.current = socket;
 
         return () => {
-            newSocket.disconnect();
+            socket.disconnect();
         };
-    }, [user]);
+    }, []);
 
     return (
-        <SocketContext.Provider value={{ socket }}>
+        <SocketContext.Provider value={ socketRef.current }>
             {children}
         </SocketContext.Provider>
     );
 };
-
-export const useSocket = () => useContext(SocketContext);
