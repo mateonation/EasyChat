@@ -37,7 +37,12 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         );
 
         const newMessages = res.data.messages;
-        setMessages((prev) => [...newMessages, ...prev]);
+        // Avoid duplicated messages by filtering existing ones
+        setMessages((prev) => {
+            const existingIds = new Set(prev.map(msg => msg.id));
+            const filterNewMssgs = newMessages.filter(msg => !existingIds.has(msg.id));
+            return [...filterNewMssgs, ...prev];
+        });
         setHasMore(res.data.hasMore);
         setLoading(false);
     }, [chatId, hasMore]);
@@ -162,7 +167,6 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
             display="flex" 
             flexDirection="column"
         >
-            {/* Mensajes */}
             <Box
                 ref={scrollContainerRef}
                 flex={1}
@@ -180,8 +184,6 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                     </Box>
                 )}
             </Box>
-
-            {/* Input de nuevo mensaje */}
             <Box
                 display="flex"
                 p={2}
