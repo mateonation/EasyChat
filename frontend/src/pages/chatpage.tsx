@@ -24,6 +24,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState("");
+    const [error, setError] = useState<string | null>(null);
 
     const topRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -93,10 +94,27 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     }, []);
 
     const sendMessage = async () => {
-        if (!newMessage.trim()) return;
+        const trimmed = newMessage.trim();
+        if(!trimmed) return;
+
+        if (trimmed.startsWith("<")) {
+            setError(t('FIELD_CANNOT_START_WITH', {
+                field: t('FORM_MESSAGE_LABEL'),
+                char: "<",
+            }));
+            return;
+        } else if (trimmed.endsWith(">")) {
+            setError(t('FIELD_CANNOT_END_WITH', {
+                field: t('FORM_MESSAGE_LABEL'),
+                char: ">",
+            }));
+            return;
+        } else {
+            setError(null);
+        }
         await api.post("/message/send", {
             chatId,
-            content: newMessage.trim(),
+            content: trimmed,
         });
         setNewMessage("");
         // Web socket connection here???
@@ -205,6 +223,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                     fullWidth
                     placeholder={t('FORM_MESSAGE_PLACEHOLDER')}
                     value={newMessage}
+                    error={error !== null}
+                    helperText={error || ""}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") sendMessage();
