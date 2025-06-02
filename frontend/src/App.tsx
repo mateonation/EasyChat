@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import LoginPage from './pages/loginpage';
 import RegisterPage from './pages/registerpage';
 import ChatsListPage from './pages/chatlistpage';
+import ChatPageWrapper from './pages/chatpagewrapper';
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter(
                   index: true,
                   element: <ChatsListPage />
                 },
+                {
+                  path: ':chatId',
+                  element: <ChatPageWrapper />
+                }
               ]
             },
           ]
