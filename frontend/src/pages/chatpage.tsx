@@ -59,14 +59,14 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
 
     // WebSocket listener for incoming messages
     useEffect(() => {
-        if(!socket) return;
+        if (!socket) return;
 
         const handleNewMessage = (msg: MessageDto) => {
             if (msg.chatId !== chatId) return; // Ignore messages not in this chat
 
             setMessages((prev) => {
                 // Prevent duplicated messages
-                if(prev.some(m => m.id === msg.id)) return prev;
+                if (prev.some(m => m.id === msg.id)) return prev;
                 return [...prev, msg];
             });
 
@@ -74,7 +74,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
             const container = scrollContainerRef.current;
             if (container) {
                 const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-                if(nearBottom) {
+                if (nearBottom) {
                     requestAnimationFrame(() => {
                         container.scrollTop = container.scrollHeight;
                     });
@@ -82,10 +82,15 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
             }
         };
 
-        socket.on("message:new", handleNewMessage);
+        socket.on("newMessage", handleNewMessage);
         return () => {
-            socket.off("message:new", handleNewMessage);
+            socket.off("newMessage", handleNewMessage);
         }
+    }, [socket, chatId]);
+
+    // Join the chat room on socket when chatId changes
+    useEffect(() => {
+        if (socket && chatId) socket.emit("joinRoom", chatId);
     }, [socket, chatId]);
 
     // Scroll listener for infinite scroll up
@@ -130,7 +135,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         if (error !== null) setError(null); // Clear error if before sending a message
         if (!newMessage.trim()) return; // Don't send empty messages
         const trimmed = newMessage.trim();
-        if(!trimmed) return;
+        if (!trimmed) return;
 
         if (trimmed.startsWith("<")) {
             setError(t('FIELD_CANNOT_START_WITH', {
@@ -153,7 +158,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                 content: trimmed,
             });
             const sentMessage = res.data;
-            socket?.emit("message:new", sentMessage); // Emit new message to socket
+            socket?.emit("sendMessage", sentMessage); // Emit new message to socket
             setNewMessage(""); // Clear input after sending
 
             setMessages((prev) => [...prev, sentMessage]); // Add message to the screen directly
