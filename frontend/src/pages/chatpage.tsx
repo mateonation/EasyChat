@@ -5,6 +5,7 @@ import { Box, CircularProgress, IconButton, TextField, Typography } from "@mui/m
 import ChatMessageItem from "../components/chatMessageItem";
 import { Send } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+import { useSocket } from "../contexts/SocketContext";
 
 interface PaginatedMessages {
     messages: MessageDto[];
@@ -19,6 +20,7 @@ interface Props {
 
 const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     const { t } = useTranslation();
+    const { socket } = useSocket();
     const [messages, setMessages] = useState<MessageDto[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -54,6 +56,37 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     useEffect(() => {
         fetchMessages(page);
     }, []);
+
+    // WebSocket listener for incoming messages
+    useEffect(() => {
+        if(!socket) return;
+
+        const handleNewMessage = (msg: MessageDto) => {
+            if (msg.chatId !== chatId) return; // Ignore messages not in this chat
+
+            setMessages((prev) => {
+                // Prevent duplicated messages
+                if(prev.some(m => m.id === msg.id)) return prev;
+                return [...prev, msg];
+            });
+
+            // Scroll to bottom if almost at the bottom
+            const container = scrollContainerRef.current;
+            if (container) {
+                const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+                if(nearBottom) {
+                    requestAnimationFrame(() => {
+                        container.scrollTop = container.scrollHeight;
+                    });
+                }
+            }
+        };
+
+        socket.on("message:new", handleNewMessage);
+        return () => {
+            socket.off("message:new", handleNewMessage);
+        }
+    }, [socket, chatId]);
 
     // Scroll listener for infinite scroll up
     const handleScroll = () => {
@@ -94,6 +127,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     }, []);
 
     const sendMessage = async () => {
+        if (error !== null) setError(null); // Clear error if before sending a message
+        if (!newMessage.trim()) return; // Don't send empty messages
         const trimmed = newMessage.trim();
         if(!trimmed) return;
 
@@ -112,12 +147,31 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         } else {
             setError(null);
         }
-        await api.post("/message/send", {
-            chatId,
-            content: trimmed,
-        });
-        setNewMessage("");
-        // Web socket connection here???
+        try {
+            const res = await api.post<MessageDto>("/message/send", {
+                chatId,
+                content: trimmed,
+            });
+            const sentMessage = res.data;
+            socket?.emit("message:new", sentMessage); // Emit new message to socket
+            setNewMessage(""); // Clear input after sending
+
+            setMessages((prev) => [...prev, sentMessage]); // Add message to the screen directly
+
+            // Scroll to bottom after sending
+            const container = scrollContainerRef.current;
+            if (container) {
+                requestAnimationFrame(() => {
+                    container.scrollTop = container.scrollHeight;
+                });
+            }
+        } catch (err) {
+            console.error("Error sending message:", err);
+            setError(t('FAILED_TO_SEND', {
+                field: t('FORM_MESSAGE_LABEL'),
+            }));
+            return;
+        }
     }
 
     const formatDay = (dateStr: string) => {
