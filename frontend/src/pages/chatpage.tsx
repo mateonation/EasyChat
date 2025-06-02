@@ -4,6 +4,7 @@ import api from "../api/axios";
 import { Box, CircularProgress, IconButton, TextField, Typography } from "@mui/material";
 import ChatMessageItem from "../components/chatMessageItem";
 import { Send } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 interface PaginatedMessages {
     messages: MessageDto[];
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
+    const { t } = useTranslation();
     const [messages, setMessages] = useState<MessageDto[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -79,13 +81,16 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         };
     }, [handleScroll]);
 
-    // Scroll to bottom on initial load
+    // Scroll to the top on initial mount
     useEffect(() => {
         if (isInitialMount.current && scrollContainerRef.current) {
-            scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+            const container = scrollContainerRef.current;
+            requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+            });
             isInitialMount.current = false;
         }
-    }, [messages]);
+    }, []);
 
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
@@ -108,8 +113,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
             a.getMonth() === b.getMonth() &&
             a.getDate() === b.getDate();
 
-        if (isSameDay(date, today)) return "Hoy";
-        if (isSameDay(date, yesterday)) return "Ayer";
+        if (isSameDay(date, today)) return t('DATE_TODAY');
+        if (isSameDay(date, yesterday)) return t('DATE_YESTERDAY');
 
         return date.toLocaleDateString();
     };
@@ -135,7 +140,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                         <Typography
                             variant="caption"
                             sx={{
-                                bgcolor: "grey.300",
+                                bgcolor: "primary.light",
+                                color: "primary.contrastText",
                                 px: 2,
                                 py: 0.5,
                                 borderRadius: 1
@@ -167,9 +173,9 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     };
 
     return (
-        <Box 
-            height="100vh" 
-            display="flex" 
+        <Box
+            height="100vh"
+            display="flex"
             flexDirection="column"
         >
             <Box
@@ -197,7 +203,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
             >
                 <TextField
                     fullWidth
-                    placeholder="Escribe un mensaje..."
+                    placeholder={t('FORM_MESSAGE_PLACEHOLDER')}
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={(e) => {
