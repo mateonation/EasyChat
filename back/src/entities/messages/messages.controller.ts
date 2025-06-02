@@ -41,6 +41,11 @@ export class MessagesController {
 
             // Send the message and return it
             const message = await this.messagesService.sendMessage(dto, req.session.user.id);
+
+            // If message is null, it means it was not saved correctly
+            if (!message) throw new NotFoundException('Message could not be sent');
+
+            // Return the message response
             return res.status(201).json(message);
         } catch (error) {
             console.log(error);
