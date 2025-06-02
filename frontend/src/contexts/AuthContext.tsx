@@ -15,22 +15,26 @@ const AuthContext = createContext<AuthContextType>({
     logout() { return Promise.resolve(); },
 });
 
-export const AuthProvider = ({children}: PropsWithChildren<object>) => {
+export const AuthProvider = ({ children }: PropsWithChildren<object>) => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        if(user != null) return;
         const stored = localStorage.getItem("user");
-        if(!stored) return;
-        setUser(JSON.parse(stored));
-    }, [user, setUser]);
+        if (stored) {
+            try {
+                setUser(JSON.parse(stored));
+            } catch {
+                localStorage.removeItem("user");
+            }
+        }
+    }, []);
 
     const login = async (username: string, password: string) => {
-        try{
-            const result = await auth.post<{user: User}>('/login', { username, password });
+        try {
+            const result = await auth.post<{ user: User }>('/login', { username, password });
             updateSession(result.data.user);
         } catch (error) {
-            if(axios.isAxiosError(error) && error.response){
+            if (axios.isAxiosError(error) && error.response) {
                 throw new Error(error.response.data.message); // Send message of the response to the component
             }
             throw new Error('Server error');
@@ -42,7 +46,7 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
             await auth.post('/logout');
             updateSession(null);
         } catch (error) {
-            if(axios.isAxiosError(error) && error.response){
+            if (axios.isAxiosError(error) && error.response) {
                 throw new Error(error.response.data.message); // Send message of the response to the component
             }
             throw new Error('Server error');
@@ -51,8 +55,8 @@ export const AuthProvider = ({children}: PropsWithChildren<object>) => {
 
     const updateSession = async (user: User | null) => {
         setUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
-        if (user === null) localStorage.removeItem("user");
+        if(user) localStorage.setItem("user", JSON.stringify(user));
+        else localStorage.removeItem("user");
     };
 
     return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
