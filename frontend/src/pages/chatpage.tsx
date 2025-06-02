@@ -31,6 +31,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     const topRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
+    const prevChatId = useRef<number | null>(null);
 
     // Fetch Messages by page
     const fetchMessages = useCallback(async (page: number) => {
@@ -88,9 +89,16 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         }
     }, [socket, chatId]);
 
-    // Join the chat room on socket when chatId changes
+    // Join the chat room on socket when chatId changes and leave previous room
     useEffect(() => {
-        if (socket && chatId) socket.emit("joinRoom", chatId);
+        if (!socket || !chatId) return;
+
+        // Leave previous room if it exists
+        if(prevChatId.current && prevChatId.current !== chatId) socket.emit("leaveChat", prevChatId.current);
+
+        // Enter new chat room
+        socket.emit("joinChat", chatId);
+        prevChatId.current = chatId;
     }, [socket, chatId]);
 
     // Scroll listener for infinite scroll up
