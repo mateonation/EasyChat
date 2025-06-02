@@ -6,6 +6,7 @@ export interface ChatMessageItemProps {
     sentDate: string;
     senderId: number;
     senderUsername: string;
+    chatId: number;
     type: string;
     isDeleted: boolean;
     isOwnMessage: boolean;
@@ -13,9 +14,7 @@ export interface ChatMessageItemProps {
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
-    id,
     sentDate,
-    senderId,
     senderUsername,
     type,
     isDeleted,
@@ -26,17 +25,17 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     return (
         <Box
             display="flex"
-            justifyContent={isOwnMessage ? "flex-end" : "flex-start"}
+            justifyContent={type === "system" ? "center" : isOwnMessage ? "flex-end" : "flex-start"}
             my={1}
             px={2}
         >
             <Paper
-                elevation={3}
+                elevation={2}
                 sx={{
                     maxWidth: "70%",
                     padding: 1.5,
-                    backgroundColor: isOwnMessage ? "primary.main" : "grey.300",
-                    color: isOwnMessage ? "white" : "black",
+                    backgroundColor: isOwnMessage ? "primary.main" : type === "system" ? "action.hover" : "grey.300",
+                    color: isOwnMessage ? "primary.contrastText" : "text.primary",
                     borderRadius: 2,
                 }}
             >

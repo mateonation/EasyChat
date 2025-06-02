@@ -20,7 +20,7 @@ interface Props {
 
 const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
     const { t } = useTranslation();
-    const { socket } = useSocket();
+    const socket = useSocket();
     const [messages, setMessages] = useState<MessageDto[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -231,6 +231,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                     key={msg.id}
                     id={msg.id}
                     senderId={msg.senderId}
+                    chatId={msg.chatId}
                     senderUsername={msg.senderUsername}
                     content={msg.content || ""}
                     sentDate={msg.sentDate}
