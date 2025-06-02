@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChatMember } from '../chats/chatmembers/chatmember.entity';
-import { Chat } from '../chats/chat.entity';
 import { Message } from './message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
 import { MessageResponseDto } from './dto/message-response.dto';
@@ -15,19 +13,13 @@ export class MessagesService {
     constructor(
         @InjectRepository(Message)
         private messageRepo: Repository<Message>,
-    
-        @InjectRepository(Chat)
-        private chatRepo: Repository<Chat>,
-    
-        @InjectRepository(ChatMember)
-        private memberRepo: Repository<ChatMember>,
     ) {}
 
     // Send message to a chat
     async sendMessage(
         dto: SendMessageDto,
         senderId: number,
-    ): Promise<MessageResponseDto> {
+    ): Promise<MessageResponseDto | null> {
         const message = this.messageRepo.create({
             content: dto.content,
             chat: { id: dto.chatId },
@@ -35,9 +27,15 @@ export class MessagesService {
         });
 
         // Save message into DB
-        await this.messageRepo.save(message);
+        const messageSaved = await this.messageRepo.save(message);
 
-        return MessageResponseDto.fromMessage(message);
+        // Reload message with user relationship
+        const messageFromBD = await this.messageRepo.findOne({
+            where: { id: messageSaved.id },
+            relations: ['user'],
+        });
+        if (!messageFromBD) return null;
+        return MessageResponseDto.fromMessage(messageFromBD);
     }
 
     // Send a system message to a chat
