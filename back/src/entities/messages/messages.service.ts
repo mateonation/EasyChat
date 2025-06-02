@@ -32,7 +32,7 @@ export class MessagesService {
         // Reload message with user relationship
         const messageFromBD = await this.messageRepo.findOne({
             where: { id: messageSaved.id },
-            relations: ['user'],
+            relations: ['user', 'chat'],
         });
         if (!messageFromBD) return null;
         return MessageResponseDto.fromMessage(messageFromBD);
@@ -97,7 +97,7 @@ export class MessagesService {
             order: { sentDate: 'ASC' }, 
             skip,
             take: limit,
-            relations: ['user'],
+            relations: ['user', 'chat'],
         });
 
         const messageDtos = messages.map((msg) => new MessageResponseDto(msg));
