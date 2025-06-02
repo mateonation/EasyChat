@@ -13,7 +13,7 @@ import { MessageResponseDto } from "../messages/dto/message-response.dto";
 
 @WebSocketGateway({
     cors: {
-        origin: true,
+        origin: ['http://localhost:5173'],
         credentials: true,
     },
 })
@@ -25,15 +25,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleConnection(client: SessionSocket) {
         const user = client.request.session?.user;
         if(!user) {
+            console.log('[ChatGateway] User not authenticated, disconnecting socket...');
             client.disconnect();
             return;
         }
+
         console.log(`User connected: ${user.username}`);
     }
 
     handleDisconnect(client: SessionSocket) {
         const user = client.request.session?.user;
-        if (user) console.log(`User disconnected: ${user.username}`);
+        if (user) console.log(`[ChatGateway] Disconnected: ${user.username}`);
     }
 
     @SubscribeMessage('sendMessage')
@@ -42,18 +44,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() client: SessionSocket,
     ) {
         const user = client.request.session?.user;
-        if (!user) return;
+        const chat = message.chatId?.toString();
+        if(!chat || !user) {
+            console.warn('[ChatGateway] sendMessage: invalid user or chatId');
+            return;
+        }
 
-        if (!user || !message || !message.chatId || !message.content) return;
-        
-        this.server.to(`chat_${message.chatId}`).emit('newMessage', message);
+        this.server.to(chat).emit('newMessage', message);
+        console.log(`[ChatGateway] ${user.username} sent message to chat ${chat}`);
     }
 
     @SubscribeMessage('joinChat')
     handleJoinChat(
         @MessageBody() chatId: number, 
-        client: SessionSocket,
+        @ConnectedSocket() client: SessionSocket,
     ) {
-        client.join(`chat_${chatId}`);
+        const user = client.request.session?.user;
+        const chat = chatId?.toString();
+        if (!user || !chat) return;
+
+        client.join(chat);
+        console.log(`[ChatGateway] ${user.username} joined chat ${chat}`);
+    }
+
+    @SubscribeMessage('leaveChat')
+    handleLeaveChat(
+        @MessageBody() chatId: number, 
+        @ConnectedSocket() client: SessionSocket,
+    ) {
+        const user = client.request.session?.user;
+        const chat = chatId?.toString();
+        if (!user || !chat) return;
+
+        client.leave(chat);
+        console.log(`[ChatGateway] ${user.username} left chat ${chat}`);
     }
 }
