@@ -114,11 +114,16 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         return date.toLocaleDateString();
     };
 
+    // Order messages by putting the old ones up
+    const sortedMessages = [...messages].sort(
+        (a, b) => new Date(a.sentDate).getTime() - new Date(b.sentDate).getTime()
+    );
+
     const renderMessages = () => {
         const items: JSX.Element[] = [];
         let lastDate = "";
 
-        for (const msg of messages) {
+        for (const msg of sortedMessages) {
             const dayLabel = formatDay(msg.sentDate);
             if (dayLabel !== lastDate) {
                 items.push(
@@ -174,7 +179,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                 px={1}
                 py={2}
                 display="flex"
-                flexDirection="column-reverse"
+                flexDirection="column"
             >
                 <div ref={topRef} />
                 {renderMessages()}
