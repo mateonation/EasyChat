@@ -6,6 +6,8 @@ import ChatMessageItem from "../components/chatMessageItem";
 import { Send } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useSocket } from "../contexts/SocketContext";
+import { ChatDto } from "../types/chat.dto";
+import ChatHeader from "../components/chatHeader";
 
 interface PaginatedMessages {
     messages: MessageDto[];
@@ -16,9 +18,10 @@ interface PaginatedMessages {
 interface Props {
     chatId: number;
     sessionUserId: number;
+    onChatInfo: ChatDto;
 }
 
-const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
+const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const { t } = useTranslation();
     const socket = useSocket();
     const [messages, setMessages] = useState<MessageDto[]>([]);
@@ -62,8 +65,6 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
         if (!socket) return;
 
         const handleNewMessage = (msg: MessageDto) => {
-            if (msg.chatId !== chatId) return; // Ignore messages not in this chat
-
             setMessages((prev) => {
                 // Prevent duplicated messages
                 if (prev.some(m => m.id === msg.id)) return prev;
@@ -166,8 +167,15 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                 content: trimmed,
             });
             const sentMessage = res.data;
-            socket?.emit("sendMessage", sentMessage); // Emit new message to socket
-            setNewMessage(""); // Clear input after sending
+
+            // Emit new message along with chatId to socket
+            socket?.emit("sendMessage", { 
+                message: sentMessage, 
+                chatId: chatId,
+            });
+
+            // Clear input after sending
+            setNewMessage("");
 
             setMessages((prev) => [...prev, sentMessage]); // Add message to the screen directly
 
@@ -244,7 +252,6 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
                     key={msg.id}
                     id={msg.id}
                     senderId={msg.senderId}
-                    chatId={msg.chatId}
                     senderUsername={msg.senderUsername}
                     content={msg.content || ""}
                     sentDate={msg.sentDate}
@@ -264,6 +271,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId }) => {
             display="flex"
             flexDirection="column"
         >
+            <ChatHeader chatName={onChatInfo.name} />
             <Box
                 ref={scrollContainerRef}
                 flex={1}
