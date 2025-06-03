@@ -171,7 +171,7 @@ const RegisterPage = () => {
             // Make the API call to register the user
             await api.post('/users/register', {
                 firstName: firstName,
-                lastName: lastName? lastName : null, // Allow last name to be optional
+                lastName: lastName? lastName : "", // Send empty string if last name is not provided
                 username: username,
                 password: password,
                 birthDate: birthDate,
