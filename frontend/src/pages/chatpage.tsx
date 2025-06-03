@@ -271,7 +271,10 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             display="flex"
             flexDirection="column"
         >
-            <ChatHeader chatName={onChatInfo.name} />
+            <ChatHeader 
+                cName={onChatInfo.name} 
+                cType={onChatInfo.type}
+            />
             <Box
                 ref={scrollContainerRef}
                 flex={1}
