@@ -5,34 +5,32 @@ import { User } from '../types/userdata.dto.ts';
 
 interface AuthContextType {
     user: User | null;
+    isAuthReady: boolean;
     login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
+    isAuthReady: false,
     login() { return Promise.resolve(); },
     logout() { return Promise.resolve(); },
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren<object>) => {
     const [user, setUser] = useState<User | null>(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
 
     useEffect(() => {
         const stored = localStorage.getItem("user");
-        if (stored) {
-            try {
-                setUser(JSON.parse(stored));
-            } catch {
-                localStorage.removeItem("user");
-            }
-        }
+        if (stored) setUser(JSON.parse(stored));
+        setIsAuthReady(true); // Set to true after checking localStorage
     }, []);
 
     const login = async (username: string, password: string) => {
         try {
             const result = await auth.post<{ user: User }>('/login', { username, password });
-            updateSession(result.data.user);
+            updateSession(result.data.user); // Activate effect in SocketContext
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
                 throw new Error(error.response.data.message); // Send message of the response to the component
@@ -59,7 +57,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<object>) => {
         else localStorage.removeItem("user");
     };
 
-    return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, login, logout, isAuthReady }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuthContext = () => useContext(AuthContext);
