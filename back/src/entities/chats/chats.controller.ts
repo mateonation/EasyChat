@@ -20,7 +20,7 @@ import { UpdateMemberRoleDto } from './chatmembers/dto/update-member-role.dto';
 export class ChatsController {
     constructor(
         private readonly chatsService: ChatsService,
-        private readonly usersService: UsersService,
+        private readonly userService: UsersService,
         private readonly membersService: ChatmembersService,
         private readonly messageService: MessagesService,
     ) { }
@@ -34,11 +34,12 @@ export class ChatsController {
     ) {
         try {
             if (!req.session.user?.id) return;
-            const requester = await this.usersService.findById(req.session.user.id); // User authenticated by session
-            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
+            const reqId = req.session.user.id;
+
             // Get all chats for the user
-            const chats = await this.chatsService.getChatsByUserId(requester.id);
-            // If there are no chats for the user, return a message
+            const chats = await this.chatsService.getChatsByUserId(reqId);
+
+            // If there are no chats for user, return a message
             if (!chats || chats.length === 0) {
                 return res.status(200).json(chats || []); // Return an empty array if no chats found
             }
@@ -106,7 +107,7 @@ export class ChatsController {
             if (!dto.usernames || dto.usernames.length === 0) throw new BadRequestException('At least one user ID is required to create a chat');
             let chatId: number;
             // Check if the user in session exists
-            const requester = await this.usersService.findById(req.session.user.id);
+            const requester = await this.userService.getFullDataById(req.session.user.id);
             if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
             switch (typeChat) {
                 // Create a private chat
@@ -117,7 +118,7 @@ export class ChatsController {
                     // Throw bad request exception if the user tries to create a chat with themselves
                     if (requester.username === dto.usernames[0]) throw new BadRequestException('You cannot create a chat with yourself');
                     // Check if the user provided in the request exists
-                    const userToCreateChatWith = await this.usersService.findByUsername(dto.usernames[0]) // User to create chat with
+                    const userToCreateChatWith = await this.userService.getBasicDataByUsername(dto.usernames[0]) // User to create chat with
                     if (!userToCreateChatWith) throw new NotFoundException(`User (ID: ${dto.usernames[0]}) not found`);
                     // If an private chat between the two users already exists, return it instead of creating a new one
                     const existingChat = await this.chatsService.findPrivateChat(requester.id, userToCreateChatWith.id);
@@ -158,7 +159,7 @@ export class ChatsController {
                     const userIds: number[] = [];
                     for (const uname of unames) {
                         // Check if the user exists
-                        const user = await this.usersService.getByUsername(uname);
+                        const user = await this.userService.getBasicDataByUsername(uname);
                         if (!user) throw new NotFoundException(`User with username '${uname}' not found`);
 
                         // If exists, add the user ID to the list of user IDs to be added to the group chat
@@ -249,7 +250,7 @@ export class ChatsController {
             // Check if the users in the request body exist and are not already members of the chat
             // If any user does not exist or is already a member, DO NOT CONTINUE and throw an exception
             for (const username of dto.usernames) {
-                const user = await this.usersService.getByUsername(username);
+                const user = await this.userService.getBasicDataByUsername(username);
                 if (!user) throw new NotFoundException(`${username} does not exist`);
 
                 const alreadyAMember = await this.membersService.findChatMember(user.id, chat.id);
