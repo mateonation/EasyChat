@@ -21,6 +21,8 @@ const ChatInfoModal = ({
     const { t } = useTranslation();
     const initial = chat.name.charAt(0).toUpperCase();
 
+    const otherMember = chat.type === 'private' ? chat.members.find(m => m.id !== sessionUserId) : null;
+
     return (
         <Dialog
             open={open}
@@ -37,10 +39,10 @@ const ChatInfoModal = ({
                     }}
                 >
                     {
-                        chat.type === 'group' ? <GroupIcon /> : 
-                        chat.type === 'archive' ? <Archive /> : 
-                        chat.type === 'private' ? initial :
-                        <WarningIcon />
+                        chat.type === 'group' ? <GroupIcon /> :
+                            chat.type === 'archive' ? <Archive /> :
+                                chat.type === 'private' ? initial :
+                                    <WarningIcon />
                     }
                 </Avatar>
                 <Typography
@@ -56,9 +58,9 @@ const ChatInfoModal = ({
                             variant="subtitle1"
                         >
                             {
-                                chat.type === 'group' ? 
-                                t('FORM_GROUP_DESCRIPTION_LABEL') : 
-                                t('FORM_DESCRIPTION_LABEL')
+                                chat.type === 'group' ?
+                                    t('FORM_GROUP_DESCRIPTION_LABEL') :
+                                    t('FORM_DESCRIPTION_LABEL')
                             }
                         </Typography>
                         <Typography
@@ -107,21 +109,21 @@ const ChatInfoModal = ({
                                     </ListItemAvatar>
                                     <ListItemText
                                         primary={
-                                            <Box 
-                                                display="flex" 
+                                            <Box
+                                                display="flex"
                                                 justifyContent="space-between"
                                             >
                                                 <Typography>
                                                     {member.username}
                                                 </Typography>
-                                                <Typography 
+                                                <Typography
                                                     variant="caption"
                                                 >
                                                     {
-                                                        member.role === 'owner' ? t('MEMBER_ROLE_OWNER') : 
-                                                        member.role === 'admin' ? t('MEMBER_ROLE_ADMIN') : 
-                                                        member.role === 'member' ? t('MEMBER_ROLE_MEMBER') : 
-                                                        member.role
+                                                        member.role === 'owner' ? t('MEMBER_ROLE_OWNER') :
+                                                            member.role === 'admin' ? t('MEMBER_ROLE_ADMIN') :
+                                                                member.role === 'member' ? t('MEMBER_ROLE_MEMBER') :
+                                                                    member.role
                                                     }
                                                 </Typography>
                                             </Box>
@@ -146,11 +148,17 @@ const ChatInfoModal = ({
                         </Typography>
                     </>
                 ) : (
-                    <Box textAlign="center">
-                        <Typography variant="body2" mt={2}>
-                            Date of register
-                        </Typography>
-                    </Box>
+                    <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        display="block"
+                        textAlign="center"
+                        mt={2}
+                    >
+                        {t('DATE_REGISTRATION', {
+                            date: new Date(otherMember?.registerDate ?? '').toLocaleDateString(),
+                        })}
+                    </Typography>
                 )}
             </DialogContent>
         </Dialog >
