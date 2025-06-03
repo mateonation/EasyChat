@@ -4,20 +4,21 @@ import { User } from './user.entity';
 import { ILike, Not, Repository } from 'typeorm';
 import { predefinedRoles } from './role/predefinedRoles';
 import * as argon2 from 'argon2';
-import { UserResponseDto } from './dto/user-response.dto';
+import { UserFullResponseDto } from './dto/user-full-response.dto';
 import { SaveUserDto } from './dto/save-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UnauthorizedException } from 'src/errors/unauthorizedException';
 import { Role } from './role/role';
 import { NotFoundException } from 'src/errors/notFoundException';
+import { UserBasicResponseDto } from './dto/user-basic-response.dto';
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(User) 
+        @InjectRepository(User)
         private usersRepo: Repository<User>,
 
-        @InjectRepository(Role) 
+        @InjectRepository(Role)
         private rolesRepo: Repository<Role>,
     ) { }
 
@@ -45,48 +46,70 @@ export class UsersService {
     // Authenticate and return user if credentials are valid
     async authenticate(
         loginUserDto: LoginUserDto
-    ): Promise<UserResponseDto | null> {
+    ): Promise<UserFullResponseDto | null> {
         // Find user by username
-        const user = await this.usersRepo.findOne({ 
-            where: { username: loginUserDto.username }, 
-            relations: ['roles'], 
+        const user = await this.usersRepo.findOne({
+            where: { username: loginUserDto.username },
+            relations: ['roles'],
         });
         // Check if user exists and password matches, if not, return null
         if (!user || !(await argon2.verify(user.password, loginUserDto.password))) return null;
         // Return user response dto
-        return UserResponseDto.fromUser(user);
+        return UserFullResponseDto.fromUser(user);
     }
 
-    // Find user by their ID
-    // Return with UserResponseDto
-    async findById(
+    // Get FULL DATA of an user by their ID
+    async getFullDataById(
         id: number
-    ): Promise<UserResponseDto | null> {
+    ): Promise<UserFullResponseDto | null> {
         const user = await this.usersRepo.findOne({
             where: { id },
             relations: ['roles'],
         });
         if (!user) return null;
-        return UserResponseDto.fromUser(user);
+        return UserFullResponseDto.fromUser(user);
     }
 
-    // Get user by username
-    // Return with UserResponseDto
-    async getByUsername(
+    // Get FULL DATA of an user by their username
+    async getFullDataByUsername(
         username: string
-    ): Promise<UserResponseDto | null> {
+    ): Promise<UserFullResponseDto | null> {
         const user = await this.usersRepo.findOne({
             where: { username },
             relations: ['roles'],
         });
         if (!user) return null;
-        return UserResponseDto.fromUser(user);
+        return UserFullResponseDto.fromUser(user);
     }
 
-    // Method to save a new user
-    async save(
+    // Get FULL DATA of an user by their ID
+    async getBasicDataById(
+        id: number
+    ): Promise<UserBasicResponseDto | null> {
+        const user = await this.usersRepo.findOne({
+            where: { id },
+            relations: ['roles'],
+        });
+        if (!user) return null;
+        return UserBasicResponseDto.fromUser(user);
+    }
+
+    // Get FULL DATA of an user by their username
+    async getBasicDataByUsername(
+        username: string
+    ): Promise<UserBasicResponseDto | null> {
+        const user = await this.usersRepo.findOne({
+            where: { username },
+            relations: ['roles'],
+        });
+        if (!user) return null;
+        return UserBasicResponseDto.fromUser(user);
+    }
+
+    // Method to register a new user
+    async register(
         saveUserDto: SaveUserDto
-    ): Promise<UserResponseDto> {
+    ): Promise<UserFullResponseDto> {
         // Count total users in the DB
         const totalUsers = await this.usersRepo.count();
         // If the user being registered is the first one, register it as an admin, moderator and user
@@ -113,16 +136,7 @@ export class UsersService {
         // Save user to the DB
         await this.usersRepo.save(user);
         // Return user response dto
-        return UserResponseDto.fromUser(user);
-    }
-
-    // Method to get user by username
-    async findByUsername(
-        username: string
-    ): Promise<UserResponseDto | null> {
-        const user = await this.usersRepo.findOne({ where: { username }, relations: ['roles'] });
-        if (!user) return null;
-        return UserResponseDto.fromUser(user);
+        return UserFullResponseDto.fromUser(user);
     }
 
     // Method to check if user is over 18 years old
@@ -140,10 +154,10 @@ export class UsersService {
         return false;
     }
 
-    // Method to find all users in the DB
-    async getAllUsers(): Promise<UserResponseDto[]> {
+    // Method to get all users in the DB
+    async getAllUsersFullData(): Promise<UserFullResponseDto[]> {
         const users = await this.usersRepo.find({ relations: ['roles'] });
-        return users.map(user => UserResponseDto.fromUser(user));
+        return users.map(user => UserFullResponseDto.fromUser(user));
     }
 
     // Method to search users by username
@@ -151,9 +165,9 @@ export class UsersService {
     async searchUsersByUsername(
         query: string,
         idToAvoid?: number
-    ): Promise<UserResponseDto[]> {
+    ): Promise<UserBasicResponseDto[]> {
         const users = await this.usersRepo.find({
-            where: { 
+            where: {
                 username: ILike(`%${query}%`),
                 ...(idToAvoid ? { id: Not(idToAvoid) } : {}), // Avoid returning the user with the given ID
             },
@@ -161,6 +175,6 @@ export class UsersService {
             order: { username: 'ASC' }, // Sort by username in ascending order
         });
 
-        return users.map(user => UserResponseDto.fromUser(user));
+        return users.map(user => UserBasicResponseDto.fromUser(user));
     }
 }
