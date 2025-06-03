@@ -342,6 +342,11 @@ const RegisterPage = () => {
                                     background: !firstNameValid ? '#ffebee' : 'transparent'
                                 }
                             }}
+                            slotProps={{ 
+                                htmlInput: { 
+                                    maxLength: 20, // Limit input length to 20 characters
+                                } 
+                            }} 
                         />
                         <TextField
                             label={t('FORM_LASTNAME_LABEL')}
@@ -358,6 +363,11 @@ const RegisterPage = () => {
                                     background: !lastNameValid ? '#ffebee' : 'transparent'
                                 }
                             }}
+                            slotProps={{ 
+                                htmlInput: { 
+                                    maxLength: 35, // Limit input length to 35 characters
+                                } 
+                            }} 
                         />
                     </Box>
                     <TextField
@@ -377,6 +387,11 @@ const RegisterPage = () => {
                                 background: !usernameValid ? '#ffebee' : 'transparent'
                             }
                         }}
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 20, // Limit input length to 20 characters
+                            } 
+                        }} 
                     />
                     <TextField
                         label={t('FORM_BIRTHDATE_LABEL')}
@@ -415,6 +430,11 @@ const RegisterPage = () => {
                                 background: !passwordValid ? '#ffebee' : 'transparent'
                             }
                         }}
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 30, // Limit input length to 30 characters
+                            } 
+                        }} 
                     />
                     <TextField
                         label={t('FORM_PASSWORD2_LABEL')}
@@ -433,6 +453,11 @@ const RegisterPage = () => {
                                 background: !passwordValid ? '#ffebee' : 'transparent'
                             }
                         }}
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 30, // Limit input length to 30 characters
+                            } 
+                        }} 
                     />
                     {netError &&
                         <Typography

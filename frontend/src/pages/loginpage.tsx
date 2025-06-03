@@ -91,7 +91,6 @@ const LoginPage = () => {
             }
             setLoading(true);
             await auth.login(username, password);
-            alert("Login successful!");
             console.log("User logged: @", username, " [", new Date().toLocaleString(), "]");
             setLoading(false);
             navigate(`${BASE}/chats`, { replace: true });
@@ -162,6 +161,11 @@ const LoginPage = () => {
                                 background: error ? '#ffebee' : !usernameValid ? '#fff3e0' : 'transparent'
                             }
                         }}
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 20, // Limit input length to 20 characters
+                            } 
+                        }} 
                     />
                     <TextField
                         label={t('FORM_PASSWORD_LABEL')}
@@ -180,6 +184,11 @@ const LoginPage = () => {
                                 background: error ? '#ffebee' : !passwordValid ? '#fff3e0' : 'transparent'
                             }
                         }}
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 30, // Limit input length to 30 characters
+                            } 
+                        }} 
                     />
                     {netError ?
                         <Typography
