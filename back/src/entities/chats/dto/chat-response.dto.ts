@@ -8,7 +8,7 @@ export class ChatResponseDto {
     creationDate: Date;
     type: ChatType;
     name: string;
-    description: string;
+    description: string | null;
     lastMessagePrefix: string;
     lastMessageContent: string;
     lastMessageSentDate: Date | null = null;
@@ -25,11 +25,13 @@ export class ChatResponseDto {
 
     static fromChat(chat: Chat, currentUserId?: number): ChatResponseDto {
         let name: string | undefined = chat.name;
+        let description: string | null = chat.description;
 
-        // Set the other member's username as the name of the chat if it's private and the current user ID is provided
+        // Set the other member's username and description as the ones of the chat if it's private and current user ID is provided
         if (chat.type === ChatType.PRIVATE && currentUserId) {
             const otherMember = chat.members.find(m => m.user.id !== currentUserId);
             name = otherMember?.user.username ?? 'Unknown';
+            description = otherMember?.user.description ?? null;
         }
 
         // Get last message sent (by date)
@@ -79,7 +81,7 @@ export class ChatResponseDto {
             creationDate: chat.creationDate,
             type: chat.type,
             name,
-            description: chat.description,
+            description,
             lastMessagePrefix,
             lastMessageContent,
             lastMessageSentDate,
