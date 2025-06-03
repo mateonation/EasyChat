@@ -23,6 +23,12 @@ export class User {
     })
     lastName: string;
 
+    @Column({
+        nullable: true,
+        default: null,
+    })
+    description: string;
+
     @Column()
     password: string;
 
