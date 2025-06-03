@@ -9,9 +9,10 @@ const BASE = import.meta.env.VITE_BASE_PATH;
 interface Props {
     cName: string;
     cType: string;
+    onClick?: () => void;
 }
 
-const ChatHeader = ({ cName, cType }: Props) => {
+const ChatHeader = ({ cName, cType, onClick }: Props) => {
     const navigate = useNavigate();
     const initial = cName.charAt(0).toUpperCase();
     const { t } = useTranslation();
@@ -44,8 +45,10 @@ const ChatHeader = ({ cName, cType }: Props) => {
                 display="flex"
                 alignItems="center"
                 gap={1.5}
+                onClick={onClick}
                 sx={{
                     transform: "translateX(-50%)",
+                    cursor: onClick ? 'pointer' : 'default',
                 }}
             >
                 <Avatar>
