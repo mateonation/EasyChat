@@ -10,6 +10,7 @@ import {
 import { Server } from "socket.io";
 import { SessionSocket } from "src/types/session-socket";
 import { MessageResponseDto } from "../messages/dto/message-response.dto";
+import { MessageResponseWithChatId } from "../messages/dto/message-response-chatId.dto";
 
 @WebSocketGateway({
     cors: {
@@ -25,32 +26,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleConnection(client: SessionSocket) {
         const user = client.handshake.auth;
         if(!user) {
-            console.log('[ChatGateway] User not authenticated, disconnecting socket...');
             client.disconnect();
             return;
         }
-        console.log(`[ChatGateway] User ${user.username} is connected (${client.id})`);
+        console.log(`[ChatGateway] ${user.username} connected`);
     }
 
     handleDisconnect(client: SessionSocket) {
         const user = client.request.session?.user;
-        if (user) console.log(`[ChatGateway] User ${user.username} is now disconnected (${client.id})`);
+        if (user) console.log(`[ChatGateway] ${user.username} disconnected`);
     }
 
     @SubscribeMessage('sendMessage')
     async handleSendMessage(
-        @MessageBody() message: MessageResponseDto,
+        @MessageBody() dto: MessageResponseWithChatId,
         @ConnectedSocket() client: SessionSocket,
     ) {
         const user = client.handshake.auth;
-        const chat = message.chatId?.toString();
+        const chat = dto.chatId.toString();
         if(!user || !chat) {
-            console.log('[ChatGateway] Message from unauthenticated user or w/o userId');
             return;
         }
 
-        this.server.to(chat).emit('newMessage', message);
-        console.log(`[ChatGateway] ${user.username} sent message to chat ${chat}`);
+        this.server.to(`chat_${chat}`).emit('newMessage', dto.message);
     }
 
     @SubscribeMessage('joinChat')
@@ -61,12 +59,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const user = client.handshake.auth;
         const chat = chatId?.toString();
         if (!chat || !user){
-            console.log('[ChatGateway] Join request from unauthenticated user or w/o chatId');
             return;
         } 
 
-        client.join(chat);
-        console.log(`[ChatGateway] ${user.username} has joined chat ${chat}`);
+        client.join(`chat_${chat}`);
     }
 
     @SubscribeMessage('leaveChat')
@@ -77,7 +73,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const chat = chatId?.toString();
         if (!chat) return;
 
-        client.leave(chat);
-        console.log(`[ChatGateway] ${client.id} left chat ${chat}`);
+        client.leave(`chat_${chat}`);
     }
 }
