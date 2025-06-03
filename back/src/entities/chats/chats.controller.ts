@@ -65,18 +65,16 @@ export class ChatsController {
         @Res() res: Response,
     ) {
         try {
-            // Check if the user in session exists
             if (!req.session.user?.id) return;
-            const requester = await this.usersService.findById(req.session.user.id);
-            if (!requester) throw new NotFoundException(`User in session (ID: ${req.session.user.id}) not found`);
-
-            // Check if the chat exists
-            const chat = await this.chatsService.findById(chatId, requester.id);
-            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
+            const reqId = req.session.user.id
 
             // Check if the requester is a member of the chat
-            const member = await this.membersService.findChatMember(requester.id, chat.id);
+            const member = await this.membersService.findChatMember(reqId, chatId);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
+
+            // Check if the chat exists
+            const chat = await this.chatsService.findById(chatId, reqId);
+            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
 
             // Return chat with it's members
             return res.status(200).json(chat);
