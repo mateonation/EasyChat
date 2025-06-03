@@ -1,5 +1,4 @@
-import { 
-    FormControl, 
+import {
     MenuItem, 
     Select, 
     SelectChangeEvent,
@@ -42,15 +41,13 @@ const LanguageSelect = () => {
     };
 
     return (
-        <FormControl
-            variant="outlined"
-            size="small"
-        >
             <Select
+                variant="outlined"
+                size="small"
                 id="language-select"
                 value={language}
                 onChange={handleLangChange}
-                aria-label={t('LANGUAGE_LABEL')}
+                aria-label={t('LANGUAGE_SELECT_LABEL')}
             >
                 {languages.map(lang => (
                     <MenuItem
@@ -62,7 +59,6 @@ const LanguageSelect = () => {
                     </MenuItem>
                 ))}
             </Select>
-        </FormControl>
     )
 }
 
