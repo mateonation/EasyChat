@@ -23,19 +23,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     server: Server;
 
     handleConnection(client: SessionSocket) {
-        const user = client.request.session?.user;
+        const user = client.handshake.auth;
         if(!user) {
             console.log('[ChatGateway] User not authenticated, disconnecting socket...');
             client.disconnect();
             return;
         }
-
-        console.log(`User connected: ${user.username}`);
+        console.log(`[ChatGateway] User ${user.username} is connected (${client.id})`);
     }
 
     handleDisconnect(client: SessionSocket) {
         const user = client.request.session?.user;
-        if (user) console.log(`[ChatGateway] Disconnected: ${user.username}`);
+        if (user) console.log(`[ChatGateway] User ${user.username} is now disconnected (${client.id})`);
     }
 
     @SubscribeMessage('sendMessage')
@@ -43,10 +42,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() message: MessageResponseDto,
         @ConnectedSocket() client: SessionSocket,
     ) {
-        const user = client.request.session?.user;
+        const user = client.handshake.auth;
         const chat = message.chatId?.toString();
-        if(!chat || !user) {
-            console.warn('[ChatGateway] sendMessage: invalid user or chatId');
+        if(!user || !chat) {
+            console.log('[ChatGateway] Message from unauthenticated user or w/o userId');
             return;
         }
 
@@ -59,12 +58,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() chatId: number, 
         @ConnectedSocket() client: SessionSocket,
     ) {
-        const user = client.request.session?.user;
+        const user = client.handshake.auth;
         const chat = chatId?.toString();
-        if (!user || !chat) return;
+        if (!chat || !user){
+            console.log('[ChatGateway] Join request from unauthenticated user or w/o chatId');
+            return;
+        } 
 
         client.join(chat);
-        console.log(`[ChatGateway] ${user.username} joined chat ${chat}`);
+        console.log(`[ChatGateway] ${user.username} has joined chat ${chat}`);
     }
 
     @SubscribeMessage('leaveChat')
@@ -72,11 +74,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @MessageBody() chatId: number, 
         @ConnectedSocket() client: SessionSocket,
     ) {
-        const user = client.request.session?.user;
         const chat = chatId?.toString();
-        if (!user || !chat) return;
+        if (!chat) return;
 
         client.leave(chat);
-        console.log(`[ChatGateway] ${user.username} left chat ${chat}`);
+        console.log(`[ChatGateway] ${client.id} left chat ${chat}`);
     }
 }
