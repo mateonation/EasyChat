@@ -4,5 +4,5 @@ export interface MemberDto {
     joinDate: Date;
     role: string;
     description: string;
-    register: Date;
+    registerDate: Date;
 }
