@@ -18,7 +18,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         setSocket(socket);
-        console.log("SOCKET CONTEXT ", socket.auth);
 
         return () => {
             socket.disconnect();

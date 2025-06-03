@@ -9,7 +9,6 @@ import {
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { SessionSocket } from "src/types/session-socket";
-import { MessageResponseDto } from "../messages/dto/message-response.dto";
 import { MessageResponseWithChatId } from "../messages/dto/message-response-chatId.dto";
 
 @WebSocketGateway({

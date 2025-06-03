@@ -6,7 +6,6 @@ export interface ChatMessageItemProps {
     sentDate: string;
     senderId: number;
     senderUsername: string;
-    chatId: number;
     type: string;
     isDeleted: boolean;
     isOwnMessage: boolean;

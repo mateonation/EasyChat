@@ -4,10 +4,8 @@ import { Repository } from 'typeorm';
 import { Chat } from './chat.entity';
 import { ChatMember } from './chatmembers/chatmember.entity';
 import { User } from '../users/user.entity';
-import { NotFoundException } from 'src/errors/notFoundException';
 import { ChatResponseDto } from './dto/chat-response.dto';
 import { GroupParamsDto } from './dto/group-params.dto';
-import { UserResponseDto } from '../users/dto/user-response.dto';
 import { ChatType } from 'src/common/enums/chat-type.enum';
 
 @Injectable()
