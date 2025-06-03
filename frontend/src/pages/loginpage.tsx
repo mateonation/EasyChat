@@ -114,12 +114,19 @@ const LoginPage = () => {
     };
 
     return (
-        <Container maxWidth="xs">
-            <Paper elevation={12} sx={{
-                marginTop: 8,
-                padding: 2,
-            }}>
+        <Container
+            component="main" 
+            maxWidth="xs"
+        >
+            <Paper elevation={12} 
+                component="section"
+                sx={{
+                    marginTop: 8,
+                    padding: 2,
+                }}
+            >
                 <Box 
+                    component="article"
                     sx={{
                         float: "right",
                         position: "absolute",
@@ -127,15 +134,24 @@ const LoginPage = () => {
                 >
                     <LanguageSelect />
                 </Box>
-                <Avatar sx={{
-                    mx: "auto",
-                    mb: 2,
-                    textAlign: "center",
-                    bgcolor: "secondary.main",
-                }}>
+                <Avatar
+                    component="article"
+                    sx={{
+                        mx: "auto",
+                        mb: 2,
+                        textAlign: "center",
+                        bgcolor: "secondary.main",
+                    }}
+                >
                     <LockOutline />
                 </Avatar>
-                <Typography component="h1" variant="h5" sx={{ textAlign: "center", }}>
+                <Typography 
+                    component="h1" 
+                    variant="h5" 
+                    sx={{ 
+                        textAlign: "center", 
+                    }}
+                >
                     {t('LOGIN_PAGE_TITLE')}
                 </Typography>
                 <Box
