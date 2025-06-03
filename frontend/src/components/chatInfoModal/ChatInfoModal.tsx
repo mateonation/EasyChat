@@ -9,12 +9,14 @@ interface Props {
     open: boolean;
     onClose: () => void;
     chat: ChatDto;
+    sessionUserId: number;
 }
 
 const ChatInfoModal = ({
     open,
     onClose,
     chat,
+    sessionUserId,
 }: Props) => {
     const { t } = useTranslation();
     const initial = chat.name.charAt(0).toUpperCase();

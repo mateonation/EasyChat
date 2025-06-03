@@ -333,6 +333,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                     open={infoOpen}
                     onClose={handleCloseInfo}
                     chat={selectedChat}
+                    sessionUserId={sessionUserId}
                 />
             )}
         </Box>
