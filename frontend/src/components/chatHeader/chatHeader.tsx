@@ -1,4 +1,5 @@
 import { ArrowBack } from "@mui/icons-material";
+import GroupIcon from '@mui/icons-material/Group';
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -6,12 +7,13 @@ import { useNavigate } from "react-router-dom";
 const BASE = import.meta.env.VITE_BASE_PATH;
 
 interface Props {
-    chatName: string;
+    cName: string;
+    cType: string;
 }
 
-const ChatHeader = ({ chatName }: Props) => {
+const ChatHeader = ({ cName, cType }: Props) => {
     const navigate = useNavigate();
-    const initial = chatName.charAt(0).toUpperCase();
+    const initial = cName.charAt(0).toUpperCase();
     const { t } = useTranslation();
 
     return (
@@ -47,7 +49,11 @@ const ChatHeader = ({ chatName }: Props) => {
                 }}
             >
                 <Avatar>
-                    {initial}
+                    {cType === 'group' ? (
+                        <GroupIcon />
+                    ) : (
+                        initial
+                    )}
                 </Avatar>
                 <Typography
                     variant="h6"
@@ -59,7 +65,7 @@ const ChatHeader = ({ chatName }: Props) => {
                         maxWidth: '200px',
                     }}
                 >
-                    {chatName}
+                    {cName}
                 </Typography>
             </Box>
         </Box>
