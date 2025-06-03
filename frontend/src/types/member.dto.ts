@@ -3,4 +3,6 @@ export interface MemberDto {
     username: string;
     joinDate: Date;
     role: string;
+    description: string;
+    register: Date;
 }
