@@ -30,15 +30,21 @@ const ChatHeader = ({ chatName }: Props) => {
             }}
         >
             <IconButton
+                edge="start"
                 onClick={() => navigate(`${BASE}/chats`, { replace: true })}
                 aria-label={t('BACK')}
             >
                 <ArrowBack />
             </IconButton>
             <Box
+                position="absolute"
+                left="50%"
                 display="flex"
                 alignItems="center"
                 gap={1.5}
+                sx={{
+                    transform: "translateX(-50%)",
+                }}
             >
                 <Avatar>
                     {initial}
@@ -50,7 +56,7 @@ const ChatHeader = ({ chatName }: Props) => {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
-                        maxWidth: '85%',
+                        maxWidth: '200px',
                     }}
                 >
                     {chatName}
