@@ -20,6 +20,8 @@ const ChatPageWrapper = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Check if user is logged in
+        const user = localStorage.getItem("user");
         if (!user) {
             navigate(`${BASE}/login`, { replace: true });
             return;
