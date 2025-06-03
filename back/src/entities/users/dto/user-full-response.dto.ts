@@ -1,7 +1,9 @@
 import { Role } from "../role/role";
 import { User } from "../user.entity";
 
-export class UserResponseDto {
+// DTO for full user info
+// This DTO is meant only meant to be used for users to see their OWN data
+export class UserFullResponseDto {
     id: number;
     username: string;
     firstName: string;
@@ -20,10 +22,10 @@ export class UserResponseDto {
         this.roles = user.roles?.map((role: Role) => role.name) || [];
     }
 
-    static fromUser(user: User): UserResponseDto {
-        return new UserResponseDto(user);
+    static fromUser(user: User): UserFullResponseDto {
+        return new UserFullResponseDto(user);
     }
-    static fromUsers(users: User[]): UserResponseDto[] {
-        return users.map(user => new UserResponseDto(user));
+    static fromUsers(users: User[]): UserFullResponseDto[] {
+        return users.map(user => new UserFullResponseDto(user));
     }
 }
