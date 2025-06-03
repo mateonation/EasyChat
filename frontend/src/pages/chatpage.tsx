@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useSocket } from "../contexts/SocketContext";
 import { ChatDto } from "../types/chat.dto";
 import ChatHeader from "../components/chatHeader";
+import ChatInfoModal from "../components/chatInfoModal";
 
 interface PaginatedMessages {
     messages: MessageDto[];
@@ -30,10 +31,23 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [infoOpen, setInfoOpen] = useState(false);
+    const [selectedChat, setSelectedChat] = useState<ChatDto | null>(null);
 
+    // Refs for scrolling and initial mount check
     const topRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
+
+    const handleOpenInfo = (chat: ChatDto) => {
+        setSelectedChat(chat);
+        setInfoOpen(true);
+    };
+
+    const handleCloseInfo = () => {
+        setSelectedChat(null);
+        setInfoOpen(false);
+    };
 
     // Fetch Messages by page
     const fetchMessages = useCallback(async (page: number) => {
@@ -58,7 +72,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     // Initial fetch
     useEffect(() => {
         fetchMessages(page);
-    }, []);
+    }, [fetchMessages]);
 
     // WebSocket listener for incoming messages
     useEffect(() => {
@@ -95,7 +109,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
 
         // Leave previous room if it exists
         const prevChatId = Number(localStorage.getItem("chatId"));
-        if(prevChatId && prevChatId !== chatId) socket.emit("leaveChat", prevChatId);
+        if (prevChatId && prevChatId !== chatId) socket.emit("leaveChat", prevChatId);
 
         // Enter new chat room
         socket.emit("joinChat", chatId);
@@ -106,7 +120,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const handleScroll = () => {
         if (
             scrollContainerRef.current &&
-            scrollContainerRef.current.scrollTop === 0 &&
+            scrollContainerRef.current.scrollTop < 10 &&
             hasMore &&
             !loading
         ) {
@@ -169,8 +183,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             const sentMessage = res.data;
 
             // Emit new message along with chatId to socket
-            socket?.emit("sendMessage", { 
-                message: sentMessage, 
+            socket?.emit("sendMessage", {
+                message: sentMessage,
                 chatId: chatId,
             });
 
@@ -271,9 +285,10 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             display="flex"
             flexDirection="column"
         >
-            <ChatHeader 
-                cName={onChatInfo.name} 
+            <ChatHeader
+                cName={onChatInfo.name}
                 cType={onChatInfo.type}
+                onClick={() => handleOpenInfo(onChatInfo)}
             />
             <Box
                 ref={scrollContainerRef}
@@ -313,7 +328,15 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                     <Send />
                 </IconButton>
             </Box>
+            {selectedChat && (
+                <ChatInfoModal
+                    open={infoOpen}
+                    onClose={handleCloseInfo}
+                    chat={selectedChat}
+                />
+            )}
         </Box>
+
     );
 };
 
