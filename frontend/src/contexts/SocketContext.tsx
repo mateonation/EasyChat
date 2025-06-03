@@ -1,34 +1,35 @@
-import { createContext, useEffect, useContext, useRef, useState, } from "react";
+import { createContext, useEffect, useContext, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuthContext } from "./AuthContext";
 
 const SocketContext = createContext<Socket | null>(null);
 
-export const useSocket = () => useContext(SocketContext);
-
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-    const socketRef = useRef<Socket | null>(null);
-    const { user } = useAuthContext();
-    const [isConnected, setIsConnected] = useState(false);
+    const { user, isAuthReady } = useAuthContext();
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        if(!user || isConnected) return;
+        if(!isAuthReady) return; // Wait until auth is ready before initializing socket
+        if (!user) return; // Don't create socket if user's not logged in
 
         const socket = io("http://localhost:3000", {
-            withCredentials: true, // permite el uso de cookies para sesiones
+            auth: user,
+            withCredentials: true,
         });
 
-        socketRef.current = socket;
+        setSocket(socket);
+        console.log("SOCKET CONTEXT ", socket.auth);
 
         return () => {
             socket.disconnect();
-            setIsConnected(false);
         };
-    }, [user, isConnected]);
+    }, [isAuthReady, user]); // Listen for changes in user and connected state
 
     return (
-        <SocketContext.Provider value={ socketRef.current }>
+        <SocketContext.Provider value={socket}>
             {children}
         </SocketContext.Provider>
     );
 };
+
+export const useSocket = () => useContext(SocketContext);
