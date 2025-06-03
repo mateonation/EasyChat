@@ -59,11 +59,11 @@ export class UsersController {
             if (!userIsOver18) throw new ForbiddenException('You must be 18 years old or older');
 
             // Check if user with the same username already exists
-            const existingUser = await this.usersService.findByUsername(saveUserDto.username);
+            const existingUser = await this.usersService.getBasicDataByUsername(saveUserDto.username);
             if (existingUser) throw new ConflictException('Username already taken');
 
             // Register user in service
-            const user = await this.usersService.save(saveUserDto);
+            const user = await this.usersService.register(saveUserDto);
             // Return 'success' response
             return res.status(201).json({
                 statusCode: 201,
@@ -84,6 +84,7 @@ export class UsersController {
     }
 
     // Endpoint to get the info of the logged in user
+    // RETURNS FULL DATA
     @Get('me')
     async getLoggedUser(
         @Res() res: Response,
@@ -92,7 +93,7 @@ export class UsersController {
         try {
             if (!req.session.user?.id) return;
             // Get user info from service
-            const user = await this.usersService.findById(req.session.user.id);
+            const user = await this.usersService.getFullDataById(req.session.user.id);
             // Return 'success' response
             return res.status(200).json({
                 statusCode: 200,
@@ -123,6 +124,7 @@ export class UsersController {
     }
 
     // Endpoint to retrieve data from a user by their id number
+    // RETURNS ONLY BASIC DATA
     @Get('id/:userId')
     @Roles('user')
     async viewUserData(
@@ -131,7 +133,7 @@ export class UsersController {
     ) {
         try {
             // Search for user by ID
-            const user = await this.usersService.findById(uid);
+            const user = await this.usersService.getBasicDataById(uid);
 
             // If user is not found, throw NotFoundException
             if (!user) throw new NotFoundException('User not found');
@@ -151,6 +153,7 @@ export class UsersController {
     }
 
     // Endpoint to retrieve data from a user by their username
+    // RETURNS ONLY BASIC DATA
     @Get('username/:username')
     @Roles('user')
     async viewUserByUsername(
@@ -159,7 +162,7 @@ export class UsersController {
     ) {
         try {
             // Search for user by username
-            const user = await this.usersService.getByUsername(username);
+            const user = await this.usersService.getBasicDataByUsername(username);
 
             // If user is not found, throw NotFoundException
             if (!user) throw new NotFoundException('User not found');
@@ -179,6 +182,7 @@ export class UsersController {
     }
 
     // Endpoint to search for users by username
+    // RETURNS ONLY BASIC DATA
     @Get('search')
     @Roles('user')
     async searchUsers(
@@ -205,6 +209,7 @@ export class UsersController {
     }
 
     // Endpoint to get the list of all users (ADMIN ONLY)
+    // RETURNS FULL DATA
     @Get('all')
     @Roles('admin')
     async getAllUsers(
@@ -212,7 +217,7 @@ export class UsersController {
     ) {
         try {
             // Get all users from service
-            const users = await this.usersService.getAllUsers();
+            const users = await this.usersService.getAllUsersFullData();
             // Return 'success' response
             return res.status(200).json({
                 statusCode: 200,
