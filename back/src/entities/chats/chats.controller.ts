@@ -168,10 +168,7 @@ export class ChatsController {
                     // Create a new chat
                     const groupCreated = await this.chatsService.createChat();
                     // Update chat with group chat properties given by the requester
-                    await this.chatsService.updateGroup(groupCreated.id, {
-                        name: dto.name,
-                        description: dto.description,
-                    });
+                    await this.chatsService.updateGroup(groupCreated.id, dto.name, dto.description);
                     // Add the requester to the group
                     await this.membersService.addUserToChat(requester.id, groupCreated.id);
                     // Add the requester as owner of the group
