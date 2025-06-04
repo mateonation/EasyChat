@@ -6,6 +6,7 @@ export interface ChatDto {
     type: string;
     name: string;
     description: string;
+    updateDate: string;
     lastMessagePrefix: string;
     lastMessageContent: string;
     lastMessageSentDate: string;
