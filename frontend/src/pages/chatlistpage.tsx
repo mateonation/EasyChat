@@ -77,6 +77,7 @@ const ChatsListPage = () => {
     return (
         <Box
             p={2}
+            component="main"
         >
             <Typography
                 variant="h4"

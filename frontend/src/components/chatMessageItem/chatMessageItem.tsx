@@ -13,6 +13,7 @@ export interface ChatMessageItemProps {
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
+    id,
     sentDate,
     senderUsername,
     type,
@@ -23,6 +24,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     const { t } = useTranslation();
     return (
         <Box
+            component="article"
+            id={`msg_${id}`}
             display="flex"
             justifyContent={type === "system" ? "center" : isOwnMessage ? "flex-end" : "flex-start"}
             my={1}

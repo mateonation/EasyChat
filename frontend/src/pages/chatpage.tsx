@@ -240,7 +240,10 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             if (dayLabel !== lastDate) {
                 items.push(
                     <Box
+                        component="article"
                         key={`day-${dayLabel}`}
+                        id={`day-${dayLabel}`}
+                        aria-label={`day-${dayLabel}`}
                         textAlign="center"
                         my={2}
                     >
@@ -280,22 +283,18 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     };
 
     return (
-        <Box
-            height="100vh"
-            display="flex"
-            flexDirection="column"
-        >
+        <>
             <ChatHeader
                 cName={onChatInfo.name}
                 cType={onChatInfo.type}
                 onClick={() => handleOpenInfo(onChatInfo)}
             />
             <Box
+                component="main"
                 ref={scrollContainerRef}
                 flex={1}
                 overflow="auto"
                 px={1}
-                py={2}
                 display="flex"
                 flexDirection="column"
             >
@@ -308,6 +307,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                 )}
             </Box>
             <Box
+                component="footer"
                 display="flex"
                 p={2}
                 borderTop="1px solid #ddd"
@@ -336,7 +336,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                     sessionUserId={sessionUserId}
                 />
             )}
-        </Box>
+        </>
 
     );
 };
