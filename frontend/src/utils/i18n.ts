@@ -30,6 +30,13 @@ const resources = {
             GENERIC_ANSWER_SUBMIT: "Submit",
             GENERIC_ANSWER_SEARCH: "Search",
             GENERIC_ANSWER_SEND: "Send",
+            GENERIC_ANSWER_CLEAR: "Clear",
+            GENERIC_ANSWER_BACK: "Back",
+            GENERIC_ANSWER_NEXT: "Next",
+            GENERIC_ANSWER_PREVIOUS: "Previous",
+            GENERIC_ANSWER_CREATE: "Create",
+            GENERIC_ANSWER_UPDATE: "Update",
+            GENERIC_ANSWER_SELECT: "Select",
 
             // GENERIC MESSAGES
             GENERIC_MSG_ERROR: "Error",
@@ -92,13 +99,26 @@ const resources = {
             MAXIMUM_LENGTH: "{{field}} must have {{length}} characters at most",
             INVALID_FIELD_CHARACTERS: "{{field}} contains invalid characters",
             ALREADY_IN_USE: "'{{data}}' already in use",
+            ALREADY_EXISTS: "{{field}} already exists",
             REQUIRED_FIELD: "{{field}} is required",
+            DOES_NOT_EXIST: "{{field}} does not exist",
             PASSWORD_MISMATCH: "Passwords do not match",
             BIRTHDATE_INVALID: "You must be at least 18 years old",
             FAILED_TO_CREATE: "Failed to create {{field}}",
             FAILED_TO_UPDATE: "Failed to update {{field}}",
             FAILED_TO_DELETE: "Failed to delete {{field}}",
+            FAILED_TO_FETCH: "Failed to fetch {{field}}",
+            FAILED_TO_SEND: "Failed to send {{field}}",
+            FAILED_TO_FETCH_LIST: "Failed to fetch {{field}} list",
+            FAILED_TO_FETCH_ITEM: "Failed to fetch {{field}} item",
+            FAILED_TO_FETCH_DETAILS: "Failed to fetch {{field}} details",
+            FAILED_TO_FETCH_PROFILE: "Failed to fetch profile",
             FAILED_TO_LOAD: "Failed to load {{field}}",
+            PRIVATE_CHAT_EXISTS: "You already have a private chat with {{user}}",
+            FIELD_CANNOT_START_WITH: "{{field}} cannot start with {{char}}",
+            FIELD_CANNOT_END_WITH: "{{field}} cannot end with {{char}}",
+            FIELD_CANNOT_CONTAIN: "{{field}} cannot contain {{char}}",
+            FIELD_CANNOT_CONTAIN_SPACES: "{{field}} cannot contain spaces",
 
             // CHATS LIST PAGE
             CHATS_LIST_PAGE_TITLE: "My chats",
@@ -109,7 +129,7 @@ const resources = {
             CHATS_LIST_EMPTY_STRING1: "why not create one now?",
             CHAT_PREFIX_YOU: "You",
             CHAT_DELETED_USER: "[Deleted]",
-            CHAT_MESSAGE_DELETED: "This message has been removed",
+            CHAT_MESSAGE_DELETED: "This message has been deleted",
 
             // DATE AND TIMES
             DATE_TODAY: "Today",
@@ -135,6 +155,14 @@ const resources = {
             DATE_MULTIPLE_WEEKS: "{{count}} weeks ago",
             DATE_MULTIPLE_MONTHS: "{{count}} months ago",
             DATE_MULTIPLE_YEARS: "{{count}} years ago",
+            DATE_CREATION: "Created on {{date}}",
+            DATE_REGISTRATION: "Registered on {{date}}",
+            DATE_LAST_MODIFIED: "Last modified on {{date}}",
+            DATE_JOINED: "Joined on {{date}}",
+            DATE_LAST_ACTIVE: "Last active on {{date}}",
+            DATE_FORMAT: "MM/DD/YYYY", // Date format used in the application
+            TIME_FORMAT: "HH:mm", // Time format used in the application
+
 
             // CREATE A CHAT
             CREATE_CHAT_TITLE: "Create a new chat",
@@ -146,6 +174,7 @@ const resources = {
             CHAT_CREATE_ERROR: "Failed to create chat.",
 
             // MEMBERS
+            MEMBERS_MANAGE_LABEL: "Manage members",
             MEMBER_ROLE_ADMIN: "Admin",
             MEMBER_ROLE_MEMBER: "Member",
             MEMBER_ROLE_OWNER: "Owner",
@@ -167,6 +196,9 @@ const resources = {
             MEMBER_REMOVE_ITSELF_QUESTION: "Are you sure you want to leave this chat?",
             MEMBER_REMOVE_ITSELF_SUCCESS: "You have left the chat successfully",
             MEMBER_REMOVE_ITSELF_ERROR: "Failed to leave the chat",
+            YOU_ARE_NOT_MEMBER: "You are not a member of this chat",
+            MEMBER_REQUIREMENT: "You must be a {{role}} to perform this action",
+            MEMBER_REMOVE_ITSELF: "Leave chat",
 
             // USER PROFILE
             USER_PROFILE_PAGE_TITLE: "User Profile",
@@ -187,6 +219,8 @@ const resources = {
             USER_ROLE_TL_CA: "Catalan Translator",
 
             // LANGUAGES
+            LANGUAGE_LABEL: "Language",
+            LANGUAGE_SELECT: "Select your language",
             LANGUAGE_EN: "English",
             LANGUAGE_ES: "Spanish",
             LANGUAGE_GL: "Galician",
@@ -195,6 +229,39 @@ const resources = {
             LANGUAGE_PT: "Portuguese",
             LANGUAGE_FR: "French",
             LANGUAGE_RO: "Romanian",
+
+            // COMMON TERMS
+            CHAT: "Chat",
+            CHATS: "Chats",
+            USER: "User",
+            USERS: "Users",
+            MEMBER: "Member",
+            MEMBERS: "Members",
+            GROUP: "Group",
+            GROUPS: "Groups",
+            MESSAGE: "Message",
+            MESSAGES: "Messages",
+            PROFILE: "Profile",
+            PROFILES: "Profiles",
+            ACCOUNT: "Account",
+            ACCOUNTS: "Accounts",
+            SETTING: "Setting",
+            NOTIFICATIONS: "Notifications",
+            NOTIFICATION: "Notification",
+
+            // MENU DRAWER
+            CREATE_CHAT: "Create a chat",
+            SETTINGS: "Settings",
+            MY_PROFILE: "My Profile",
+            EDIT_MY_PROFILE: "Edit My Profile",
+            LOGOUT: "Logout",
+
+            // LANDPAGE
+            EASYCHAT_LANDPAGE: "EasyChat",
+            EASYCHAT_LANDPAGE_SUBTITLE_1: "A simple and easy-to-use chat app for everyone, focusing on your privacy and security",
+            EASYCHAT_LANDPAGE_SUBTITLE_2: "Join our community and start connecting with people today!",
+            EASYCHAT_LANDPAGE_ENTER_BUTTON: "Enter",
+            EASYCHAT_LANDPAGE_LANGUAGE_LABEL: "Select your language",
         }
     },
     // SPANISH
