@@ -153,7 +153,7 @@ export class ChatsController {
                     if (!dto.name) throw new BadRequestException('A name is required to create a group chat');
 
                     // Trim name and description
-                    if(dto.description) dto.description = dto.description.trim();
+                    if (dto.description) dto.description = dto.description.trim();
                     dto.name = dto.name.trim();
 
                     // If the name is empty, throw an exception
@@ -358,7 +358,7 @@ export class ChatsController {
                             }
                         );
 
-                    // If there are no other members, delete chat
+                        // If there are no other members, delete chat
                     } else {
                         // If there are no other members, delete the chat
                         await this.chatsService.deleteChatById(chatId);
@@ -533,8 +533,8 @@ export class ChatsController {
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
             // Chat must be a group
-            const chat = await this.chatsService.findById(chatId, reqId);
-            if (!chat || chat.type !== 'group') throw new ConflictException('You can only update group chats');
+            const chatToEdit = await this.chatsService.findById(chatId, reqId);
+            if (!chatToEdit || chatToEdit.type !== 'group') throw new ConflictException('You can only update group chats');
 
             // Users with member role cannot edit group chat details
             if (member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to update this group chat");
@@ -544,14 +544,55 @@ export class ChatsController {
 
             // Trim name and description
             dto.name = dto.name.trim();
-            dto.description = dto.description?.trim();
+
+            if(dto.clearDescription) {
+                dto.description = '';
+            } else{
+                dto.description = dto.description?.trim()
+            }
+
+            // If name and description are the same as the current ones and description is not going to be cleared, throw a bad request exception (as it won't change a thing)
+            if (
+                (!dto.name || dto.name === chatToEdit.name) &&
+                (!dto.description || dto.description === chatToEdit.description) &&
+                !dto.clearDescription
+            ) {
+                throw new BadRequestException('No changes were made to the group chat');
+            }
 
             // Change group chat properties
-            await this.chatsService.updateGroup(chatId, dto.name, dto.description, dto.clearDescription);
+            const chatUpdated = await this.chatsService.updateGroup(chatId, dto.name, dto.description, dto.clearDescription);
 
-            // If name was changed, send system message to the chat
-            if (dto.name && dto.name !== chat.name) {
-                await this.messageService.sendSystemMessage(
+            if (!chatUpdated) throw new ConflictException(`Unexpected error while updating group`);
+
+            // Send system message to the group chat based on the properties changed and save it to be sent to the client
+            let sysmsg;
+
+            console.log('chat before', chatToEdit);
+            console.log('chat after', chatUpdated);
+
+            // Both name and description were changed
+            if (
+                chatUpdated.name != chatToEdit.name && 
+                chatUpdated.description != chatToEdit.description && 
+                !dto.clearDescription
+            ) {
+                sysmsg = await this.messageService.sendSystemMessage(
+                    chatId,
+                    'GROUP_NAME_DESCRIPTION_CHANGED',
+                    {
+                        admin: member.user.username,
+                        newName: dto.name,
+                    }
+                );
+            }
+            // Only name was changed
+            else if (
+                chatUpdated.name != chatToEdit.name &&
+                chatUpdated.description === chatToEdit.description && 
+                !dto.clearDescription
+            ) {
+                sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'GROUP_NAME_CHANGED',
                     {
@@ -560,27 +601,41 @@ export class ChatsController {
                     }
                 );
             }
-            // If description was blank and now is set, send system message to chat indicating description was added
-            if (chat.description === "" && dto.description) {
-                await this.messageService.sendSystemMessage(
-                    chatId,
-                    'GROUP_DESCRIPTION_ADD',
-                    {
-                        admin: member.user.username,
-                    }
-                );
-            // If description was changed, send system message to chat indicating description was changed
-            } else if (dto.description && dto.description !== chat.description) {
-                await this.messageService.sendSystemMessage(
+            // Only description was changed
+            else if (
+                chatUpdated.name === chatToEdit.name &&
+                chatUpdated.description != chatToEdit.description && 
+                !dto.clearDescription
+            ) {
+                sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'GROUP_DESCRIPTION_CHANGED',
                     {
                         admin: member.user.username,
                     }
                 );
-            // If description was cleared, send system message to chat indicating description was cleared
-            } else if(dto.description === "" && chat.description) {
-                await this.messageService.sendSystemMessage(
+            }
+            // Name was changed but description cleared
+            // Only name was changed
+            else if (
+                chatUpdated.name != chatToEdit.name && 
+                dto.clearDescription
+            ) {
+                sysmsg = await this.messageService.sendSystemMessage(
+                    chatId,
+                    'GROUP_NAME_CHANGED_DESCRIPTION_CLEARED',
+                    {
+                        admin: member.user.username,
+                        newName: dto.name,
+                    }
+                );
+            }
+            // Only description was cleared
+            else if (
+                chatUpdated.name === chatToEdit.name && 
+                dto.clearDescription
+            ) {
+                sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'GROUP_DESCRIPTION_CLEARED',
                     {
@@ -588,9 +643,12 @@ export class ChatsController {
                     }
                 );
             }
+
+            // Return success message with system message
             return res.status(200).json({
                 statusCode: 200,
                 message: 'Group chat updated successfully',
+                systemMessage: sysmsg,
             });
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof ConflictException) {
