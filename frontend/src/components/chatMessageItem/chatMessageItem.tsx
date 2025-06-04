@@ -35,7 +35,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                 elevation={2}
                 sx={{
                     maxWidth: "70%",
-                    padding: 1.5,
+                    padding: 1,
+                    minWidth: type != 'system' ? "25%" : "10%",
                     backgroundColor: isOwnMessage ? "primary.main" : type === "system" ? "action.hover" : "grey.300",
                     color: isOwnMessage ? "primary.contrastText" : "text.primary",
                     borderRadius: 2,
@@ -53,20 +54,23 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     variant="body1"
                     sx={{
                         wordBreak: "break-word",
+                        fontSize: type === 'system' ? "0.9rem" : "inherit",
                     }}
                 >
                     {isDeleted ? t('CHAT_MESSAGE_DELETED') : content}
                 </Typography>
-                <Typography 
-                    variant="caption" 
-                    sx={{ 
-                        display: "block", 
-                        textAlign: "right",
-                        mt: 0.5, 
-                    }}
-                >
-                    {new Date(sentDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </Typography>
+                {type != 'system' &&
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            display: "block",
+                            textAlign: "right",
+                            mt: 0.5,
+                        }}
+                    >
+                        {new Date(sentDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </Typography>
+                }
             </Paper>
         </Box>
     )
