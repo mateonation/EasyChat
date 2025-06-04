@@ -2,9 +2,10 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Box, Button, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
 import GroupIcon from '@mui/icons-material/Group';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Archive, } from "@mui/icons-material";
+import { Add, Archive, } from "@mui/icons-material";
 import { ChatDto } from "../../types/chat.dto";
 import { useState } from "react";
+import ManageMembersForm from "../manageMembersForm";
 
 interface Props {
     open: boolean;
@@ -72,7 +73,10 @@ const ChatInfoModal = ({
             </Typography>
             <DialogContent>
                 {isManagingMembers ? (
-                    null // Placeholder
+                    <ManageMembersForm
+                        chat={chat}
+                        onClose={() => setIsManagingMembers(false)}
+                    />
                 ) : isEditingChat ? (
                     null // Placeholder
                 ) : (
@@ -116,7 +120,27 @@ const ChatInfoModal = ({
                                 <List
                                     dense
                                 >
-                                    {chat.members.map((member) => (
+                                    {currentMember && currentMember.role != 'member' &&  // Add members button won't appear if the user has member role
+                                        <ListItem
+                                            onClick={() => setIsManagingMembers(true)}
+                                            aria-label={t('FORM_MEMBERS_ADD')}
+                                            sx={{
+                                                cursor: 'pointer',
+                                                '&:hover': {
+                                                    textDecoration: 'underline',
+                                                    color: 'primary.main',
+                                                },
+                                            }}>
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    <Add />
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={t('FORM_MEMBERS_ADD')}
+                                            />
+                                        </ListItem>
+                                    } {chat.members.map((member) => (
                                         <ListItem
                                             key={member.id}
                                         >
@@ -168,19 +192,6 @@ const ChatInfoModal = ({
                                             onClick={() => setIsEditingChat(true)}
                                         >
                                             {t('EDIT_CHAT_LABEL')}
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip
-                                        title={t('MEMBERS_MANAGE_LABEL')}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
-                                            color="primary"
-                                            onClick={() => setIsManagingMembers(true)}
-                                            aria-label="manage-members"
-                                        >
-                                            {t('MEMBERS_MANAGE_LABEL')}
                                         </Button>
                                     </Tooltip>
                                 </Box>
