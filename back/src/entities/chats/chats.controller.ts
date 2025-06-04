@@ -521,7 +521,7 @@ export class ChatsController {
     @Roles('user')
     async updateGroupChat(
         @Param('chatId') chatId: number,
-        @Body() dto: GroupParamsDto,
+        @Body() dto: EditGroupParamsDto,
         @Req() req: Request,
         @Res() res: Response,
     ) {
@@ -537,13 +537,17 @@ export class ChatsController {
             if (!chat || chat.type !== 'group') throw new ConflictException('You can only update group chats');
 
             // Users with member role cannot edit group chat details
-            if (member.role === ChatMemberRole.OWNER) throw new ForbiddenException("You don't have permission to update this group chat");
+            if (member.role === ChatMemberRole.MEMBER) throw new ForbiddenException("You don't have permission to update this group chat");
 
-            // Validate the new name and description
-            if (!dto.name && !dto.description) throw new BadRequestException('At least one of name or description must be provided');
+            // If no name, description or the description's not going to be cleared, throw a bad request exception (as it won't change a thing)
+            if (!dto.name && !dto.description && !dto.clearDescription) throw new BadRequestException('At least one of name or description must be provided');
+
+            // Trim name and description
+            dto.name = dto.name.trim();
+            dto.description = dto.description?.trim();
 
             // Change group chat properties
-            await this.chatsService.updateGroup(chatId, dto);
+            await this.chatsService.updateGroup(chatId, dto.name, dto.description, dto.clearDescription);
 
             // If name was changed, send system message to the chat
             if (dto.name && dto.name !== chat.name) {
