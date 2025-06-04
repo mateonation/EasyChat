@@ -174,7 +174,7 @@ const LoginPage = () => {
                         sx={{
                             mb: 2,
                             input: {
-                                background: error ? '#ffebee' : !usernameValid ? '#fff3e0' : 'transparent'
+                                background: error ? '#ffebee' : !usernameValid ? '#ffebee' : 'transparent'
                             }
                         }}
                         slotProps={{ 
@@ -197,7 +197,7 @@ const LoginPage = () => {
                         sx={{
                             mb: 2,
                             input: {
-                                background: error ? '#ffebee' : !passwordValid ? '#fff3e0' : 'transparent'
+                                background: error ? '#ffebee' : !passwordValid ? '#ffebee' : 'transparent'
                             }
                         }}
                         slotProps={{ 
