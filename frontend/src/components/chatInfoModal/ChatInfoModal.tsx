@@ -144,7 +144,7 @@ const ChatInfoModal = ({
                 {isManagingMembers ? (
                     <ManageMembersForm
                         chat={chat}
-                        onClose={() => setIsManagingMembers(false)}
+                        onClose={onClose}
                         onChatUpdate={onChatUpdate}
                     />
                 ) : isEditingChat ? (
