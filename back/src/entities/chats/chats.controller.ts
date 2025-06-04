@@ -14,6 +14,7 @@ import { ConflictException } from 'src/errors/conflictException';
 import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
 import { MessagesService } from '../messages/messages.service';
 import { UpdateMemberRoleDto } from './chatmembers/dto/update-member-role.dto';
+import { EditGroupParamsDto } from './dto/edit-group-params.dto';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
@@ -150,6 +151,13 @@ export class ChatsController {
                 case 'group':
                     // If body of request does not contain name, throw an exception
                     if (!dto.name) throw new BadRequestException('A name is required to create a group chat');
+
+                    // Trim name and description
+                    if(dto.description) dto.description = dto.description.trim();
+                    dto.name = dto.name.trim();
+
+                    // If the name is empty, throw an exception
+                    if (dto.name === '') throw new BadRequestException('Group chat name cannot be empty');
 
                     // Filter out the requester username from the list of users
                     const unames = dto.usernames.filter((username) => username !== requester.username);
