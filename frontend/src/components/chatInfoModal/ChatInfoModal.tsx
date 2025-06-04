@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Avatar, Box, Dialog, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Button, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
 import GroupIcon from '@mui/icons-material/Group';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Add, Archive, } from "@mui/icons-material";
+import { Archive, } from "@mui/icons-material";
 import { ChatDto } from "../../types/chat.dto";
 
 interface Props {
@@ -22,6 +22,7 @@ const ChatInfoModal = ({
     const initial = chat.name.charAt(0).toUpperCase();
 
     const otherMember = chat.type === 'private' ? chat.members.find(m => m.id !== sessionUserId) : null;
+    const currentMember = chat.type === 'group' ? chat.members.find(m => m.id === sessionUserId) : null;
 
     return (
         <Dialog
@@ -87,13 +88,6 @@ const ChatInfoModal = ({
                             >
                                 {t('FORM_MEMBERS_LABEL')}
                             </Typography>
-                            <Tooltip
-                                title={t('FORM_MEMBERS_ADD')}
-                            >
-                                <IconButton>
-                                    <Add />
-                                </IconButton>
-                            </Tooltip>
                         </Box>
                         <List
                             dense
@@ -135,6 +129,37 @@ const ChatInfoModal = ({
                                 </ListItem>
                             ))}
                         </List>
+                        <Box
+                            display="flex"
+                            justifyContent="right"
+                            gap={2}
+                        >
+                            <Tooltip
+                                title={t('EDIT_CHAT_LABEL')}
+                            >
+                                <Button
+                                    variant="contained"
+                                    disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
+                                    color="primary"
+                                    onClick={onClose}
+                                >
+                                    {t('EDIT_CHAT_LABEL')}
+                                </Button>
+                            </Tooltip>
+                            <Tooltip
+                                title={t('MEMBERS_MANAGE_LABEL')}
+                            >
+                                <Button
+                                    variant="contained"
+                                    disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
+                                    color="primary"
+                                    onClick={onClose}
+                                    aria-label="manage-members"
+                                >
+                                    {t('MEMBERS_MANAGE_LABEL')}
+                                </Button>
+                            </Tooltip>
+                        </Box>
                         <Typography
                             variant="caption"
                             color="textSecondary"
