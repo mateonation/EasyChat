@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Avatar, Box, Button, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Dialog, DialogContent, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
 import GroupIcon from '@mui/icons-material/Group';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Add, Archive, } from "@mui/icons-material";
+import { Add, Archive, Close, Edit, } from "@mui/icons-material";
 import { ChatDto } from "../../types/chat.dto";
 import { useState } from "react";
 import ManageMembersForm from "../manageMembersForm";
@@ -35,42 +35,109 @@ const ChatInfoModal = ({
             maxWidth="sm"
             fullWidth
         >
-            <Avatar
-                sx={{
-                    mx: "auto",
-                    mt: 2,
-                }}
+            <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                bgcolor="background.paper"
+                zIndex={10}
             >
-                {
-                    chat.type === 'group' ? <GroupIcon /> :
-                        chat.type === 'archive' ? <Archive /> :
-                            chat.type === 'private' ? initial :
-                                <WarningIcon />
-                }
-            </Avatar>
-            <DialogTitle
-                textAlign="center"
-                sx={{
-                    padding: 0,
-                }}
-            >
-                {chat.name}
-            </DialogTitle>
-            <Typography
-                variant="caption"
-                textAlign="center"
-                color="textSecondary"
-            >
-                {chat.type === 'private' ? (
-                    t('DATE_REGISTRATION', {
-                        date: new Date(otherMember?.registerDate ?? '').toLocaleDateString()
-                    })
-                ) : chat.type === 'group' ? (
-                    t('DATE_CREATION', {
-                        date: new Date(chat?.creationDate ?? '').toLocaleDateString(),
-                    })
-                ) : null}
-            </Typography>
+                <Tooltip title={t('GENERIC_ANSWER_CLOSE')}>
+                    <IconButton
+                        onClick={onClose}
+                        aria-label={t('CLOSE')}
+                        sx={{
+                            position: 'absolute',
+                            left: 10,
+                            top: 12,
+                        }}
+                    >
+                        <Close />
+                    </IconButton>
+                </Tooltip>
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    maxWidth="lg"
+                >
+                    <Avatar
+                        sx={{
+                            mx: "auto",
+                            mt: 2,
+                        }}
+                    >
+                        {
+                            chat.type === 'group' ? <GroupIcon /> :
+                                chat.type === 'archive' ? <Archive /> :
+                                    chat.type === 'private' ? initial :
+                                        <WarningIcon />
+                        }
+                    </Avatar>
+                    <Box
+                        display="flex"
+                        justifyContent="center"
+                        textAlign={"center"}
+                        alignItems="center"
+                        width="100%"
+                    >
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            sx={{
+                                padding: 0,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '200px',
+                            }}
+                        >
+                            <Typography
+                                noWrap
+                                variant="h6"
+                                sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {chat.name}
+                            </Typography>
+                        </Box>
+                        {!isEditingChat && !isManagingMembers && chat.type === 'group' && currentMember?.role !== 'member' &&
+                            <Tooltip title={t('GENERIC_ANSWER_EDIT')}>
+                                <IconButton
+                                    aria-label={t('EDIT')}
+                                    size="small"
+                                    onClick={() => setIsEditingChat(true)}
+                                    sx={{
+                                        position: 'absolute',
+                                        right: 10,
+                                        top: 12,
+                                    }}
+                                >
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
+                        }
+                    </Box>
+                    <Typography
+                        variant="caption"
+                        textAlign="center"
+                        color="textSecondary"
+                    >
+                        {chat.type === 'private' ? (
+                            t('DATE_REGISTRATION', {
+                                date: new Date(otherMember?.registerDate ?? '').toLocaleDateString()
+                            })
+                        ) : chat.type === 'group' ? (
+                            t('DATE_CREATION', {
+                                date: new Date(chat?.creationDate ?? '').toLocaleDateString(),
+                            })
+                        ) : null}
+                    </Typography>
+                </Box>
+            </Box>
             <DialogContent>
                 {isManagingMembers ? (
                     <ManageMembersForm
@@ -132,7 +199,12 @@ const ChatInfoModal = ({
                                                 },
                                             }}>
                                             <ListItemAvatar>
-                                                <Avatar>
+                                                <Avatar
+                                                    sx={{
+                                                        bgcolor: 'primary.main',
+                                                        color: 'white',
+                                                    }}
+                                                >
                                                     <Add />
                                                 </Avatar>
                                             </ListItemAvatar>
@@ -156,7 +228,7 @@ const ChatInfoModal = ({
                                                         justifyContent="space-between"
                                                     >
                                                         <Typography>
-                                                            {member.username}
+                                                            {member.username} {currentMember?.id === member.id ? `(${t('YOU')})` : ''}
                                                         </Typography>
                                                         <Typography
                                                             variant="caption"
@@ -182,18 +254,6 @@ const ChatInfoModal = ({
                                     justifyContent="right"
                                     gap={2}
                                 >
-                                    <Tooltip
-                                        title={t('EDIT_CHAT_LABEL')}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
-                                            color="primary"
-                                            onClick={() => setIsEditingChat(true)}
-                                        >
-                                            {t('EDIT_CHAT_LABEL')}
-                                        </Button>
-                                    </Tooltip>
                                 </Box>
                                 <Typography
                                     variant="caption"
