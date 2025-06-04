@@ -97,9 +97,17 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             }
         };
 
+        const handleChatModifications = (updatedChat: ChatDto) => {
+            if (updatedChat.id === chatId) {
+                setSelectedChat(updatedChat);
+            }
+        };
+
+        socket.on("chatUpdates", handleChatModifications);
         socket.on("newMessage", handleNewMessage);
         return () => {
             socket.off("newMessage", handleNewMessage);
+            socket.off("chatUpdates", handleChatModifications);
         }
     }, [socket, chatId]);
 
@@ -143,7 +151,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         };
     }, [handleScroll]);
 
-    // Scroll to the top on initial mount
+    // Scroll to the bottom on initial mount
     useEffect(() => {
         if (isInitialMount.current && scrollContainerRef.current) {
             const container = scrollContainerRef.current;
@@ -286,8 +294,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     return (
         <>
             <ChatHeader
-                cName={onChatInfo.name}
-                cType={onChatInfo.type}
+                cName={selectedChat?.name || onChatInfo.name}
+                cType={selectedChat?.type || onChatInfo.type}
                 onClick={() => handleOpenInfo(onChatInfo)}
             />
             <Box
