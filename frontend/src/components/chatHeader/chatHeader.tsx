@@ -3,18 +3,18 @@ import GroupIcon from '@mui/icons-material/Group';
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { ChatDto } from "../../types/chat.dto";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
 interface Props {
-    cName: string;
-    cType: string;
+    chat: ChatDto;
     onClick?: () => void;
 }
 
-const ChatHeader = ({ cName, cType, onClick }: Props) => {
+const ChatHeader = ({ chat, onClick }: Props) => {
     const navigate = useNavigate();
-    const initial = cName.charAt(0).toUpperCase();
+    const initial = chat.name.charAt(0).toUpperCase();
     const { t } = useTranslation();
 
     return (
@@ -52,7 +52,7 @@ const ChatHeader = ({ cName, cType, onClick }: Props) => {
                 }}
             >
                 <Avatar>
-                    {cType === 'group' ? (
+                    {chat.type === 'group' ? (
                         <GroupIcon />
                     ) : (
                         initial
@@ -68,7 +68,7 @@ const ChatHeader = ({ cName, cType, onClick }: Props) => {
                         maxWidth: '200px',
                     }}
                 >
-                    {cName}
+                    {chat.name}
                 </Typography>
             </Box>
         </Box>
