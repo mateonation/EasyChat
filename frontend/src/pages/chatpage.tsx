@@ -33,11 +33,16 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const [error, setError] = useState<string | null>(null);
     const [infoOpen, setInfoOpen] = useState(false);
     const [selectedChat, setSelectedChat] = useState<ChatDto | null>(null);
+    const [chatInfo, setChatInfo] = useState<ChatDto>(onChatInfo);
 
     // Refs for scrolling and initial mount check
     const topRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
+
+    const handleChatUpdate = (updatedChat: ChatDto) => {
+        setChatInfo(updatedChat);
+    }
 
     const handleOpenInfo = (chat: ChatDto) => {
         setSelectedChat(chat);
@@ -98,9 +103,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         };
 
         const handleChatModifications = (updatedChat: ChatDto) => {
-            if (updatedChat.id === chatId) {
-                setSelectedChat(updatedChat);
-            }
+            setSelectedChat(updatedChat);
         };
 
         socket.on("chatUpdates", handleChatModifications);
@@ -294,9 +297,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     return (
         <>
             <ChatHeader
-                cName={selectedChat?.name || onChatInfo.name}
-                cType={selectedChat?.type || onChatInfo.type}
-                onClick={() => handleOpenInfo(onChatInfo)}
+                chat={chatInfo}
+                onClick={() => handleOpenInfo(chatInfo)}
             />
             <Box
                 component="main"
@@ -341,7 +343,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                 <ChatInfoModal
                     open={infoOpen}
                     onClose={handleCloseInfo}
-                    chat={selectedChat}
+                    chat={selectedChat!}
+                    onChatUpdate={handleChatUpdate}
                     sessionUserId={sessionUserId}
                 />
             )}
