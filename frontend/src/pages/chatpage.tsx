@@ -275,6 +275,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                     isOwnMessage={msg.senderId === sessionUserId}
                     type={msg.type}
                     isDeleted={false}
+                    chatType={onChatInfo.type}
                 />
             );
         }
@@ -337,7 +338,6 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                 />
             )}
         </>
-
     );
 };
 
