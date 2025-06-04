@@ -4,6 +4,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import WarningIcon from '@mui/icons-material/Warning';
 import { Archive, } from "@mui/icons-material";
 import { ChatDto } from "../../types/chat.dto";
+import { useState } from "react";
 
 interface Props {
     open: boolean;
@@ -20,6 +21,8 @@ const ChatInfoModal = ({
 }: Props) => {
     const { t } = useTranslation();
     const initial = chat.name.charAt(0).toUpperCase();
+    const [isManagingMembers, setIsManagingMembers] = useState(false);
+    const [isEditingChat, setIsEditingChat] = useState(false);
 
     const otherMember = chat.type === 'private' ? chat.members.find(m => m.id !== sessionUserId) : null;
     const currentMember = chat.type === 'group' ? chat.members.find(m => m.id === sessionUserId) : null;
@@ -68,136 +71,145 @@ const ChatInfoModal = ({
                 ) : null}
             </Typography>
             <DialogContent>
-                {chat.description &&
+                {isManagingMembers ? (
+                    null // Placeholder
+                ) : isEditingChat ? (
+                    null // Placeholder
+                ) : (
                     <>
-                        <Typography
-                            variant="subtitle1"
-                        >
-                            {
-                                chat.type === 'group' ?
-                                    t('FORM_GROUP_DESCRIPTION_LABEL') :
-                                    t('FORM_DESCRIPTION_LABEL')
-                            }
-                        </Typography>
-                        <Typography
-                            component="p"
-                            variant="body2"
-                            color="textSecondary"
-                            textAlign="justify"
-                            minHeight={200} // Ensures a minimum height for the description box
-                        >
-                            {chat.description}
-                        </Typography>
-                    </>
-                }
-                {chat.type === "group" ? (
-                    <>
-                        <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            mb={1}
-                        >
-                            <Typography
-                                variant="subtitle1"
-                            >
-                                {t('FORM_MEMBERS_LABEL')}
-                            </Typography>
-                        </Box>
-                        <List
-                            dense
-                        >
-                            {chat.members.map((member) => (
-                                <ListItem
-                                    key={member.id}
+                        {chat.description &&
+                            <>
+                                <Typography
+                                    variant="subtitle1"
                                 >
-                                    <ListItemAvatar>
-                                        <Avatar>
-                                            {member.username.charAt(0).toUpperCase()}
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={
-                                            <Box
-                                                display="flex"
-                                                justifyContent="space-between"
-                                            >
-                                                <Typography>
-                                                    {member.username}
-                                                </Typography>
-                                                <Typography
-                                                    variant="caption"
-                                                >
-                                                    {
-                                                        member.role === 'owner' ? t('MEMBER_ROLE_OWNER') :
-                                                            member.role === 'admin' ? t('MEMBER_ROLE_ADMIN') :
-                                                                member.role === 'member' ? t('MEMBER_ROLE_MEMBER') :
-                                                                    member.role
-                                                    }
-                                                </Typography>
-                                            </Box>
-                                        }
-                                        secondary={t('DATE_JOINED', {
-                                            date: new Date(member.joinDate).toLocaleDateString(),
-                                        })}
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                        <Box
-                            display="flex"
-                            justifyContent="right"
-                            gap={2}
-                        >
-                            <Tooltip
-                                title={t('EDIT_CHAT_LABEL')}
-                            >
-                                <Button
-                                    variant="contained"
-                                    disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
-                                    color="primary"
-                                    onClick={onClose}
+                                    {
+                                        chat.type === 'group' ?
+                                            t('FORM_GROUP_DESCRIPTION_LABEL') :
+                                            t('FORM_DESCRIPTION_LABEL')
+                                    }
+                                </Typography>
+                                <Typography
+                                    component="p"
+                                    variant="body2"
+                                    color="textSecondary"
+                                    textAlign="justify"
+                                    minHeight={200} // Ensures a minimum height for the description box
                                 >
-                                    {t('EDIT_CHAT_LABEL')}
-                                </Button>
-                            </Tooltip>
-                            <Tooltip
-                                title={t('MEMBERS_MANAGE_LABEL')}
-                            >
-                                <Button
-                                    variant="contained"
-                                    disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
-                                    color="primary"
-                                    onClick={onClose}
-                                    aria-label="manage-members"
+                                    {chat.description}
+                                </Typography>
+                            </>
+                        }
+                        {chat.type === "group" ? (
+                            <>
+                                <Box
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                    mb={1}
                                 >
-                                    {t('MEMBERS_MANAGE_LABEL')}
-                                </Button>
-                            </Tooltip>
-                        </Box>
-                        <Typography
+                                    <Typography
+                                        variant="subtitle1"
+                                    >
+                                        {t('FORM_MEMBERS_LABEL')}
+                                    </Typography>
+                                </Box>
+                                <List
+                                    dense
+                                >
+                                    {chat.members.map((member) => (
+                                        <ListItem
+                                            key={member.id}
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    {member.username.charAt(0).toUpperCase()}
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={
+                                                    <Box
+                                                        display="flex"
+                                                        justifyContent="space-between"
+                                                    >
+                                                        <Typography>
+                                                            {member.username}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="caption"
+                                                        >
+                                                            {
+                                                                member.role === 'owner' ? t('MEMBER_ROLE_OWNER') :
+                                                                    member.role === 'admin' ? t('MEMBER_ROLE_ADMIN') :
+                                                                        member.role === 'member' ? t('MEMBER_ROLE_MEMBER') :
+                                                                            member.role
+                                                            }
+                                                        </Typography>
+                                                    </Box>
+                                                }
+                                                secondary={t('DATE_JOINED', {
+                                                    date: new Date(member.joinDate).toLocaleDateString(),
+                                                })}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                                <Box
+                                    display="flex"
+                                    justifyContent="right"
+                                    gap={2}
+                                >
+                                    <Tooltip
+                                        title={t('EDIT_CHAT_LABEL')}
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
+                                            color="primary"
+                                            onClick={() => setIsEditingChat(true)}
+                                        >
+                                            {t('EDIT_CHAT_LABEL')}
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip
+                                        title={t('MEMBERS_MANAGE_LABEL')}
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            disabled={!currentMember?.role || currentMember.role === 'member'} // Disable if current user's role is member
+                                            color="primary"
+                                            onClick={() => setIsManagingMembers(true)}
+                                            aria-label="manage-members"
+                                        >
+                                            {t('MEMBERS_MANAGE_LABEL')}
+                                        </Button>
+                                    </Tooltip>
+                                </Box>
+                                <Typography
+                                    variant="caption"
+                                    color="textSecondary"
+                                    display="block"
+                                    textAlign="center"
+                                    mt={2}
+                                >
+                                    {t('DATE_LAST_MODIFIED', {
+                                        date: new Date(chat.updateDate).toLocaleDateString(),
+                                    })}
+                                </Typography>
+                            </>
+                        ) : <Typography
                             variant="caption"
                             color="textSecondary"
                             display="block"
                             textAlign="center"
                             mt={2}
                         >
-                            {t('DATE_LAST_MODIFIED', {
-                                date: new Date(chat.updateDate).toLocaleDateString(),
+                            {t('CHAT_DATE_CREATION', {
+                                date: new Date(chat.creationDate).toLocaleDateString(),
                             })}
                         </Typography>
+                        }
                     </>
-                ) : <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    display="block"
-                    textAlign="center"
-                    mt={2}
-                >
-                    {t('CHAT_DATE_CREATION', {
-                        date: new Date(chat.creationDate).toLocaleDateString(),
-                    })}
-                </Typography>}
+                )}
             </DialogContent>
         </Dialog >
     );
