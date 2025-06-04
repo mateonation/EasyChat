@@ -3,9 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Chat } from './chat.entity';
 import { ChatMember } from './chatmembers/chatmember.entity';
-import { User } from '../users/user.entity';
 import { ChatResponseDto } from './dto/chat-response.dto';
-import { GroupParamsDto } from './dto/group-params.dto';
 import { ChatType } from 'src/common/enums/chat-type.enum';
 
 @Injectable()
@@ -15,8 +13,6 @@ export class ChatsService {
         private readonly chatRepo: Repository<Chat>,
         @InjectRepository(ChatMember)
         private readonly memberRepo: Repository<ChatMember>,
-        @InjectRepository(User)
-        private readonly userRepo: Repository<User>,
     ) {}
 
     // Function that returns all chats for a user
