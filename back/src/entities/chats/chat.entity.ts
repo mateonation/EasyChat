@@ -37,6 +37,14 @@ export class Chat {
     })
     description: string; // only used in group chats
 
+    @Column({
+        type: 'timestamp',
+        transformer: UtcDateTransformer,
+        default: () => 'CURRENT_TIMESTAMP',
+        onUpdate: 'CURRENT_TIMESTAMP', 
+    })
+    updateDate: Date; // Timestamp that's updated automatically when the chat is modified.
+
     @OneToMany(() => ChatMember, member => member.chat, { cascade: true, })
     members: ChatMember[]; // Members of the chat. This is a one-to-many relationship with the ChatMember entity.
 
