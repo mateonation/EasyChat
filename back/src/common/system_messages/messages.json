@@ -6,6 +6,8 @@
     "MEMBER_LEFT": "{username} left the group",
     "MEMBER_KICKED": "{username} was kicked by {admin}",
 
+    "GROUP_NAME_DESCRIPTION_CHANGED": "{admin} changed both description and name of the group to '{newName}'",
+    "GROUP_NAME_CHANGED_DESCRIPTION_CLEARED": "{admin} cleared the group description and changed the name to '{newName}'",
     "GROUP_NAME_CHANGED": "{admin} changed the group name to '{newName}'",
     "GROUP_DESCRIPTION_CLEARED": "{admin} cleared the group description",
     "GROUP_DESCRIPTION_CHANGED": "{admin} changed the group description",
