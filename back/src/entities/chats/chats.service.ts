@@ -53,7 +53,9 @@ export class ChatsService {
     // This is ONLY FOR GROUP CHATS, private ones are not allowed to be modified
     async updateGroup(
         chatId: number,
-        chatData: Partial<GroupParamsDto>,
+        name: string,
+        description?: string,
+        clearDescription?: boolean,
     ): Promise<Chat | null> {
         // Get the chat by ID
         const chat = await this.chatRepo.findOne({ where: { id: chatId } });
@@ -62,8 +64,11 @@ export class ChatsService {
         if (!chat) return null;
 
         // Update the chat properties
-        chat.name = chatData.name || chat.name; // Update name if provided
-        chat.description = chatData.description || chat.description; // Update description if provided
+        chat.name = name || chat.name; // Update name if provided
+        chat.description = description || chat.description; // Update description if provided
+
+        // Clear description if requested
+        if (clearDescription) chat.description = ''; 
 
         // Set the chat as a group chat if it is not already
         if (chat.type !== 'group') chat.type = ChatType.GROUP;
