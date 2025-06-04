@@ -5,28 +5,43 @@ import api from "../../api/axios";
 import { Avatar, Box, Button, DialogActions, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Typography } from "@mui/material";
 import { Close, Search } from "@mui/icons-material";
 import { motion } from "framer-motion";
+import { ChatDto } from "../../types/chat.dto";
 
 interface Props {
-    chatId: number;
+    chat: ChatDto;
     onClose: () => void;
 }
 
-const ManageMembersForm = ({ chatId, onClose }: Props) => {
+const ManageMembersForm = ({ chat, onClose, }: Props) => {
     const { t } = useTranslation();
 
     const [query, setQuery] = useState("");
     const [searchResults, setSearchResults] = useState<User[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
+    const [searchError, setSearchError] = useState<string | null>(null);
 
     const handleSearch = async () => {
         if (query.trim().length === 0) return;
         setLoading(true);
         try {
-            const results = await api.get(`/users/search?username=${query}`);
+            const results = await api.get<User[]>(`/users/search?username=${query}`);
+
             // Filter out already selected users from the results
             const filteredResults = results.data.filter((user: User) => !selectedUsers.find((u) => u.id === user.id));
-            setSearchResults(filteredResults);
+
+            // Filter out users that are already members of the chat
+            const chatMemberUsernames = chat.members.map(member => member.username);
+            const finalResults = filteredResults.filter((user) => !chatMemberUsernames.includes(user.username));
+
+            if (finalResults.length === 0) {
+                setSearchError(t("NO_RESULTS_FOR", {
+                    query: query.trim(),
+                }));
+            } else {
+                setSearchError(null);
+            }
+            setSearchResults(finalResults);
         } catch (error) {
             console.error("Error searching users:", error);
             alert(t("FAILED_TO_FETCH", {
@@ -43,16 +58,18 @@ const ManageMembersForm = ({ chatId, onClose }: Props) => {
         } else {
             setSelectedUsers(prev => [...prev, user]);
         }
+        setQuery("");
+        setSearchResults([]);
     };
 
     const addMembers = async () => {
         if (selectedUsers.length === 0) return;
         setLoading(true);
         try {
-            await api.post(`/chats/${chatId}/member`, {
+            const response = await api.post(`/chats/${chat.id}/member`, {
                 usernames: selectedUsers.map(user => user.username),
             });
-            alert(t("MEMBERS_ADD_SUCCESS"));
+            
             onClose();
         } catch (error) {
             console.error("Error adding members:", error);
@@ -84,13 +101,22 @@ const ManageMembersForm = ({ chatId, onClose }: Props) => {
                 onKeyDown={(e) => {
                     if (e.key === "Enter") handleSearch();
                 }}
+                sx={{
+                    mb: 2,
+                    input: {
+                        background: searchError ? '#ffebee' : 'transparent'
+                    }
+                }}
                 fullWidth
+                error={searchError !== null}
+                helperText={searchError ? searchError : ''}
                 InputProps={{
                     endAdornment: (
-                        <InputAdornment position="end">
+                        <InputAdornment position="end" >
                             <IconButton
                                 onClick={handleSearch}
                                 aria-label={t("GENERIC_ANSWER_SEARCH")}
+                                
                             >
                                 <Search />
                             </IconButton>
@@ -148,12 +174,12 @@ const ManageMembersForm = ({ chatId, onClose }: Props) => {
             )}
             {selectedUsers.map((user) => (
                 <motion.div
+                    key={user.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
                 >
                     <Box
-                        key={user.id}
                         role="group"
                         aria-label={`${t('GENERIC_ANSWER_SELECT')}: ${user.username}`}
                         display="flex"
