@@ -12,6 +12,7 @@ interface Props {
     onClose: () => void;
     chat: ChatDto;
     sessionUserId: number;
+    onChatUpdate: (chat: ChatDto) => void;
 }
 
 const ChatInfoModal = ({
@@ -19,6 +20,7 @@ const ChatInfoModal = ({
     onClose,
     chat,
     sessionUserId,
+    onChatUpdate,
 }: Props) => {
     const { t } = useTranslation();
     const initial = chat.name.charAt(0).toUpperCase();
@@ -143,6 +145,7 @@ const ChatInfoModal = ({
                     <ManageMembersForm
                         chat={chat}
                         onClose={() => setIsManagingMembers(false)}
+                        onChatUpdate={onChatUpdate}
                     />
                 ) : isEditingChat ? (
                     null // Placeholder
