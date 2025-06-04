@@ -10,6 +10,7 @@ import {
 import { Server } from "socket.io";
 import { SessionSocket } from "src/types/session-socket";
 import { MessageResponseWithChatId } from "../messages/dto/message-response-chatId.dto";
+import { ChatResponseDto } from "./dto/chat-response.dto";
 
 @WebSocketGateway({
     cors: {
@@ -73,5 +74,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!chat) return;
 
         client.leave(`chat_${chat}`);
+    }
+
+    emitChatUpdate(
+        chat: ChatResponseDto,
+    ) {
+        this.server.to(`chat_${chat.id}`).emit('chatUpdate', chat);
     }
 }
