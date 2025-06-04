@@ -31,27 +31,42 @@ const ChatInfoModal = ({
             maxWidth="sm"
             fullWidth
         >
+            <Avatar
+                sx={{
+                    mx: "auto",
+                    mt: 2,
+                }}
+            >
+                {
+                    chat.type === 'group' ? <GroupIcon /> :
+                        chat.type === 'archive' ? <Archive /> :
+                            chat.type === 'private' ? initial :
+                                <WarningIcon />
+                }
+            </Avatar>
             <DialogTitle
                 textAlign="center"
+                sx={{
+                    padding: 0,
+                }}
             >
-                <Avatar
-                    sx={{
-                        mx: "auto",
-                    }}
-                >
-                    {
-                        chat.type === 'group' ? <GroupIcon /> :
-                            chat.type === 'archive' ? <Archive /> :
-                                chat.type === 'private' ? initial :
-                                    <WarningIcon />
-                    }
-                </Avatar>
-                <Typography
-                    mt={0.5}
-                >
-                    {chat.name}
-                </Typography>
+                {chat.name}
             </DialogTitle>
+            <Typography
+                variant="caption"
+                textAlign="center"
+                color="textSecondary"
+            >
+                {chat.type === 'private' ? (
+                    t('DATE_REGISTRATION', {
+                        date: new Date(otherMember?.registerDate ?? '').toLocaleDateString()
+                    })
+                ) : chat.type === 'group' ? (
+                    t('DATE_CREATION', {
+                        date: new Date(chat?.creationDate ?? '').toLocaleDateString(),
+                    })
+                ) : null}
+            </Typography>
             <DialogContent>
                 {chat.description &&
                     <>
@@ -167,24 +182,22 @@ const ChatInfoModal = ({
                             textAlign="center"
                             mt={2}
                         >
-                            {t('DATE_CREATION', {
-                                date: new Date(chat.creationDate).toLocaleDateString(),
+                            {t('DATE_LAST_MODIFIED', {
+                                date: new Date(chat.updateDate).toLocaleDateString(),
                             })}
                         </Typography>
                     </>
-                ) : (
-                    <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        display="block"
-                        textAlign="center"
-                        mt={2}
-                    >
-                        {t('DATE_REGISTRATION', {
-                            date: new Date(otherMember?.registerDate ?? '').toLocaleDateString(),
-                        })}
-                    </Typography>
-                )}
+                ) : <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    display="block"
+                    textAlign="center"
+                    mt={2}
+                >
+                    {t('CHAT_DATE_CREATION', {
+                        date: new Date(chat.creationDate).toLocaleDateString(),
+                    })}
+                </Typography>}
             </DialogContent>
         </Dialog >
     );
