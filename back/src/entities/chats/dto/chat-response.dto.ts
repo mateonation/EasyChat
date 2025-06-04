@@ -9,6 +9,7 @@ export class ChatResponseDto {
     type: ChatType;
     name: string;
     description: string | null;
+    updateDate: Date;
     lastMessagePrefix: string;
     lastMessageContent: string;
     lastMessageSentDate: Date | null = null;
@@ -20,6 +21,7 @@ export class ChatResponseDto {
         this.type = chat.type;
         this.name = chat.name;
         this.description = chat.description;
+        this.updateDate = chat.updateDate;
         this.members = MemberResponseDto.fromMembers(chat.members);
     }
 
@@ -82,6 +84,7 @@ export class ChatResponseDto {
             type: chat.type,
             name,
             description,
+            updateDate: chat.updateDate,
             lastMessagePrefix,
             lastMessageContent,
             lastMessageSentDate,
