@@ -10,6 +10,7 @@ export interface ChatMessageItemProps {
     isDeleted: boolean;
     isOwnMessage: boolean;
     content: string;
+    chatType: string;
 }
 
 const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
@@ -20,6 +21,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     isDeleted,
     isOwnMessage,
     content,
+    chatType,
 }) => {
     const { t } = useTranslation();
     return (
@@ -42,7 +44,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     borderRadius: 2,
                 }}
             >
-                {!isOwnMessage && (
+                {chatType != 'private' && !isOwnMessage && (
                     <Typography
                         variant="caption"
                         fontWeight="bold"
