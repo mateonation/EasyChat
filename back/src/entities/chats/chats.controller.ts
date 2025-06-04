@@ -15,6 +15,7 @@ import { ChatMemberRole } from 'src/common/enums/chat-members-roles.enum';
 import { MessagesService } from '../messages/messages.service';
 import { UpdateMemberRoleDto } from './chatmembers/dto/update-member-role.dto';
 import { EditGroupParamsDto } from './dto/edit-group-params.dto';
+import { ChatGateway } from './chat.gateway';
 
 @UseGuards(RolesGuard)
 @Controller('api/chats')
@@ -24,6 +25,7 @@ export class ChatsController {
         private readonly userService: UsersService,
         private readonly membersService: ChatmembersService,
         private readonly messageService: MessagesService,
+        private readonly chatGateway: ChatGateway,
     ) { }
 
     // Get a list of all chats for the authenticated user
@@ -270,9 +272,10 @@ export class ChatsController {
                 await this.membersService.addUserToChat(uid, chat.id);
             }
 
+            let sysmsg;
             if (userIds.length > 1) {
                 // Send system message of new members added to the group
-                await this.messageService.sendSystemMessage(
+                sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'NEW_MEMBERS',
                     {
@@ -282,7 +285,7 @@ export class ChatsController {
                 );
             } else {
                 // Send system message of the new member added to the group
-                await this.messageService.sendSystemMessage(
+                sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'NEW_MEMBER',
                     {
@@ -291,8 +294,20 @@ export class ChatsController {
                     }
                 );
             }
+            
             // Fetch the chat with its members
             const chatWithMembers = await this.chatsService.findById(chatId, reqId);
+            if(!chatWithMembers) return;
+
+            // Emit system message through chat gateway
+            this.chatGateway.handleSendMessage({
+                message: sysmsg,
+                chatId: chatId,
+            })
+
+            // Emit system message through chat gateway
+            this.chatGateway.emitChatUpdate(chatWithMembers);
+
             // Return chat with its members
             return res.status(200).json(chatWithMembers);
         } catch (error) {
