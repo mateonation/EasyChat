@@ -40,11 +40,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('sendMessage')
     async handleSendMessage(
         @MessageBody() dto: MessageResponseWithChatId,
-        @ConnectedSocket() client: SessionSocket,
     ) {
-        const user = client.handshake.auth;
         const chat = dto.chatId.toString();
-        if(!user || !chat) {
+        if(!chat) {
             return;
         }
 
