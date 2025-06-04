@@ -10,9 +10,10 @@ import { ChatDto } from "../../types/chat.dto";
 interface Props {
     chat: ChatDto;
     onClose: () => void;
+    onChatUpdate: (chat: ChatDto) => void;
 }
 
-const ManageMembersForm = ({ chat, onClose, }: Props) => {
+const ManageMembersForm = ({ chat, onClose, onChatUpdate }: Props) => {
     const { t } = useTranslation();
 
     const [query, setQuery] = useState("");
@@ -69,7 +70,8 @@ const ManageMembersForm = ({ chat, onClose, }: Props) => {
             const response = await api.post(`/chats/${chat.id}/member`, {
                 usernames: selectedUsers.map(user => user.username),
             });
-            
+            const chatUpdated = response.data;
+            onChatUpdate(chatUpdated);
             onClose();
         } catch (error) {
             console.error("Error adding members:", error);
@@ -90,7 +92,7 @@ const ManageMembersForm = ({ chat, onClose, }: Props) => {
                 variant="h6"
                 gutterBottom
             >
-                {t("MEMBERS_MANAGE_LABEL")}
+                {t("FORM_MEMBERS_ADD")}
             </Typography>
             <TextField
                 id="user-search"
