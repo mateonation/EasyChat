@@ -70,6 +70,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                             fontSize: type === 'system' ? "0.9rem" : "inherit",
                             fontStyle: type === 'system' || isDeleted ? "italic" : "normal",
                             verticalAlign: "middle",
+                            textAlign: type === 'system' ? "center" : "left",
                         }}
                     >
                         {isDeleted ? t('CHAT_MESSAGE_DELETED') : content}
