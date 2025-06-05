@@ -115,6 +115,13 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                     <Typography
                         variant="subtitle1"
                         fontWeight="bold"
+                        sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '400px',
+                        }}
                     >
                         {chat.name}
                     </Typography>
@@ -125,7 +132,13 @@ const ChatItem = ({ chat }: ChatItemProps) => {
                             variant="body2"
                             component="span"
                             color="text.secondary"
-                            sx={{ display: 'block' }}
+                            sx={{
+                                display: 'block',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '100%',
+                            }}
                         >
                             {formatMessage()}
                         </Typography>
