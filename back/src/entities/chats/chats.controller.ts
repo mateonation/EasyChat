@@ -365,7 +365,7 @@ export class ChatsController {
                         await this.membersService.updateMemberRole(oldestMember.user.id, chatId, ChatMemberRole.OWNER);
 
                         // Send system message of new owner assigned
-                        await this.messageService.sendSystemMessage(
+                        const sysmsg = await this.messageService.sendSystemMessage(
                             chatId,
                             'MEMBER_NOW_OWNER',
                             {
@@ -373,7 +373,12 @@ export class ChatsController {
                             }
                         );
 
-                        // If there are no other members, delete chat
+                        // Emit system message through chat gateway
+                        this.chatGateway.handleSendMessage({
+                            message: sysmsg,
+                            chatId: chatId,
+                        });
+
                     } else {
                         // If there are no other members, delete the chat
                         await this.chatsService.deleteChatById(chatId);
@@ -386,13 +391,25 @@ export class ChatsController {
                 // Finally, let the user leave the chat
                 await this.membersService.removeUserFromChat(rmId, chat.id);
                 // Send system message of member leaving the group
-                await this.messageService.sendSystemMessage(
+                const sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'MEMBER_LEFT',
                     {
                         username: member.user.username,
                     }
                 );
+
+                // Emit system message through chat gateway
+                this.chatGateway.handleSendMessage({
+                    message: sysmsg,
+                    chatId: chatId,
+                });
+
+                // Get updated chat and send it through chat gateway
+                const updatedChat = await this.chatsService.findById(chatId, reqId);
+                if(!updatedChat) return;
+                this.chatGateway.emitChatUpdate(updatedChat);
+
                 return res.status(200).json({
                     statusCode: 200,
                     message: `You left the group "${chat.name}"`,
@@ -415,8 +432,9 @@ export class ChatsController {
 
             // Kick member out of the chat
             await this.membersService.removeUserFromChat(rmId, chatId);
+
             // Send system message of member kicking by the requester
-            await this.messageService.sendSystemMessage(
+            const sysmsg = await this.messageService.sendSystemMessage(
                 chatId,
                 'MEMBER_KICKED',
                 {
@@ -424,6 +442,18 @@ export class ChatsController {
                     admin: member.user.username,
                 }
             );
+
+            // Emit system message through chat gateway
+            this.chatGateway.handleSendMessage({
+                message: sysmsg,
+                chatId: chatId,
+            });
+
+            // Get updated chat and send it through chat gateway
+            const updatedChat = await this.chatsService.findById(chatId, reqId);
+            if(!updatedChat) return;
+            this.chatGateway.emitChatUpdate(updatedChat);
+
             return res.status(200).json({
                 statusCode: 200,
                 message: `${memberToRemove.user.username} was removed from chat`,
