@@ -507,8 +507,9 @@ export class ChatsController {
                 };
                 // Let the requester change it's role in group
                 await this.membersService.updateMemberRole(dto.editId, chatId, dto.role as ChatMemberRole);
+
                 // Send system message of member role change
-                await this.messageService.sendSystemMessage(
+                const sysmsg = await this.messageService.sendSystemMessage(
                     chatId,
                     'MEMBER_NEW_ROLE',
                     {
@@ -516,6 +517,18 @@ export class ChatsController {
                         newRole: dto.role,
                     }
                 );
+
+                // Emit system message through chat gateway
+                this.chatGateway.handleSendMessage({
+                    message: sysmsg,
+                    chatId: chatId,
+                });
+
+                // Get updated chat and send it through chat gateway
+                const updatedChat = await this.chatsService.findById(chatId, reqId);
+                if(!updatedChat) return;
+                this.chatGateway.emitChatUpdate(updatedChat);
+
                 return res.status(200).json({
                     statusCode: 200,
                     message: `You have changed your role in "${chat.name}" to "${dto.role}"`,
@@ -536,7 +549,7 @@ export class ChatsController {
             await this.membersService.updateMemberRole(dto.editId, chatId, dto.role as ChatMemberRole);
 
             // Send system message of member role change by other user
-            await this.messageService.sendSystemMessage(
+            const sysmsg = await this.messageService.sendSystemMessage(
                 chatId,
                 'MEMBER_NEW_ROLE_BY_OTHER',
                 {
@@ -545,6 +558,18 @@ export class ChatsController {
                     user2: member.user.username,
                 }
             );
+
+            // Emit system message through chat gateway
+            this.chatGateway.handleSendMessage({
+                message: sysmsg,
+                chatId: chatId,
+            });
+
+            // Get updated chat and send it through chat gateway
+            const updatedChat = await this.chatsService.findById(chatId, reqId);
+            if(!updatedChat) return;
+            this.chatGateway.emitChatUpdate(updatedChat);
+
             return res.status(200).json({
                 statusCode: 200,
                 message: `You changed the role of "${memberToEdit.user.username}" to "${dto.role}"`,
@@ -689,11 +714,22 @@ export class ChatsController {
                 );
             }
 
+            // Emit system message through chat gateway
+            this.chatGateway.handleSendMessage({
+                message: sysmsg,
+                chatId: chatId,
+            });
+
+            // Get updated chat with its members
+            const updatedChat = await this.chatsService.findById(chatId, reqId);
+            if(!updatedChat) return;
+            // Emit chat update through chat gateway
+            this.chatGateway.emitChatUpdate(updatedChat);
+
             // Return success message with system message
             return res.status(200).json({
                 statusCode: 200,
                 message: 'Group chat updated successfully',
-                systemMessage: sysmsg,
             });
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof ConflictException) {
