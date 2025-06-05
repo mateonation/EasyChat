@@ -1,3 +1,4 @@
+import { ErrorOutline } from "@mui/icons-material";
 import { Box, Paper, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -52,16 +53,29 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                         {senderUsername}
                     </Typography>
                 )}
-                <Typography
-                    variant="body1"
-                    sx={{
-                        wordBreak: "break-word",
-                        fontSize: type === 'system' ? "0.9rem" : "inherit",
-                        fontStyle: type === 'system' || isDeleted ? "italic" : "normal",
-                    }}
+                <Box
+                    display="flex"
+                    alignItems="center"
                 >
-                    {isDeleted ? t('CHAT_MESSAGE_DELETED') : content}
-                </Typography>
+                    {isDeleted &&
+                        <ErrorOutline 
+                        sx={{ 
+                            mr: 0.5, 
+                        }}
+                    />
+                    }
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            wordBreak: "break-word",
+                            fontSize: type === 'system' ? "0.9rem" : "inherit",
+                            fontStyle: type === 'system' || isDeleted ? "italic" : "normal",
+                            verticalAlign: "middle",
+                        }}
+                    >
+                        {isDeleted ? t('CHAT_MESSAGE_DELETED') : content}
+                    </Typography>
+                </Box>
                 {type != 'system' &&
                     <Typography
                         variant="caption"
