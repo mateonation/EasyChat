@@ -27,8 +27,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
     const { t } = useTranslation();
     return (
         <Box
-            component="article"
-            id={`msg_${id}`}
+            id={`message_${id}`}
             display="flex"
             justifyContent={type === "system" ? "center" : isOwnMessage ? "flex-end" : "flex-start"}
             my={1}
