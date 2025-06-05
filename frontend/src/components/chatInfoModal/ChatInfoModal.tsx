@@ -110,7 +110,7 @@ const ChatInfoModal = ({
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',
-                                    maxWidth: '200px',
+                                    maxWidth: 'sm',
                                 }}
                             >
                                 <Typography
@@ -264,8 +264,9 @@ const ChatInfoModal = ({
                                                     aria-label={t('FORM_MEMBERS_ADD')}
                                                     sx={{
                                                         display: 'flex',
-                                                        justifyContent: 'space-between',
+                                                        justifyContent: currentMember.role != "member" ? "space-between" : "flex-end",
                                                         cursor: 'pointer',
+                                                        flexDirection: currentMember.role != "member" ? "row" : "row-reverse",
                                                         '&:hover': {
                                                             textDecoration: 'underline',
                                                             color: 'error.main',
@@ -275,13 +276,13 @@ const ChatInfoModal = ({
                                                     <ListItemText
                                                         primary={t('MEMBER_REMOVE_ITSELF')}
                                                         sx={{
-                                                            textAlign: 'right',
+                                                            textAlign: currentMember.role != "member" ? "right" : "left",
                                                         }}
                                                     />
                                                     <ListItemAvatar
                                                         sx={{
                                                             display: 'flex',
-                                                            justifyContent: 'flex-end',
+                                                            justifyContent: currentMember.role != "member" ? "flex-end" : "flex-start",
                                                         }}>
                                                         <Avatar
                                                             sx={{
@@ -319,7 +320,7 @@ const ChatInfoModal = ({
                                                     variant="caption"
                                                     color="textSecondary"
                                                     sx={{
-                                                        marginRight: 2
+                                                        marginRight: 0
                                                     }}
                                                 >
                                                     {
