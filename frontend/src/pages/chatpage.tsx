@@ -282,7 +282,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                     sentDate={msg.sentDate}
                     isOwnMessage={msg.senderId === sessionUserId}
                     type={msg.type}
-                    isDeleted={false}
+                    isDeleted={msg.isDeleted}
                     chatType={onChatInfo.type}
                 />
             );
