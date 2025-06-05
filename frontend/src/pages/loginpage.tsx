@@ -101,7 +101,7 @@ const LoginPage = () => {
                 console.error(err);
                 const reason = (err as ErrorResponse).message;
                 switch (reason) {
-                    case 'Username or password are incorrect':
+                    case 'Invalid credentials':
                         setPasswordText(t('LOGIN_FORM_ERROR'));
                         setError(true);
                         break;
