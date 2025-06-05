@@ -103,14 +103,15 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         };
 
         const handleChatModifications = (updatedChat: ChatDto) => {
+            setChatInfo(updatedChat);
             setSelectedChat(updatedChat);
         };
 
-        socket.on("chatUpdates", handleChatModifications);
+        socket.on("chatUpdate", handleChatModifications);
         socket.on("newMessage", handleNewMessage);
         return () => {
             socket.off("newMessage", handleNewMessage);
-            socket.off("chatUpdates", handleChatModifications);
+            socket.off("chatUpdate", handleChatModifications);
         }
     }, [socket, chatId]);
 
