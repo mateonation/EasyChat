@@ -36,7 +36,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const [chatInfo, setChatInfo] = useState<ChatDto>(onChatInfo);
 
     // Refs for scrolling and initial mount check
-    const topRef = useRef<HTMLDivElement>(null);
+    const bottomRef = useRef<HTMLDivElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
 
@@ -157,14 +157,10 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
 
     // Scroll to the bottom on initial mount
     useEffect(() => {
-        if (isInitialMount.current && scrollContainerRef.current) {
-            const container = scrollContainerRef.current;
-            requestAnimationFrame(() => {
-                container.scrollTop = container.scrollHeight;
-            });
-            isInitialMount.current = false;
+        if (bottomRef.current) {
+            bottomRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    }, []);
+    }, [messages]);
 
     const sendMessage = async () => {
         if (error !== null) setError(null); // Clear error if before sending a message
@@ -310,13 +306,13 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                 display="flex"
                 flexDirection="column"
             >
-                <div ref={topRef} />
                 {renderMessages()}
                 {loading && (
                     <Box textAlign="center" my={2}>
                         <CircularProgress size={20} />
                     </Box>
                 )}
+                <div ref={bottomRef} />
             </Box>
             <Box
                 component="footer"
