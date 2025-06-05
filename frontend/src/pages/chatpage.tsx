@@ -39,6 +39,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const topMsgRef = useRef<HTMLDivElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const isInitialMount = useRef(true);
 
     const handleChatUpdate = (updatedChat: ChatDto) => {
         setChatInfo(updatedChat);
@@ -59,19 +60,37 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         if (!hasMore) return;
 
         setLoading(true);
+
+        const container = scrollContainerRef.current;
+        const prevTopMessage = topMsgRef.current;
+        const prevScrollHeight = container?.scrollHeight ?? 0;
+        const prevTopOffset = prevTopMessage?.offsetTop ?? 0;
+
         const res = await api.get<PaginatedMessages>(
             `/message/from/${chatId}?page=${page}`
         );
 
         const newMessages = res.data.messages;
+
         // Avoid duplicated messages by filtering existing ones
         setMessages((prev) => {
             const existingIds = new Set(prev.map(msg => msg.id));
             const filterNewMssgs = newMessages.filter(msg => !existingIds.has(msg.id));
             return [...filterNewMssgs, ...prev];
         });
+
         setHasMore(res.data.hasMore);
         setLoading(false);
+
+        // Restore scroll position after fetching new messages (wait 1 frame to ensure render is done)
+        requestAnimationFrame(() => {
+            if (container && prevTopMessage) {
+                const newScrollHeight = container.scrollHeight;
+                const newTopOffset = prevTopMessage.offsetTop;
+                const diff = newTopOffset - prevTopOffset;
+                container.scrollTop += diff;
+            }
+        });
     }, [chatId, hasMore]);
 
     // Initial fetch
@@ -157,10 +176,13 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
 
     // Scroll to the bottom on initial mount
     useEffect(() => {
-        if (bottomRef.current) {
-            bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+        if (isInitialMount.current && messages.length > 0 && bottomRef.current) {
+            requestAnimationFrame(() => {
+                bottomRef.current?.scrollIntoView({ behavior: "auto" });
+            });
+            isInitialMount.current = false; // Set to false after first render
         }
-    }, [messages]);
+    }, [messages.length]);
 
     const sendMessage = async () => {
         if (error !== null) setError(null); // Clear error if before sending a message
@@ -276,9 +298,9 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             }
 
             items.push(
-                <div 
-                    key={msg.id} 
-                    id={`msg_${msg.id}`} 
+                <div
+                    key={msg.id}
+                    id={`msg_${msg.id}`}
                     ref={msg.id === firstMessageId ? topMsgRef : null}
                 >
                     <ChatMessageItem
