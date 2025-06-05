@@ -28,7 +28,7 @@ const MemberRemovalConfirmDialog = ({
     const handleConfirm = async () => {
         if (!memberId) return;
         try {
-            const res = await api.delete(`/chats/${chatId}/members`, {
+            const res = await api.delete(`/chats/${chatId}/member`, {
                 data: {
                     rmId: memberId,
                 },
@@ -37,7 +37,7 @@ const MemberRemovalConfirmDialog = ({
             console.log(res.data.message);
             // If user is leaving the chat, redirect to chats list
             if (ownUserLeaving) {
-                navigate(`${BASE}/home`);
+                navigate(`${BASE}/chats`);
             }
         } catch (error) {
             console.error('Error removing member:', error);
@@ -70,7 +70,7 @@ const MemberRemovalConfirmDialog = ({
             <DialogActions>
                 <Button 
                     onClick={onClose} 
-                    color="secondary"
+                    color="inherit"
                     variant="text"
                 >
                     {t('GENERIC_ANSWER_CANCEL')}
