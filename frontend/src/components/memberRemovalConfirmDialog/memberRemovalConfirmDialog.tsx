@@ -58,7 +58,9 @@ const MemberRemovalConfirmDialog = ({
                     }
             </DialogTitle>
             <DialogContent>
-                <Typography>
+                <Typography
+                    maxWidth={400}
+                >
                     {ownUserLeaving
                         ? t('MEMBER_REMOVE_ITSELF_QUESTION')
                         : t('MEMBER_KICK_OUT_CONFIRM', {
