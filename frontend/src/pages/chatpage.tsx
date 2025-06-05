@@ -37,8 +37,8 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
 
     // Refs for scrolling and initial mount check
     const bottomRef = useRef<HTMLDivElement | null>(null);
+    const topMsgRef = useRef<HTMLDivElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const isInitialMount = useRef(true);
 
     const handleChatUpdate = (updatedChat: ChatDto) => {
         setChatInfo(updatedChat);
@@ -239,11 +239,14 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         (a, b) => new Date(a.sentDate).getTime() - new Date(b.sentDate).getTime()
     );
 
+    // Render messages with day labels
     const renderMessages = () => {
         const items: JSX.Element[] = [];
         let lastDate = "";
+        let firstMessageId: number | null = null;
 
         for (const msg of sortedMessages) {
+            if (!firstMessageId) firstMessageId = msg.id; // Store ID of first message
             const dayLabel = formatDay(msg.sentDate);
             if (dayLabel !== lastDate) {
                 items.push(
@@ -273,18 +276,23 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             }
 
             items.push(
-                <ChatMessageItem
-                    key={msg.id}
-                    id={msg.id}
-                    senderId={msg.senderId}
-                    senderUsername={msg.senderUsername}
-                    content={msg.content || ""}
-                    sentDate={msg.sentDate}
-                    isOwnMessage={msg.senderId === sessionUserId}
-                    type={msg.type}
-                    isDeleted={msg.isDeleted}
-                    chatType={onChatInfo.type}
-                />
+                <div 
+                    key={msg.id} 
+                    id={`msg_${msg.id}`} 
+                    ref={msg.id === firstMessageId ? topMsgRef : null}
+                >
+                    <ChatMessageItem
+                        id={msg.id}
+                        senderId={msg.senderId}
+                        senderUsername={msg.senderUsername}
+                        content={msg.content || ""}
+                        sentDate={msg.sentDate}
+                        isOwnMessage={msg.senderId === sessionUserId}
+                        type={msg.type}
+                        isDeleted={msg.isDeleted}
+                        chatType={onChatInfo.type}
+                    />
+                </div>
             );
         }
 
