@@ -57,6 +57,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({
                     sx={{
                         wordBreak: "break-word",
                         fontSize: type === 'system' ? "0.9rem" : "inherit",
+                        fontStyle: type === 'system' || isDeleted ? "italic" : "normal",
                     }}
                 >
                     {isDeleted ? t('CHAT_MESSAGE_DELETED') : content}
