@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Box, Dialog, DialogContent, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
 import GroupIcon from '@mui/icons-material/Group';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Add, Archive, Close, Edit, MoreVert, } from "@mui/icons-material";
+import { Add, Archive, Close, Edit, Logout, MoreVert, } from "@mui/icons-material";
 import { ChatDto } from "../../types/chat.dto";
 import { useState } from "react";
 import ManageMembersForm from "../manageMembersForm";
@@ -203,30 +203,86 @@ const ChatInfoModal = ({
                                 <List
                                     dense
                                 >
-                                    {currentMember && currentMember.role != 'member' &&  // Add members button won't appear if the user has member role
+                                    {currentMember && chat.type === 'group' &&
                                         <ListItem
-                                            onClick={() => setIsManagingMembers(true)}
-                                            aria-label={t('FORM_MEMBERS_ADD')}
                                             sx={{
-                                                cursor: 'pointer',
-                                                '&:hover': {
-                                                    textDecoration: 'underline',
-                                                    color: 'primary.main',
-                                                },
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                width: '100%',
                                             }}>
-                                            <ListItemAvatar>
-                                                <Avatar
+                                            {currentMember.role != "member" &&
+                                                <Box
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    width="50%"
+                                                    borderRadius={2}
+                                                    onClick={() => setIsManagingMembers(true)}
+                                                    aria-label={t('FORM_MEMBERS_ADD')}
                                                     sx={{
-                                                        bgcolor: 'primary.main',
-                                                        color: 'white',
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        cursor: 'pointer',
+                                                        '&:hover': {
+                                                            textDecoration: 'underline',
+                                                            color: 'primary.main',
+                                                        },
                                                     }}
                                                 >
-                                                    <Add />
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={t('FORM_MEMBERS_ADD')}
-                                            />
+                                                    <ListItemAvatar>
+                                                        <Avatar
+                                                            sx={{
+                                                                bgcolor: 'primary.main',
+                                                                color: 'white',
+                                                            }}
+                                                        >
+                                                            <Add />
+                                                        </Avatar>
+                                                    </ListItemAvatar>
+                                                    <ListItemText
+                                                        primary={t('FORM_MEMBERS_ADD')}
+                                                        sx={{
+                                                            textAlign: 'left',
+                                                        }}
+                                                    />
+                                                </Box>
+                                            }
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                width={currentMember.role != "member" ? "50%" : "100%"}
+                                                onClick={onClose}
+                                                aria-label={t('FORM_MEMBERS_ADD')}
+                                                sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    cursor: 'pointer',
+                                                    '&:hover': {
+                                                        textDecoration: 'underline',
+                                                        color: 'error.main',
+                                                    },
+                                                }}
+                                            >
+                                                <ListItemText
+                                                    primary={t('MEMBER_REMOVE_ITSELF')}
+                                                    sx={{
+                                                        textAlign: 'right',
+                                                    }}
+                                                />
+                                                <ListItemAvatar
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'flex-end',
+                                                    }}>
+                                                    <Avatar
+                                                        sx={{
+                                                            bgcolor: 'error.main',
+                                                            color: 'white',
+                                                        }}
+                                                    >
+                                                        <Logout />
+                                                    </Avatar>
+                                                </ListItemAvatar>
+                                            </Box>
                                         </ListItem>
                                     } {chat.members.map((member) => (
                                         <ListItem
