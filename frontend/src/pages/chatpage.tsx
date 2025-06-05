@@ -26,14 +26,14 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const { t } = useTranslation();
     const socket = useSocket();
     const [messages, setMessages] = useState<MessageDto[]>([]);
-    const [page, setPage] = useState(1);
+    const pageRef = useRef(0);
     const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [infoOpen, setInfoOpen] = useState(false);
     const [selectedChat, setSelectedChat] = useState<ChatDto | null>(null);
     const [chatInfo, setChatInfo] = useState<ChatDto>(onChatInfo);
+    const fetchingRef = useRef(false);
 
     // Refs for scrolling and initial mount check
     const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -56,49 +56,55 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     };
 
     // Fetch Messages by page
-    const fetchMessages = useCallback(async (page: number) => {
-        if (!hasMore) return;
+    const fetchMessages = useCallback(async () => {
+        if (!hasMore || fetchingRef.current) return;
 
-        setLoading(true);
+        fetchingRef.current = true;
 
         const container = scrollContainerRef.current;
         const prevTopMessage = topMsgRef.current;
-        const prevScrollHeight = container?.scrollHeight ?? 0;
         const prevTopOffset = prevTopMessage?.offsetTop ?? 0;
 
-        const res = await api.get<PaginatedMessages>(
-            `/message/from/${chatId}?page=${page}`
-        );
+        try {
+            const nextPage = pageRef.current + 1;
 
-        const newMessages = res.data.messages;
+            const res = await api.get<PaginatedMessages>(`/message/from/${chatId}?page=${nextPage}`);
+            const newMessages = res.data.messages;
 
-        // Avoid duplicated messages by filtering existing ones
-        setMessages((prev) => {
-            const existingIds = new Set(prev.map(msg => msg.id));
-            const filterNewMssgs = newMessages.filter(msg => !existingIds.has(msg.id));
-            return [...filterNewMssgs, ...prev];
-        });
+            setMessages((prev) => {
+                const existingIds = new Set(prev.map(msg => msg.id));
+                const filterNewMssgs = newMessages.filter(msg => !existingIds.has(msg.id));
+                return [...filterNewMssgs, ...prev];
+            });
 
-        setHasMore(res.data.hasMore);
-        setLoading(false);
+            if (!res.data.hasMore) setHasMore(false);
 
-        // Restore scroll position after fetching new messages (wait 1 frame to ensure render is done)
-        requestAnimationFrame(() => {
-            if (container && prevTopMessage) {
-                const newScrollHeight = container.scrollHeight;
-                const newTopOffset = prevTopMessage.offsetTop;
-                const diff = newTopOffset - prevTopOffset;
-                container.scrollTop += diff;
-            }
-        });
+            pageRef.current = nextPage; // Update page reference
+        } catch (err) {
+            console.error(`Failed to fetch messages from chat_${chatId}:`, err);
+        } finally {
+            fetchingRef.current = false;
+
+            // Restore scroll position after fetching new messages (wait 1 frame to ensure render is done)
+            requestAnimationFrame(() => {
+                if (container && prevTopMessage) {
+                    const newTopOffset = prevTopMessage.offsetTop;
+                    const diff = newTopOffset - prevTopOffset;
+                    container.scrollTop += diff;
+                }
+            });
+        }
     }, [chatId, hasMore]);
 
     // Initial fetch
     useEffect(() => {
-        fetchMessages(page);
-    }, [fetchMessages]);
+        pageRef.current = 0; // Reset page on new chat
+        setMessages([]); // Clear previous messages
+        setHasMore(true); // Reset hasMore
+        fetchMessages();
+    }, [chatId]);
 
-    // WebSocket listener for incoming messages
+    // WebSocket listeners for incoming messages and chat updates
     useEffect(() => {
         if (!socket) return;
 
@@ -148,31 +154,26 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     }, [chatId, socket]);
 
     // Scroll listener for infinite scroll up
-    const handleScroll = () => {
-        if (
-            scrollContainerRef.current &&
-            scrollContainerRef.current.scrollTop < 10 &&
-            hasMore &&
-            !loading
-        ) {
-            setPage((prev) => {
-                const nextPage = prev + 1;
-                fetchMessages(nextPage);
-                return nextPage;
-            });
-        }
-    };
-
-    // Scroll to bottom on new messages
     useEffect(() => {
         const container = scrollContainerRef.current;
+        if (!container) return;
 
-        if (container) container.addEventListener("scroll", handleScroll);
+        const handleScroll = () => {
+            if (
+                container.scrollTop < 10 &&
+                hasMore &&
+                !fetchingRef.current
+            ) {
+                fetchMessages();
+            }
+        };
+
+        container.addEventListener("scroll", handleScroll);
 
         return () => {
             if (container) container.removeEventListener("scroll", handleScroll);
         };
-    }, [handleScroll]);
+    }, [fetchMessages, hasMore]);
 
     // Scroll to the bottom on initial mount
     useEffect(() => {
@@ -298,7 +299,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             }
 
             items.push(
-                <div
+                <article
                     key={msg.id}
                     id={`msg_${msg.id}`}
                     ref={msg.id === firstMessageId ? topMsgRef : null}
@@ -314,7 +315,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                         isDeleted={msg.isDeleted}
                         chatType={onChatInfo.type}
                     />
-                </div>
+                </article>
             );
         }
 
@@ -336,12 +337,27 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                 display="flex"
                 flexDirection="column"
             >
-                {renderMessages()}
-                {loading && (
-                    <Box textAlign="center" my={2}>
-                        <CircularProgress size={20} />
+                {hasMore && fetchingRef.current === true && (
+                    <Box
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        my={2}
+                    >
+                        <CircularProgress
+                            size={24}
+                        />
+                        <Typography
+                            variant="body2"
+                            mt={1}
+                            color="text.secondary"
+                            textAlign="center"
+                        >
+                            {t('GENERIC_MSG_LOADING')}
+                        </Typography>
                     </Box>
                 )}
+                {renderMessages()}
                 <div ref={bottomRef} />
             </Box>
             <Box
