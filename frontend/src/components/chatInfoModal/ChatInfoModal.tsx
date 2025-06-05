@@ -2,10 +2,11 @@ import { useTranslation } from "react-i18next";
 import { Avatar, Box, Dialog, DialogContent, IconButton, List, ListItem, ListItemAvatar, ListItemText, Tooltip, Typography } from "@mui/material";
 import GroupIcon from '@mui/icons-material/Group';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Add, Archive, Close, Edit, } from "@mui/icons-material";
+import { Add, Archive, Close, Edit, MoreVert, } from "@mui/icons-material";
 import { ChatDto } from "../../types/chat.dto";
 import { useState } from "react";
 import ManageMembersForm from "../manageMembersForm";
+import { Menu, MenuItem } from '@mui/material';
 
 interface Props {
     open: boolean;
@@ -26,9 +27,21 @@ const ChatInfoModal = ({
     const initial = chat.name.charAt(0).toUpperCase();
     const [isManagingMembers, setIsManagingMembers] = useState(false);
     const [isEditingChat, setIsEditingChat] = useState(false);
-
     const otherMember = chat.type === 'private' ? chat.members.find(m => m.id !== sessionUserId) : null;
     const currentMember = chat.type === 'group' ? chat.members.find(m => m.id === sessionUserId) : null;
+
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+
+    const handleMenuEditMemberOpen = (event: React.MouseEvent<HTMLElement>, memberId: number) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedMemberId(memberId);
+    };
+
+    const handleMenuEditMemberClose = () => {
+        setAnchorEl(null);
+        setSelectedMemberId(null);
+    };
 
     return (
         <Dialog
@@ -226,22 +239,9 @@ const ChatInfoModal = ({
                                             </ListItemAvatar>
                                             <ListItemText
                                                 primary={
-                                                    <Box
-                                                        display="flex"
-                                                        justifyContent="space-between"
-                                                    >
+                                                    <Box>
                                                         <Typography>
                                                             {member.username} {currentMember?.id === member.id ? `(${t('YOU')})` : ''}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="caption"
-                                                        >
-                                                            {
-                                                                member.role === 'owner' ? t('MEMBER_ROLE_OWNER') :
-                                                                    member.role === 'admin' ? t('MEMBER_ROLE_ADMIN') :
-                                                                        member.role === 'member' ? t('MEMBER_ROLE_MEMBER') :
-                                                                            member.role
-                                                            }
                                                         </Typography>
                                                     </Box>
                                                 }
@@ -249,8 +249,66 @@ const ChatInfoModal = ({
                                                     date: new Date(member.joinDate).toLocaleDateString(),
                                                 })}
                                             />
+                                            <Typography
+                                                variant="caption"
+                                                color="textSecondary"
+                                                sx={{
+                                                    marginRight: 2
+                                                }}
+                                            >
+                                                {
+                                                    member.role === 'owner' ? t('MEMBER_ROLE_OWNER') :
+                                                        member.role === 'admin' ? t('MEMBER_ROLE_ADMIN') :
+                                                            member.role === 'member' ? t('MEMBER_ROLE_MEMBER') :
+                                                                member.role
+                                                }
+                                            </Typography>
+                                            {currentMember && currentMember.role != 'member' ?
+                                                <IconButton
+                                                    onClick={(e) => handleMenuEditMemberOpen(e, member.id)}
+                                                >
+                                                    <MoreVert />
+                                                </IconButton>
+                                                : null
+                                            }
                                         </ListItem>
                                     ))}
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={Boolean(anchorEl)}
+                                        onClose={handleMenuEditMemberClose}
+                                    >
+                                        <MenuItem
+                                            disabled={!!(() => {
+                                                const member = chat.members.find(m => m.id === selectedMemberId);
+                                                // Disable IF
+                                                return (
+                                                    member && member.role === 'owner' ||   // The member to edit the is owner
+                                                    currentMember && member && currentMember.id === member.id // The current member is the same as the member to edit
+                                                );
+                                            })()}
+                                            onClick={() => {
+                                                handleMenuEditMemberClose();
+                                            }}
+                                        >
+                                            {t('MEMBER_EDIT_ROLE_LABEL')}
+                                        </MenuItem>
+                                        <MenuItem
+                                            disabled={!!(() => {
+                                                const member = chat.members.find(m => m.id === selectedMemberId);
+                                                // Disable IF
+                                                return (
+                                                    member && member.role === 'owner' && currentMember && currentMember.id != member.id   // The member to kick out is the owner
+                                                );
+                                            })()}
+                                            onClick={() => {
+                                                handleMenuEditMemberClose();
+                                            }}
+                                            sx={{ color: 'error.main' }}
+                                        >
+                                            {currentMember && currentMember.id === selectedMemberId ? t('MEMBER_REMOVE_ITSELF') : t('MEMBER_KICK_OUT')}
+                                        </MenuItem>
+                                    </Menu>
                                 </List>
                                 <Box
                                     display="flex"
