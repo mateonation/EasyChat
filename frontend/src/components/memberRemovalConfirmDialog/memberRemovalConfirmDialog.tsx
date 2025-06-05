@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { useSocket } from "../../contexts/SocketContext";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -24,10 +25,19 @@ const MemberRemovalConfirmDialog = ({
 }: Props) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const socket = useSocket();
 
     const handleConfirm = async () => {
-        if (!memberId) return;
+        if (!memberId || !chatId || !socket) return;
         try {
+            // If user is leaving the chat, leave chat via socket and clear chatId from localStorage
+            if (ownUserLeaving) {
+                socket.emit("leaveChat", chatId);
+                const chatIdInLocalStorage = localStorage.getItem('chatId');
+                if(chatIdInLocalStorage && parseInt(chatIdInLocalStorage) === chatId) localStorage.removeItem('chatId');
+            };
+
+            // Send request to remove member from chat
             const res = await api.delete(`/chats/${chatId}/member`, {
                 data: {
                     rmId: memberId,
@@ -35,10 +45,9 @@ const MemberRemovalConfirmDialog = ({
             });
 
             console.log(res.data.message);
+
             // If user is leaving the chat, redirect to chats list
-            if (ownUserLeaving) {
-                navigate(`${BASE}/chats`);
-            }
+            if (ownUserLeaving) navigate(`${BASE}/chats`);
         } catch (error) {
             console.error('Error removing member:', error);
         } finally {
