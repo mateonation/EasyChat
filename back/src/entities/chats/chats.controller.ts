@@ -614,6 +614,13 @@ export class ChatsController {
 
             // Trim name and description
             dto.name = dto.name.trim();
+            dto.description = dto.description.trim();
+
+            // If name is too long, throw a bad request exception
+            if(dto.name.length > 50) throw new BadRequestException('Name too long (max 50 characters)');
+
+            // If description is too long, throw a bad request exception
+            if(dto.description.length > 500) throw new BadRequestException('Description too long (max 500 characters)');
 
             if(dto.clearDescription) {
                 dto.description = '';
