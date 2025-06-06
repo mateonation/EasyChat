@@ -72,18 +72,18 @@ export class ChatsController {
             if (!req.session.user?.id) return;
             const reqId = req.session.user.id
 
+            // Check if the chat exists
+            const chat = await this.chatsService.findById(chatId, reqId);
+            if (!chat) throw new NotFoundException(`Chat with ID 4 does not exist`);
+
             // Check if the requester is a member of the chat
             const member = await this.membersService.findChatMember(reqId, chatId);
             if (!member) throw new ForbiddenException('You are not a member of this chat');
 
-            // Check if the chat exists
-            const chat = await this.chatsService.findById(chatId, reqId);
-            if (!chat) throw new NotFoundException(`Chat with ID ${chatId} not found`);
-
             // Return chat with it's members
             return res.status(200).json(chat);
         } catch (error) {
-            if (error instanceof NotFoundException) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException) {
                 return res.status(error.getStatus()).json(error.getResponse());
             }
             // If error is not handled by service, return 500
