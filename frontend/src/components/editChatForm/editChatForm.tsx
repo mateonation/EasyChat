@@ -18,14 +18,16 @@ const EditChatForm = ({ chat, onClose, onChatUpdate }: Props) => {
     const [clearDescription, setClearDescription] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const hasChanges =
-        name !== chat.name ||
-        (description !== chat.description && !clearDescription) ||
-        clearDescription;
+    const nameChanged = name.trim() !== chat.name;
+    const descriptionChanged = description.trim() !== chat.description;
+    const shouldClearDescription = clearDescription && chat.description.trim() !== "";
+
+    const hasChanges = nameChanged || descriptionChanged || shouldClearDescription;
 
     const submitDisabled =
         loading ||
-        (!hasChanges || (name.trim() === "" && description.trim() === "" && !clearDescription));
+        !hasChanges ||
+        (description.trim() === "" && !clearDescription); // Don't allow empty description unless clearDescription is checked
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,7 +71,6 @@ const EditChatForm = ({ chat, onClose, onChatUpdate }: Props) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 fullWidth
-                required
                 slotProps={{ 
                     htmlInput: { 
                         maxLength: 50, // Limit name of group to a maximum of 30 characters
@@ -113,7 +114,7 @@ const EditChatForm = ({ chat, onClose, onChatUpdate }: Props) => {
                         mt: 2,
                     }}
                 >
-                    {t("FORM_MEMBERS_ADD")}
+                    {t("GENERIC_ANSWER_SAVE")}
                 </Button>
             </DialogActions>
         </Box>
