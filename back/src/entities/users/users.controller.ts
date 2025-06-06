@@ -33,6 +33,10 @@ export class UsersController {
             if (saveUserDto.username.length < 3) throw new BadRequestException('Username not long enough (min 3 characters)');
             if (saveUserDto.username.length > 20) throw new BadRequestException('Username too long (max 20 characters)');
 
+            // trim first name and last name (if not provided, set it to an empty string)
+            saveUserDto.firstName = saveUserDto.firstName.trim();
+            saveUserDto.lastName = saveUserDto.lastName?.trim() || '';
+
             // If first name contains invalid characters, throw an error
             if (!textRegexAlt.test(saveUserDto.firstName)) throw new BadRequestException('Invalid characters in first name');
 
