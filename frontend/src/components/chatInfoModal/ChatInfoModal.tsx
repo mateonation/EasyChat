@@ -10,6 +10,7 @@ import { Menu, MenuItem } from '@mui/material';
 import MemberRemovalConfirmDialog from "../memberRemovalConfirmDialog";
 import EditChatForm from "../editChatForm";
 import MemberEditRoleDialog from "../memberEditRoleDialog";
+import { MemberDto } from "../../types/member.dto";
 
 interface Props {
     open: boolean;
@@ -34,10 +35,8 @@ const ChatInfoModal = ({
     const currentMember = chat.type === 'group' ? chat.members.find(m => m.id === sessionUserId) : null;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedMemberSubmenu, setSelectedMemberSubMenu] = useState<MemberDto | null>(null);
     const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
-    const [selectedMemberUsernameSubMenu, setSelectedMemberUsernameSubMenu] = useState<string>('');
-    const [selectedMemberIdSubMenu, setSelectedMemberIdSubMenu] = useState<number | null>(null);
-    const [selectedMemberRoleSubMenu, setSelectedMemberRoleSubMenu] = useState<string | null>(null);
     const [selectedOwnUser, setSelectedOwnUser] = useState<boolean>(false);
     const [confirmKickOpen, setConfirmKickOpen] = useState(false);
     const [editRoleOpen, setEditRoleOpen] = useState(false);
@@ -270,7 +269,7 @@ const ChatInfoModal = ({
                                                     alignItems="center"
                                                     width={currentMember.role != "member" ? "50%" : "100%"}
                                                     onClick={() => {
-                                                        setSelectedMemberIdSubMenu(currentMember.id);
+                                                        setSelectedMemberSubMenu(currentMember);
                                                         setConfirmKickOpen(true);
                                                         setSelectedOwnUser(true);
                                                     }}
@@ -368,9 +367,7 @@ const ChatInfoModal = ({
                                                     );
                                                 })()}
                                                 onClick={() => {
-                                                    setSelectedMemberIdSubMenu(selectedMemberId);
-                                                    setSelectedMemberUsernameSubMenu(chat.members.find(m => m.id === selectedMemberId)?.username ?? '');
-                                                    setSelectedMemberRoleSubMenu(chat.members.find(m => m.id === selectedMemberId)?.role ?? '');
+                                                    setSelectedMemberSubMenu(chat.members.find(m => m.id === selectedMemberId) ?? null);
                                                     setEditRoleOpen(true);
                                                     handleMenuEditMemberClose();
                                                 }}
@@ -386,8 +383,7 @@ const ChatInfoModal = ({
                                                     );
                                                 })()}
                                                 onClick={() => {
-                                                    setSelectedMemberIdSubMenu(selectedMemberId);
-                                                    setSelectedMemberUsernameSubMenu(chat.members.find(m => m.id === selectedMemberId)?.username ?? '');
+                                                    setSelectedMemberSubMenu(chat.members.find(m => m.id === selectedMemberId) ?? null);
                                                     setConfirmKickOpen(true);
                                                     setSelectedOwnUser(currentMember?.id === selectedMemberId);
                                                     handleMenuEditMemberClose();
@@ -437,16 +433,13 @@ const ChatInfoModal = ({
                 onClose={() => setConfirmKickOpen(false)}
                 ownUserLeaving={selectedOwnUser}
                 chatId={chat.id}
-                memberId={selectedMemberIdSubMenu ?? 0}
-                memberUsername={selectedMemberUsernameSubMenu}
+                member={selectedMemberSubmenu}
             />
             <MemberEditRoleDialog
                 open={editRoleOpen}
                 onClose={() => setEditRoleOpen(false)}
                 chatId={chat.id}
-                memberId={selectedMemberIdSubMenu ?? 0}
-                memberUsername={selectedMemberUsernameSubMenu}
-                memberRole={selectedMemberRoleSubMenu ?? ''}
+                member={selectedMemberSubmenu}
             />
         </>
     );
