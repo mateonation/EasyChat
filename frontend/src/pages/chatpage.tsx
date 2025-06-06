@@ -9,6 +9,7 @@ import { useSocket } from "../contexts/SocketContext";
 import { ChatDto } from "../types/chat.dto";
 import ChatHeader from "../components/chatHeader";
 import ChatInfoModal from "../components/chatInfoModal";
+import ModalKickedOut from "../components/modalKickedOut";
 
 interface PaginatedMessages {
     messages: MessageDto[];
@@ -33,6 +34,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const [infoOpen, setInfoOpen] = useState(false);
     const [selectedChat, setSelectedChat] = useState<ChatDto | null>(null);
     const [chatInfo, setChatInfo] = useState<ChatDto>(onChatInfo);
+    const [isKickedOutFromChat, setIsKickedOutFromChat] = useState(false);
     const fetchingRef = useRef(false);
 
     // Refs for scrolling and initial mount check
@@ -128,6 +130,17 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         };
 
         const handleChatModifications = (updatedChat: ChatDto) => {
+            if (updatedChat.id !== chatId) return;
+
+            // Check if the user is still a member of the chat
+            const stillAMember = updatedChat.members.some(m => m.id === sessionUserId);
+            
+            // If not, set the state to indicate kicking out of the chat and leave the chat web socket
+            if (!stillAMember) {
+                socket.emit('leaveChat', chatId);
+                setIsKickedOutFromChat(true);
+                return;
+            }
             setChatInfo(updatedChat);
             setSelectedChat(updatedChat);
         };
@@ -391,6 +404,10 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                     sessionUserId={sessionUserId}
                 />
             )}
+            <ModalKickedOut 
+                open={isKickedOutFromChat}
+                chatName={chatInfo.name}
+            />
         </>
     );
 };
