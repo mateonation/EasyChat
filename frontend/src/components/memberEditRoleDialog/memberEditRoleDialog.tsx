@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../../api/axios";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Typography } from "@mui/material";
 import { t } from "i18next";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
     chatId: number;
     memberId: number;
     memberUsername: string;
-    memberRole: 'member' | 'admin';
+    memberRole: string;
 }
 const selectableRoles = [
     { value: 'member', label: t('MEMBER_ROLE_MEMBER') },
@@ -26,25 +26,26 @@ const MemberEditRoleDialog = ({
     memberRole,
 }: Props) => {
     const { t } = useTranslation();
-    const [role, setRole] = useState<'member' | 'admin'>('member');
+    const [role, setRole] = useState<string>('member');
     const [loading, setLoading] = useState(false);
-
+    const [error, setError] = useState<string | null>(null);
 
     const handleEditRole = async () => {
         if (loading || !memberId || !chatId) return;
 
+        setError(null); // Reset error state
         setLoading(true);
         try {
             // Assuming there's an API endpoint to edit member role
-            const res = await api.patch(`/chats/${chatId}/member/role/role`, {
+            const res = await api.patch(`/chats/${chatId}/member/role`, {
+                editId: memberId,
                 role
             });
             console.log(res.data.message);
             onClose(); // Close modal after successful update
         } catch (error) {
             console.error("Failed to edit member role:", error);
-            alert(t("MEMBER_EDIT_ROLE_ERROR"));
-            onClose();
+            setError(t("MEMBER_EDIT_ROLE_ERROR"));
         } finally {
             setLoading(false);
         }
@@ -60,13 +61,23 @@ const MemberEditRoleDialog = ({
                     username: memberUsername,
                 })}
             </DialogTitle>
-            <DialogContent>
+            <DialogContent
+                sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
                 <Select
+                    size="small"
                     value={role}
-                    onChange={(e) => setRole(e.target.value as 'member' | 'admin')}
-                    fullWidth
-                    disabled={loading || role === memberRole}
+                    onChange={(e) => setRole(e.target.value)}
+                    disabled={loading}
                     variant="outlined"
+                    aria-label={t('MEMBER_EDIT_ROLE_PLACEHOLDER', {
+                        username: memberUsername,
+                    })}
+                    error={!!error}
                 >
                     {selectableRoles.map((role) => (
                         <MenuItem
@@ -79,6 +90,15 @@ const MemberEditRoleDialog = ({
                         </MenuItem>
                     ))}
                 </Select>
+                {error && 
+                    <Typography
+                        color="error"
+                        variant="body2"
+                        mt={1}
+                    >
+                        {error}
+                    </Typography>
+                }
             </DialogContent>
             <DialogActions>
                 <Button
