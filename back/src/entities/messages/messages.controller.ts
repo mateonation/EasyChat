@@ -62,7 +62,7 @@ export class MessagesController {
     }
 
     // Remove message
-    @Delete(':msgId/rm')
+    @Delete(':msgId')
     @Roles('user')
     async deleteMessage(
         @Param('msgId') messageId: number,
