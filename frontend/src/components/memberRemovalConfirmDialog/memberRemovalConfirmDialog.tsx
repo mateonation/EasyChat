@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { useSocket } from "../../contexts/SocketContext";
+import { MemberDto } from "../../types/member.dto";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -11,8 +12,7 @@ interface Props {
     onClose: () => void;
     ownUserLeaving: boolean;
     chatId: number;
-    memberId: number;
-    memberUsername: string;
+    member: MemberDto | null;
 }
 
 const MemberRemovalConfirmDialog = ({
@@ -20,15 +20,14 @@ const MemberRemovalConfirmDialog = ({
     onClose,
     ownUserLeaving,
     chatId,
-    memberId,
-    memberUsername,
+    member,
 }: Props) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const socket = useSocket();
 
     const handleConfirm = async () => {
-        if (!memberId || !chatId || !socket) return;
+        if (!member || !chatId || !socket) return;
         try {
             // If user is leaving the chat, leave chat via socket and clear chatId from localStorage
             if (ownUserLeaving) {
@@ -40,7 +39,7 @@ const MemberRemovalConfirmDialog = ({
             // Send request to remove member from chat
             const res = await api.delete(`/chats/${chatId}/member`, {
                 data: {
-                    rmId: memberId,
+                    rmId: member.id,
                 },
             });
 
@@ -73,7 +72,7 @@ const MemberRemovalConfirmDialog = ({
                     {ownUserLeaving
                         ? t('MEMBER_REMOVE_ITSELF_QUESTION')
                         : t('MEMBER_KICK_OUT_CONFIRM', {
-                            username: memberUsername
+                            username: member ? member.username : t('GENERIC_MSG_NOT_FOUND'),
                         })
                     }
                 </Typography>

@@ -3,14 +3,13 @@ import { useTranslation } from "react-i18next";
 import api from "../../api/axios";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Typography } from "@mui/material";
 import { t } from "i18next";
+import { MemberDto } from "../../types/member.dto";
 
 interface Props {
     open: boolean;
     onClose: () => void;
     chatId: number;
-    memberId: number;
-    memberUsername: string;
-    memberRole: string;
+    member: MemberDto | null;
 }
 const selectableRoles = [
     { value: 'member', label: t('MEMBER_ROLE_MEMBER') },
@@ -21,9 +20,7 @@ const MemberEditRoleDialog = ({
     open,
     onClose,
     chatId,
-    memberId,
-    memberUsername,
-    memberRole,
+    member,
 }: Props) => {
     const { t } = useTranslation();
     const [role, setRole] = useState<string>('member');
@@ -31,14 +28,14 @@ const MemberEditRoleDialog = ({
     const [error, setError] = useState<string | null>(null);
 
     const handleEditRole = async () => {
-        if (loading || !memberId || !chatId) return;
+        if (loading || !member || !chatId) return;
 
         setError(null); // Reset error state
         setLoading(true);
         try {
             // Assuming there's an API endpoint to edit member role
             const res = await api.patch(`/chats/${chatId}/member/role`, {
-                editId: memberId,
+                editId: member.id,
                 role
             });
             console.log(res.data.message);
@@ -58,7 +55,7 @@ const MemberEditRoleDialog = ({
         >
             <DialogTitle>
                 {t('MEMBER_EDIT_ROLE_PLACEHOLDER', {
-                    username: memberUsername,
+                    username: member ? member.username : t('GENERIC_MSG_NOT_FOUND'),
                 })}
             </DialogTitle>
             <DialogContent
@@ -75,7 +72,7 @@ const MemberEditRoleDialog = ({
                     disabled={loading}
                     variant="outlined"
                     aria-label={t('MEMBER_EDIT_ROLE_PLACEHOLDER', {
-                        username: memberUsername,
+                        username: member ? member.username : t('GENERIC_MSG_NOT_FOUND'),
                     })}
                     error={!!error}
                 >
@@ -112,7 +109,7 @@ const MemberEditRoleDialog = ({
                     onClick={handleEditRole}
                     color="primary"
                     variant="contained"
-                    disabled={loading || role === memberRole}
+                    disabled={loading || member ? role === member?.role : true}
                 >
                     {t('GENERIC_ANSWER_CONFIRM')}
                 </Button>
