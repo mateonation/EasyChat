@@ -638,9 +638,6 @@ export class ChatsController {
             // Send system message to the group chat based on the properties changed and save it to be sent to the client
             let sysmsg;
 
-            console.log('chat before', chatToEdit);
-            console.log('chat after', chatUpdated);
-
             // Both name and description were changed
             if (
                 chatUpdated.name != chatToEdit.name && 
@@ -726,11 +723,8 @@ export class ChatsController {
             // Emit chat update through chat gateway
             this.chatGateway.emitChatUpdate(updatedChat);
 
-            // Return success message with system message
-            return res.status(200).json({
-                statusCode: 200,
-                message: 'Group chat updated successfully',
-            });
+            // Return chat updated to the client
+            return res.status(200).json(updatedChat);
         } catch (error) {
             if (error instanceof ForbiddenException || error instanceof BadRequestException || error instanceof ConflictException) {
                 return res.status(error.getStatus()).json(error.getResponse());
