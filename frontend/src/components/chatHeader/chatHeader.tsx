@@ -1,6 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import GroupIcon from '@mui/icons-material/Group';
-import { Avatar, Box, IconButton, Typography } from "@mui/material";
+import { Avatar, Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ChatDto } from "../../types/chat.dto";
@@ -32,13 +32,17 @@ const ChatHeader = ({ chat, onClick }: Props) => {
                 borderColor: 'divider',
             }}
         >
-            <IconButton
-                edge="start"
-                onClick={() => navigate(`${BASE}/chats`, { replace: true })}
-                aria-label={t('BACK')}
+            <Tooltip
+                title={t('GENERIC_ANSWER_BACK')}
             >
-                <ArrowBack />
-            </IconButton>
+                <IconButton
+                    edge="start"
+                    onClick={() => navigate(`${BASE}/chats`, { replace: true })}
+                    aria-label={t('BACK')}
+                >
+                    <ArrowBack />
+                </IconButton>
+            </Tooltip>
             <Box
                 position="absolute"
                 left="50%"
