@@ -9,6 +9,7 @@ import ManageMembersForm from "../manageMembersForm";
 import { Menu, MenuItem } from '@mui/material';
 import MemberRemovalConfirmDialog from "../memberRemovalConfirmDialog";
 import EditChatForm from "../editChatForm";
+import MemberEditRoleDialog from "../memberEditRoleDialog";
 
 interface Props {
     open: boolean;
@@ -36,8 +37,10 @@ const ChatInfoModal = ({
     const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
     const [selectedMemberUsernameSubMenu, setSelectedMemberUsernameSubMenu] = useState<string>('');
     const [selectedMemberIdSubMenu, setSelectedMemberIdSubMenu] = useState<number | null>(null);
+    const [selectedMemberRoleSubMenu, setSelectedMemberRoleSubMenu] = useState<string | null>(null);
     const [selectedOwnUser, setSelectedOwnUser] = useState<boolean>(false);
     const [confirmKickOpen, setConfirmKickOpen] = useState(false);
+    const [editRoleOpen, setEditRoleOpen] = useState(false);
 
     const handleMenuEditMemberOpen = (event: React.MouseEvent<HTMLElement>, memberId: number) => {
         setAnchorEl(event.currentTarget);
@@ -365,6 +368,10 @@ const ChatInfoModal = ({
                                                     );
                                                 })()}
                                                 onClick={() => {
+                                                    setSelectedMemberIdSubMenu(selectedMemberId);
+                                                    setSelectedMemberUsernameSubMenu(chat.members.find(m => m.id === selectedMemberId)?.username ?? '');
+                                                    setSelectedMemberRoleSubMenu(chat.members.find(m => m.id === selectedMemberId)?.role ?? '');
+                                                    setEditRoleOpen(true);
                                                     handleMenuEditMemberClose();
                                                 }}
                                             >
@@ -432,6 +439,14 @@ const ChatInfoModal = ({
                 chatId={chat.id}
                 memberId={selectedMemberIdSubMenu ?? 0}
                 memberUsername={selectedMemberUsernameSubMenu}
+            />
+            <MemberEditRoleDialog
+                open={editRoleOpen}
+                onClose={() => setEditRoleOpen(false)}
+                chatId={chat.id}
+                memberId={selectedMemberIdSubMenu ?? 0}
+                memberUsername={selectedMemberUsernameSubMenu}
+                memberRole={selectedMemberRoleSubMenu ?? ''}
             />
         </>
     );
