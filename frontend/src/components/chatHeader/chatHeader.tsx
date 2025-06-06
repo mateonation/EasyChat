@@ -65,7 +65,7 @@ const ChatHeader = ({ chat, onClick }: Props) => {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
-                        maxWidth: '200px',
+                        maxWidth: 'lg',
                     }}
                 >
                     {chat.name}
