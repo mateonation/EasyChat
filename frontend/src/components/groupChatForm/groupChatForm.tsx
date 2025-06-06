@@ -90,6 +90,11 @@ export default function GroupChatForm({ onClose, onChatCreated }: Props) {
                         onChange={(e) => setName(e.target.value)}
                         fullWidth
                         required
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 50, // Limit name of group to a maximum of 30 characters
+                            } 
+                        }} 
                     />
                     <TextField
                         label={t('FORM_DESCRIPTION_LABEL')}
@@ -98,13 +103,15 @@ export default function GroupChatForm({ onClose, onChatCreated }: Props) {
                         onChange={(e) => setDescription(e.target.value)}
                         fullWidth
                         multiline
-                        rows={2}
+                        rows={8}
                         sx={{
                             my: 2,
-                            input: {
-                                maxLength: 255
-                            }
                         }}
+                        slotProps={{ 
+                            htmlInput: { 
+                                maxLength: 500, // Limit description of the group to a maximum of 500 characters
+                            } 
+                        }} 
                     />
 
                     <Typography
