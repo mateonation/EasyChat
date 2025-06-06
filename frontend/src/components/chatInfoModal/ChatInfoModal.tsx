@@ -8,6 +8,7 @@ import { useState } from "react";
 import ManageMembersForm from "../manageMembersForm";
 import { Menu, MenuItem } from '@mui/material';
 import MemberRemovalConfirmDialog from "../memberRemovalConfirmDialog";
+import EditChatForm from "../editChatForm";
 
 interface Props {
     open: boolean;
@@ -167,7 +168,11 @@ const ChatInfoModal = ({
                             onChatUpdate={onChatUpdate}
                         />
                     ) : isEditingChat ? (
-                        null // Placeholder
+                        <EditChatForm
+                            chat={chat}
+                            onClose={onClose}
+                            onChatUpdate={onChatUpdate}
+                        />
                     ) : (
                         <>
                             <>
