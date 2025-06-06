@@ -170,28 +170,33 @@ const ChatInfoModal = ({
                         null // Placeholder
                     ) : (
                         <>
-                            {chat.description &&
-                                <>
-                                    <Typography
-                                        variant="subtitle1"
-                                    >
-                                        {
-                                            chat.type === 'group' ?
-                                                t('FORM_GROUP_DESCRIPTION_LABEL') :
-                                                t('FORM_DESCRIPTION_LABEL')
-                                        }
-                                    </Typography>
-                                    <Typography
-                                        component="p"
-                                        variant="body2"
-                                        color="textSecondary"
-                                        textAlign="justify"
-                                        minHeight={200} // Ensures a minimum height for the description box
-                                    >
-                                        {chat.description}
-                                    </Typography>
-                                </>
-                            }
+                            <>
+                                <Typography
+                                    variant="subtitle1"
+                                >
+                                    {
+                                        chat.type === 'group' ?
+                                            t('FORM_GROUP_DESCRIPTION_LABEL') :
+                                            t('FORM_DESCRIPTION_LABEL')
+                                    }
+                                </Typography>
+                                <Typography
+                                    component="p"
+                                    variant="body2"
+                                    color="textSecondary"
+                                    textAlign="justify"
+                                    fontStyle={chat.description ? 'normal' : 'italic'}
+                                    whiteSpace={'pre-wrap'} // Preserves whitespace and line breaks
+                                    minHeight={100} // Ensures a minimum height for the description box
+                                    mb={2} // Margin bottom for spacing
+                                    sx={{
+                                        wordBreak: 'break-word', // Ensures long words break correctly
+                                        overflowWrap: 'break-word', // Ensures long words break correctly
+                                    }}
+                                >
+                                    {chat.description || t('DESCRIPTION_ISEMPTY')}
+                                </Typography>
+                            </>
                             {chat.type === "group" ? (
                                 <>
                                     <Box
