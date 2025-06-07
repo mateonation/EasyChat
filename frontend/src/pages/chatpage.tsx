@@ -10,6 +10,7 @@ import { ChatDto } from "../types/chat.dto";
 import ChatHeader from "../components/chatHeader";
 import ChatInfoModal from "../components/chatInfoModal";
 import ModalKickedOut from "../components/modalKickedOut";
+import DeleteMessageConfirmModal from "../components/deleteMessageConfirmModal";
 
 interface PaginatedMessages {
     messages: MessageDto[];
@@ -35,6 +36,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
     const [selectedChat, setSelectedChat] = useState<ChatDto | null>(null);
     const [chatInfo, setChatInfo] = useState<ChatDto>(onChatInfo);
     const [isKickedOutFromChat, setIsKickedOutFromChat] = useState(false);
+    const [msgId, setMsgId] = useState<number | null>(null);
     const fetchingRef = useRef(false);
 
     // Refs for scrolling and initial mount check
@@ -129,6 +131,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             }
         };
 
+        // Handle chat updates from the server
         const handleChatModifications = (updatedChat: ChatDto) => {
             if (updatedChat.id !== chatId) return;
 
@@ -145,11 +148,26 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             setSelectedChat(updatedChat);
         };
 
+        // Handle incoming message deletion from the server
+        const handleIncomingDelete = (messageId: number) => {
+            setMessages(prev =>
+                prev.map(msg =>
+                    msg.id === messageId ? { 
+                        ...msg, 
+                        isDeleted: true, 
+                        content: null 
+                    } : msg
+                )
+            );
+        };
+
+        socket.on("deleteMessage", handleIncomingDelete);
         socket.on("chatUpdate", handleChatModifications);
         socket.on("newMessage", handleNewMessage);
         return () => {
             socket.off("newMessage", handleNewMessage);
             socket.off("chatUpdate", handleChatModifications);
+            socket.off("deleteMessage", handleIncomingDelete);
         }
     }, [socket, chatId]);
 
@@ -253,6 +271,30 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
         }
     }
 
+    const requestDeleteMessage = async () => {
+        if (!msgId || !socket) return;
+
+        try {
+            await api.delete(`/message/${msgId}`);
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.id === msgId
+                        ? { ...msg, isDeleted: true, content: null }
+                        : msg
+                )
+            );
+
+            socket.emit("deleteMessage", { 
+                chatId: chatId, 
+                messageId: msgId,
+            });
+        } catch (err) {
+            console.error("Failed to delete message", err);
+        } finally {
+            setMsgId(null); // Close modal
+        }
+    };
+
     const formatDay = (dateStr: string) => {
         const date = new Date(dateStr);
         const today = new Date();
@@ -327,6 +369,7 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
                         type={msg.type}
                         isDeleted={msg.isDeleted}
                         chatType={onChatInfo.type}
+                        onDeleteRequest={() => setMsgId(msg.id)}
                     />
                 </article>
             );
@@ -407,6 +450,11 @@ const ChatPage: React.FC<Props> = ({ chatId, sessionUserId, onChatInfo }) => {
             <ModalKickedOut 
                 open={isKickedOutFromChat}
                 chatName={chatInfo.name}
+            />
+            <DeleteMessageConfirmModal
+                open={msgId !== null}
+                onClose={() => setMsgId(null)}
+                onConfirm={requestDeleteMessage}
             />
         </>
     );
