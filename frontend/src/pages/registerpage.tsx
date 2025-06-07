@@ -13,7 +13,7 @@ import {
     Button,
     Link,
 } from "@mui/material";
-import LanguageSelect from "../components/languageSelect.tsx";
+import LanguageSelect from "../components/languageSelect/index.ts";
 import { useTranslation } from "react-i18next";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
@@ -278,7 +278,9 @@ const RegisterPage = () => {
     };
 
     return (
-        <Container maxWidth="xs">
+        <Container 
+            maxWidth="xs"
+        >
             <Paper
                 elevation={12}
                 sx={{
@@ -292,7 +294,10 @@ const RegisterPage = () => {
                         position: "absolute",
                     }}
                 >
-                    <LanguageSelect />
+                    <LanguageSelect 
+                        textColor="text.primary"
+                        backgroundColor="background.paper"
+                    />
                 </Box>
                 <Avatar
                     sx={{
@@ -324,7 +329,9 @@ const RegisterPage = () => {
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
-                        sx={{ mb: 2, }}
+                        sx={{ 
+                            mb: 2, 
+                        }}
                     >
                         <TextField
                             label={t('FORM_FIRSTNAME_LABEL')}

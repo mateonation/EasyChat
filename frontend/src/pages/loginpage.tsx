@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { ErrorResponse } from "../types/errorResponse.interface";
 import { useTranslation } from "react-i18next";
-import LanguageSelect from "../components/languageSelect.tsx";
+import LanguageSelect from "../components/languageSelect/index.ts";
 
 const BASE = import.meta.env.VITE_BASE_PATH;
 
@@ -118,7 +118,8 @@ const LoginPage = () => {
             component="main" 
             maxWidth="xs"
         >
-            <Paper elevation={12} 
+            <Paper 
+                elevation={12} 
                 component="section"
                 sx={{
                     marginTop: 8,
@@ -132,7 +133,10 @@ const LoginPage = () => {
                         position: "absolute",
                     }}
                 >
-                    <LanguageSelect />
+                    <LanguageSelect 
+                        textColor="text.primary"
+                        backgroundColor="background.paper"
+                    />
                 </Box>
                 <Avatar
                     component="article"
@@ -157,7 +161,9 @@ const LoginPage = () => {
                 <Box
                     component="form"
                     onSubmit={handleLogin}
-                    sx={{ mt: 2, }}
+                    sx={{ 
+                        mt: 2, 
+                    }}
                 >
                     <TextField
                         label={t('FORM_USERNAME_LABEL')}
