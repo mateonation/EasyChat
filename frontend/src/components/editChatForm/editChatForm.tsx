@@ -14,13 +14,14 @@ interface Props {
 const EditChatForm = ({ chat, onClose, onChatUpdate }: Props) => {
     const { t } = useTranslation();
     const [name, setName] = useState(chat.name);
-    const [description, setDescription] = useState(chat.description);
+    const [description, setDescription] = useState(chat.description || ''); // Default to empty string if description is null
     const [clearDescription, setClearDescription] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const nameChanged = name.trim() !== chat.name;
-    const descriptionChanged = description.trim() !== chat.description;
-    const shouldClearDescription = clearDescription && chat.description.trim() !== "";
+    const originalDescription = chat.description ?? '';
+    const descriptionChanged = (description.trim() !== originalDescription); 
+    const shouldClearDescription = clearDescription && originalDescription.trim() !== "";
 
     const hasChanges = nameChanged || descriptionChanged || shouldClearDescription;
 
