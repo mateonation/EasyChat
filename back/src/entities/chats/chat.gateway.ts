@@ -11,6 +11,7 @@ import { Server } from "socket.io";
 import { SessionSocket } from "src/types/session-socket";
 import { MessageResponseWithChatId } from "../messages/dto/message-response-chatId.dto";
 import { ChatResponseDto } from "./dto/chat-response.dto";
+import { DeleteMessageIdWithChatIdDto } from "../messages/dto/delete-messageid-with-chatid.dto";
 
 @WebSocketGateway({
     cors: {
@@ -60,6 +61,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         } 
 
+        console.log(`[ChatGateway] ${user.username} joined chat_${chat}`);
         client.join(`chat_${chat}`);
     }
 
@@ -71,6 +73,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const chat = chatId?.toString();
         if (!chat) return;
 
+        const user = client.handshake.auth;
+        console.log(`[ChatGateway] ${user.username} left chat_${chat}`);
         client.leave(`chat_${chat}`);
     }
 
@@ -78,5 +82,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         chat: ChatResponseDto,
     ) {
         this.server.to(`chat_${chat.id}`).emit('chatUpdate', chat);
+    }
+
+    @SubscribeMessage('deleteMessage')
+    emitMessageDeleted(
+        @MessageBody() dto: DeleteMessageIdWithChatIdDto,
+    ) {
+        console.log(`[ChatGateway] Deleting message ${dto.messageId} in chat ${dto.chatId}`);
+        const chat = dto.chatId.toString();
+        if (!chat) return;
+
+        this.server.to(`chat_${chat}`).emit('deleteMessage', dto.messageId);
     }
 }
