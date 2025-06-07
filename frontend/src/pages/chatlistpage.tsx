@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import ChatItem from "../components/chatItem";
 import ChatIcon from '@mui/icons-material/Chat';
 import CreateChatModal from "../components/createChatModal";
+import MainHeader from "../components/mainHeader";
 
 const ChatsListPage = () => {
     const { t } = useTranslation();
@@ -48,7 +49,10 @@ const ChatsListPage = () => {
             justifyContent="center"
             alignItems="center"
             mt={4}
-            sx={{ fontSize: '1.5rem', color: 'secondary.main' }}
+            sx={{ 
+                fontSize: '1.5rem', 
+                color: 'secondary.main' 
+            }}
         >
             <Typography
                 variant="h6"
@@ -75,6 +79,7 @@ const ChatsListPage = () => {
 
     return (
         <>
+            <MainHeader />
             <Box
                 p={2}
                 component="main"
