@@ -49,9 +49,9 @@ const ChatsListPage = () => {
             justifyContent="center"
             alignItems="center"
             mt={4}
-            sx={{ 
-                fontSize: '1.5rem', 
-                color: 'secondary.main' 
+            sx={{
+                fontSize: '1.5rem',
+                color: 'secondary.main'
             }}
         >
             <Typography
@@ -84,33 +84,37 @@ const ChatsListPage = () => {
                 p={2}
                 component="main"
             >
-                <Typography
-                    variant="h4"
-                    gutterBottom
+                <Box
+                    component="section"
                 >
-                    {t('CHATS_LIST_PAGE_TITLE')}
-                </Typography>
-                {chats.length === 0 ? (
                     <Typography
-                        align="center"
-                        mt={4}
-                        sx={{ color: 'text.secondary' }}
+                        variant="h4"
+                        gutterBottom
                     >
-                        <ChatIcon fontSize="large" />
-                        <br />
-                        {t('CHATS_LIST_EMPTY_STRING0')}
-                        <br />
-                        {t('CHATS_LIST_EMPTY_STRING1')}
+                        {t('CHATS_LIST_PAGE_TITLE')}
                     </Typography>
-                ) : (
-                    <List
-                        component="ul"
-                    >
-                        {chats.map(chat => (
-                            <ChatItem key={chat.id} chat={chat} />
-                        ))}
-                    </List>
-                )}
+                    {chats.length === 0 ? (
+                        <Typography
+                            align="center"
+                            mt={4}
+                            sx={{ color: 'text.secondary' }}
+                        >
+                            <ChatIcon fontSize="large" />
+                            <br />
+                            {t('CHATS_LIST_EMPTY_STRING0')}
+                            <br />
+                            {t('CHATS_LIST_EMPTY_STRING1')}
+                        </Typography>
+                    ) : (
+                        <List
+                            component="ul"
+                        >
+                            {chats.map(chat => (
+                                <ChatItem key={chat.id} chat={chat} />
+                            ))}
+                        </List>
+                    )}
+                </Box>
 
                 <Fab
                     color="primary"
