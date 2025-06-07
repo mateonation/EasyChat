@@ -72,18 +72,17 @@ export class MessagesController {
         try {
             if (!req.session.user?.id) return;
             const requesterId = req.session.user.id;
-            // Check if message exists
-            const message = await this.messagesService.findById(messageId);
+
             // If message does not exist or is already deleted, throw a not found exception
-            if (!message || message.isDeleted) {
-                throw new NotFoundException('Message not found');
-            }
+            const message = await this.messagesService.findById(messageId);
+            if (!message || message.isDeleted) throw new NotFoundException('Message not found');
+
             // If user requesting the deletion is not the sender of the message, throw an error
-            if (message.user.id !== requesterId) {
-                throw new ForbiddenException('You can only delete your own messages');
-            }
+            if (message.user.id !== requesterId) throw new ForbiddenException('You can only delete your own messages');
+            
             // Delete message
             await this.messagesService.deleteMessage(messageId);
+
             return res.status(200).json({
                 statusCode: 200,
                 message: 'Message deleted successfully',
