@@ -20,7 +20,12 @@ const languages = [
     { code: 'fr', label: t('LANGUAGE_FR') }, // French
     { code: 'ro', label: t('LANGUAGE_RO') }, // Romanian
 ]
-const LanguageSelect = () => {
+
+interface Props {
+    textColor: string;
+    backgroundColor: string;
+}
+const LanguageSelect = ({ textColor, backgroundColor }: Props) => {
     const [language, setLanguage] = useState(i18n.language || 'en');
     const { t } = useTranslation();
 
@@ -48,6 +53,13 @@ const LanguageSelect = () => {
                 value={language}
                 onChange={handleLangChange}
                 aria-label={t('LANGUAGE_SELECT_LABEL')}
+                sx={{
+                    width: 120, // Set a fixed width for the select box
+                    marginLeft: 'auto', // Align to the right in the toolbar
+                    marginRight: 2, // Add some space from the right edge
+                    bgcolor: backgroundColor, // Pass background color from props
+                    color: textColor, // Pass text color from props
+                }}
             >
                 {languages.map(lang => (
                     <MenuItem
