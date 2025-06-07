@@ -194,12 +194,12 @@ export default function GroupChatForm({ onClose, onChatCreated }: Props) {
                 </motion.div>
                 {selectedUsers.map((user) => (
                     <motion.div
+                        key={user.id}
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3 }}
                     >
                         <Box
-                            key={user.id}
                             role="group"
                             aria-label={`${t('GENERIC_ANSWER_SELECT')}: ${user.username}`}
                             display="flex"
