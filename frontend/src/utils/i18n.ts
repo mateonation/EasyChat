@@ -46,6 +46,7 @@ const resources = {
             GENERIC_MSG_LOADING: "Loading...",
             GENERIC_MSG_NOT_FOUND: "Not found",
             GENERIC_MSG_UNAUTHORIZED: "Unauthorized",
+            GENERIC_MSG_FORBIDDEN: "Forbidden",
 
             // FORM FIELDS
             FORM_NAME_LABEL: "Name",
@@ -79,6 +80,10 @@ const resources = {
             FORM_MESSAGE_PLACEHOLDER: "Write a message...",
             FORM_MESSAGE_LABEL: "Message",
             FORM_MESSAGE_SEND: "Send message",
+            FORM_MESSAGE_EDIT: "Edit message",
+            FORM_MESSAGE_EDIT_PLACEHOLDER: "Edit your message here",
+            FORM_MESSAGE_DELETE: "Delete message",
+            FORM_MESSAGE_DELETE_CONFIRM: "Are you sure you want to delete this message? This action cannot be undone.",
 
             // LOGIN PAGE
             LOGIN_PAGE_TITLE: "Log in to your account",
@@ -119,6 +124,7 @@ const resources = {
             FIELD_CANNOT_END_WITH: "{{field}} cannot end with {{char}}",
             FIELD_CANNOT_CONTAIN: "{{field}} cannot contain {{char}}",
             FIELD_CANNOT_CONTAIN_SPACES: "{{field}} cannot contain spaces",
+            NO_RESULTS_FOR: "No results found for '{{query}}'",
 
             // CHATS LIST PAGE
             CHATS_LIST_PAGE_TITLE: "My chats",
@@ -156,6 +162,7 @@ const resources = {
             DATE_MULTIPLE_MONTHS: "{{count}} months ago",
             DATE_MULTIPLE_YEARS: "{{count}} years ago",
             DATE_CREATION: "Created on {{date}}",
+            CHAT_DATE_CREATION: "Chat created on {{date}}",
             DATE_REGISTRATION: "Registered on {{date}}",
             DATE_LAST_MODIFIED: "Last modified on {{date}}",
             DATE_JOINED: "Joined on {{date}}",
@@ -188,7 +195,7 @@ const resources = {
             MEMBER_REMOVE_OWNER_ERROR: "You can't remove the owner of this group",
             MEMBER_REMOVAL_UNAUTHORIZED_ADMIN: "You have to be an admin to remove members from this group",
             MEMBERS_ADD_SUCCESS: "Members added successfully",
-            
+
             MEMBER_ERROR_INVALID: "Invalid members list",
             MEMBER_ERROR_EMPTY: "Members list cannot be empty",
             MEMBER_REMOVE_SUCCESS: "{{username}} was removed from the group successfully",
@@ -199,6 +206,21 @@ const resources = {
             YOU_ARE_NOT_MEMBER: "You are not a member of this chat",
             MEMBER_REQUIREMENT: "You must be a {{role}} to perform this action",
             MEMBER_REMOVE_ITSELF: "Leave chat",
+            MEMBER_EDIT_ROLE: "Edit role",
+            MEMBER_KICK_OUT: "Kick out member",
+            MEMBER_KICK_OUT_CONFIRM: "Are you sure you want to kick out {{username}} from this group? This action cannot be undone.",
+            MEMBER_KICK_OUT_SUCCESS: "{{username}} has been kicked out of the chat successfully",
+            MEMBER_EDIT_ROLE_LABEL: "Edit member role",
+            MEMBER_EDIT_ROLE_ERROR: "Failed to edit member role",
+            MEMBER_EDIT_ROLE_PLACEHOLDER: "Select a new role for {{username}}",
+            MEMBER_EDIT_ROLE_SUCCESS: "{{username}}'s role has been updated successfully to {{role}}",
+            MEMBER_ITSELF_KICKED_OUT_TITLE: "You have been kicked out",
+            MEMBER_ITSELF_KICKED_OUT: "You have been kicked out of '{{chatName}}' by an admin or owner",
+
+            EDIT_CHAT_LABEL: "Edit chat",
+            DESCRIPTION_ISEMPTY: "No description available",
+            CLEAR_DESCRIPTION_LABEL: "Clear description",
+            CLEAR_DESCRIPTION_TOOLTIP: "Clear the chat description",
 
             // USER PROFILE
             USER_PROFILE_PAGE_TITLE: "User Profile",
@@ -246,12 +268,22 @@ const resources = {
             ACCOUNT: "Account",
             ACCOUNTS: "Accounts",
             SETTING: "Setting",
-            NOTIFICATIONS: "Notifications",
+            SETTINGS: "Settings",
             NOTIFICATION: "Notification",
+            NOTIFICATIONS: "Notifications",
+            YOU: "You",
+            ME: "Me",
+
+            // HEADER
+            HEADER_TITLE: "EasyChat",
+            HEADER_SUBTITLE: "connect with people",
+
+            LOGOUT_MENU_LABEL: "Logout",
+            LOGOUT_DIALOG_TITLE: "Logout from your account",
+            LOGOUT_DIALOG_CONFIRMATION: "Are you sure you want to log out?",
 
             // MENU DRAWER
             CREATE_CHAT: "Create a chat",
-            SETTINGS: "Settings",
             MY_PROFILE: "My Profile",
             EDIT_MY_PROFILE: "Edit My Profile",
             LOGOUT: "Logout",
@@ -337,7 +369,7 @@ const resources = {
             REGISTER_SUCCESSFUL: "¡Felicidades! Tu cuenta fue registrada con éxito. Ahora puedes iniciar sesión en ella",
             REGISTER_LOGIN_LABEL: "¿Ya tienes una cuenta?",
             REGISTER_LOGIN_LINK: "Inicia sesión aquí",
-            
+
             // FORM MESSAGES
             MINIMUM_LENGTH: "'{{field}}' debe tener {{length}} caracteres como mínimo",
             MAXIMUM_LENGTH: "'{{field}}' no puede tener más de {{length}} caracteres",
@@ -382,7 +414,7 @@ const resources = {
             DATE_MULTIPLE_WEEKS: "Hace {{count}} semanas",
             DATE_MULTIPLE_MONTHS: "Hace {{count}} meses",
             DATE_MULTIPLE_YEARS: "Hace {{count}} años",
-            
+
             // CREAR CHAT
             CREATE_CHAT_TITLE: "Crear un chat nuevo",
             CHAT_TYPE_PRIVATE: "Chat privado",
@@ -395,6 +427,7 @@ const resources = {
             GROUP_CREATE_ERROR_NAME: "El nombre del grupo debe tener al menos 3 caracteres y como máximo 50 caracteres",
             GROUP_CREATE_ERROR_DESCRIPTION: "La descripción del grupo debe tener como máximo 255 caracteres",
             CHAT_CREATE_ERROR_TYPE: "El tipo de chat es requerido",
+
 
             // MIEMBROS
             MEMBER_ROLE_ADMIN: "Administrador",
@@ -410,7 +443,7 @@ const resources = {
             MEMBER_REMOVE_OWNER_ERROR: "No puedes eliminar al propietario de este grupo",
             MEMBER_REMOVAL_UNAUTHORIZED_ADMIN: "Debes ser un administrador para eliminar miembros de este grupo",
             MEMBERS_ADD_SUCCESS: "Miembros añadidos correctamente",
-            
+
             MEMBER_ERROR_INVALID: "Lista de miembros inválida",
             MEMBER_ERROR_EMPTY: "La lista de miembros no puede estar vacía",
             MEMBER_REMOVE_SUCCESS: "{{username}} fue eliminado del grupo correctamente",
@@ -493,7 +526,7 @@ const resources = {
             REGISTER_SUCCESSFUL: "Noraboa! Rexistráchesche correctamente. Agora podes iniciar sesión na túa conta",
             REGISTER_LOGIN_LABEL: "Xa tes unha conta creada?",
             REGISTER_LOGIN_LINK: "Inicia sesión nela",
-            
+
             // FORM MESSAGES
             MINIMUM_LENGTH: "'{{field}}' debe ter {{length}} caracteres como mínimo",
             MAXIMUM_LENGTH: "'{{field}}' non pode ter máis de {{length}} caracteres",
@@ -538,7 +571,7 @@ const resources = {
             DATE_MULTIPLE_WEEKS: "Fai {{count}} semanas",
             DATE_MULTIPLE_MONTHS: "Fai {{count}} meses",
             DATE_MULTIPLE_YEARS: "Fai {{count}} anos",
-            
+
             // CREAR CHAT
             CREATE_CHAT_TITLE: "Crear un chat novo",
             CHAT_TYPE_PRIVATE: "Chat privado",
@@ -566,7 +599,7 @@ const resources = {
             MEMBER_REMOVE_OWNER_ERROR: "Non podes eliminar ao propietario deste grupo",
             MEMBER_REMOVAL_UNAUTHORIZED_ADMIN: "Tes que ser administrador para eliminar membros deste grupo",
             MEMBERS_ADD_SUCCESS: "Membros engadidos correctamente",
-            
+
             MEMBER_ERROR_INVALID: "Lista de membros inválida",
             MEMBER_ERROR_EMPTY: "A lista de membros non pode estar baleira",
             MEMBER_REMOVE_SUCCESS: "{{username}} foi eliminado do grupo",
@@ -603,9 +636,193 @@ const resources = {
     // PORTUGUESE
     pt: {
         translation: {
-            // ERROS GENÉRICOS
-            ERR_NETWORK: "Erro de rede",
-            ERR_SERVER: "Erro do servidor",
+            // GENERIC ERRORS
+            ERR_NETWORK: "Erro da rede",
+            ERR_SERVER: "Erro do servidor ",
+            ERR_UNEXPECTED: "Erro inesperado",
+            ERR_UNEXPECTED_FORMAT: "Formato de erro inesperado",
+
+            // GENERIC ANSWERS
+            GENERIC_ANSWER_YES: "Sim",
+            GENERIC_ANSWER_NO: "Não",
+            GENERIC_ANSWER_CANCEL: "Cancelar",
+            GENERIC_ANSWER_CONFIRM: "Confirmar",
+            GENERIC_ANSWER_DELETE: "Apagar",
+            GENERIC_ANSWER_REMOVE: "Remover",
+            GENERIC_ANSWER_LEAVE: "Saír",
+            GENERIC_ANSWER_OK: "Okey",
+            GENERIC_ANSWER_CLOSE: "Fechar",
+            GENERIC_ANSWER_ADD: "Adicionar",
+            GENERIC_ANSWER_EDIT: "Editar",
+            GENERIC_ANSWER_SAVE: "Salvar",
+            GENERIC_ANSWER_SUBMIT: "Enviar",
+            GENERIC_ANSWER_SEARCH: "Pesquisar",
+            GENERIC_ANSWER_SEND: "Enviar",
+
+            // GENERIC MESSAGES
+            GENERIC_MSG_ERROR: "Erro",
+            GENERIC_MSG_SUCCESS: "Successo",
+            GENERIC_MSG_WARNING: "Aviso",
+            GENERIC_MSG_INFO: "Informação",
+            GENERIC_MSG_LOADING: "Carregando",
+            GENERIC_MSG_NOT_FOUND: "Não achado",
+            GENERIC_MSG_UNAUTHORIZED: "Não autorizado",
+
+            // FORM FIELDS
+            FORM_NAME_LABEL: "Nome",
+            FORM_DESCRIPTION_LABEL: "Descrição",
+            FORM_EMAIL_LABEL: "Correio electrónico",
+            FORM_EMAIL_PLACEHOLDER: "Introduza aqui o seu endereço de correio eletrónico",
+            FORM_FIRSTNAME_LABEL: "Nome",
+            FORM_LASTNAME_LABEL: "Apelido",
+            FORM_USERNAME_LABEL: "Nome de utilizador",
+            FORM_USERNAME_PLACEHOLDER: "Introduza aqui o seu nome de utilizador",
+            FORM_PASSWORD_LABEL: "Palavra-passe",
+            FORM_PASSWORD_PLACEHOLDER: "Introduza aqui a súa palavra-passe",
+            FORM_PASSWORD2_LABEL: "Repita a palavra-passe",
+            FORM_PASSWORD2_PLACEHOLDER: "Repita a palavra-passe aqui",
+            FORM_BIRTHDATE_LABEL: "Data de nascimento",
+            FORM_CHAT_TYPE_LABEL: "Tipo de chat",
+            FORM_TYPE_LABEL: "Tipo",
+            FORM_CHAT_TYPE_PLACEHOLDER: "Selecione o tipo de chat que pretende criar",
+            FORM_GROUP_NAME_LABEL: "Nome do grupo",
+            FORM_GROUP_NAME_PLACEHOLDER: "Introduza aqui o nome da conversa de grupo",
+            FORM_GROUP_DESCRIPTION_LABEL: "Descrição do grupo",
+            FORM_GROUP_DESCRIPTION_PLACEHOLDER: "Escreva aqui uma descrição da conversa de grupo",
+            FORM_MEMBERS_LABEL: "Membros",
+            FORM_MEMBERS_PLACEHOLDER: "Adicione membros ao chat introduzindo os seus nomes de utilizador aqui",
+            FORM_MEMBERS_ADD: "Adicionar membros",
+            FORM_SEARCH_CLEAR: "Eliminar pesquisa",
+            FORM_CHAT_SEARCH_LABEL: "Pesquisar chats",
+            FORM_CHAT_SEARCH_PLACEHOLDER: "Procurar um chat pelo seu nome",
+            FORM_MESSAGE_SEARCH_LABEL: "Mensagens de pesquisa",
+            FORM_MESSAGE_SEARCH_PLACEHOLDER: "Procurar uma mensagem pelo seu conteúdo",
+            FORM_MESSAGE_PLACEHOLDER: "Escreve uma mensagem",
+            FORM_MESSAGE_LABEL: "Mensagem",
+            FORM_MESSAGE_SEND: "Enviar mensagem",
+
+            // LOGIN PAGE
+            LOGIN_PAGE_TITLE: "Iniciar sessão na sua conta",
+            LOGIN_FORM_SUBMIT: "A iniciar sessão",
+            LOGIN_FORM_ERROR: "O nome de utilizador ou a palavra-passe está incorreta",
+            LOGIN_REGISTER_LABEL: "Não tem uma conta?",
+            LOGIN_REGISTER_LINK: "Registar uma nova",
+
+            // REGISTER PAGE
+            REGISTER_PAGE_TITLE: "Criar uma nova conta",
+            REGISTER_FORM_SUBMIT: "Registar",
+            REGISTER_SUCCESSFUL: "Parabéns! A sua conta foi registada com sucesso. Pode agora iniciar sessão na sua conta",
+            REGISTER_LOGIN_LABEL: "Já tem uma conta?",
+            REGISTER_LOGIN_LINK: "Iniciar sessão aqui",
+
+            // FORM MESSAGES
+            MINIMUM_LENGTH: "{{field}} deve ter pelo menos {{length}} caracteres",
+            MAXIMUM_LENGTH: "{{field}} deve ter {{length}} caracteres no máximo",
+            INVALID_FIELD_CHARACTERS: "{{field}} contém caracteres inválidos",
+            ALREADY_IN_USE: "'{{data}}' já em utilização",
+            REQUIRED_FIELD: "{{field}} é necessário",
+            PASSWORD_MISMATCH: "As palavras-passe não coincidem",
+            BIRTHDATE_INVALID: "Ter pelo menos 18 anos de idade",
+            FAILED_TO_CREATE: "Erro ao criar {{field}}",
+            FAILED_TO_UPDATE: "Erro na atualização {{field}}",
+            FAILED_TO_DELETE: "Erro ao eliminar {{field}}",
+            FAILED_TO_LOAD: "Erro no carregamento {{field}}",
+
+            // CHATS LIST PAGE
+            CHATS_LIST_PAGE_TITLE: "As minhas conversas",
+            CHATS_LIST_PAGE_SUBTITLE: "Clique num chat para o abrir",
+            CHATS_LIST_LOADING: "Carregando chats...",
+            CHATS_LIST_ERROR: "Erro ao carregar os chats",
+            CHATS_LIST_EMPTY_STRING0: "Ainda não tem conversas...",
+            CHATS_LIST_EMPTY_STRING1: "porque não criar uma agora?",
+            CHAT_PREFIX_YOU: "Tu",
+            CHAT_DELETED_USER: "[Apagado]",
+            CHAT_MESSAGE_DELETED: "Apagou esta mensagem",
+
+            // DATE AND TIMES
+            DATE_TODAY: "Hoje",
+            DATE_YESTERDAY: "Ontem",
+            DATE_NOW: "Agora mesmo",
+            DATE_MONDAY: "Segunda-feira",
+            DATE_TUESDAY: "Terça-feira",
+            DATE_WEDNESDAY: "Quarta-feira",
+            DATE_THURSDAY: "Quinta-feira",
+            DATE_FRIDAY: "Sexta-feira",
+            DATE_SATURDAY: "Sábado",
+            DATE_SUNDAY: "Domingo",
+            DATE_THIS_WEEK: "Esta semana",
+            DATE_LAST_WEEK: "A semana passada",
+            DATE_THIS_MONTH: "Este mês",
+            DATE_LAST_MONTH: "O mês passado",
+            DATE_THIS_YEAR: "Este ano",
+            DATE_LAST_YEAR: "Ano passado",
+            DATE_MULTIPLE_DAYS: "{{count}} dias atrás",
+            DATE_MULTIPLE_HOURS: "{{count}} horas atrás",
+            DATE_MULTIPLE_MINUTES: "{{count}} minutos atrás",
+            DATE_MULTIPLE_SECONDS: "{{count}} segundos atrás",
+            DATE_MULTIPLE_WEEKS: "{{count}} semanas atrás",
+            DATE_MULTIPLE_MONTHS: "{{count}} meses atrás",
+            DATE_MULTIPLE_YEARS: "{{count}} anos atrás",
+
+            // CREATE A CHAT
+            CREATE_CHAT_TITLE: "Criar um novo chat",
+            CHAT_TYPE_PRIVATE: "Privado",
+            CHAT_TYPE_GROUP: "Grupo",
+            CHAT_TYPE_PUBLIC: "Público",
+            CHAT_CREATE: "Criar chat",
+            CHAT_CREATE_SUCCESS: "Chat criado com sucesso",
+            CHAT_CREATE_ERROR: "Erro ao criar chat.",
+
+            // MEMBERS
+            MEMBER_ROLE_ADMIN: "Administrador/a",
+            MEMBER_ROLE_MEMBER: "Membro",
+            MEMBER_ROLE_OWNER: "Proprietário/a",
+            MEMBERS_ADD_ERROR: "Erro ao adicionar membros",
+            MEMBER_ALREADY_EXISTS: "{{username}} já é membro deste chat",
+            MEMBERS_ADD_ERROR_UNEXPECTED: "Erro inesperado ao adicionar membros",
+            MEMBER_REMOVE_ERROR_UNEXPECTED: "Erro inesperado ao remover membro",
+            MEMBERS_ADD_ERROR_NOT_ENOUGH: "É necessário adicionar pelo menos um membro ao grupo",
+            MEMBERS_ADD_ERROR_NOT_FOUND: "Alguns dos usuários que tentou adicionar não foram encontradosd",
+            MEMBER_REMOVE_ERROR: "Erro ao remover o membro",
+            MEMBER_REMOVE_OWNER_ERROR: "Não é possível remover o proprietário deste grupo",
+            MEMBER_REMOVAL_UNAUTHORIZED_ADMIN: "Tem de ser um administrador/a para remover membros deste grupo",
+            MEMBERS_ADD_SUCCESS: "Membros adicionados com sucesso",
+
+            MEMBER_ERROR_INVALID: "Lista de membros inválida",
+            MEMBER_ERROR_EMPTY: "A lista de membros não pode estar vazia",
+            MEMBER_REMOVE_SUCCESS: "{{username}} foi retirado do grupo com sucesso",
+            MEMBER_ERROR_NOT_FOUND: "{{username}} não é membro deste chat",
+            MEMBER_REMOVE_ITSELF_QUESTION: "Tens a certeza de que queres sair deste chat?",
+            MEMBER_REMOVE_ITSELF_SUCCESS: "saiu do chat com sucesso",
+            MEMBER_REMOVE_ITSELF_ERROR: "Erro ao sair da conversação",
+
+            // USER PROFILE
+            USER_PROFILE_PAGE_TITLE: "Perfil do usuário",
+            USER_PROFILE_LOADING: "Carregando perfil do usuário...",
+            USER_PROFILE_ERROR: "Erro ao cargar o perfil do usuário",
+            USER_JOIN_DATE: "Aderiu em {{date}}",
+            USER_ROLE_ADMIN: "Administrador/a",
+            USER_ROLE_USER: "Membro",
+            USER_ROLE_BLOG_AUTHOR: "Autor do blogue",
+            USER_ROLE_MODERATOR: "Moderador/a",
+            USER_ROLE_TL_EN: "Tradutor de inglês",
+            USER_ROLE_TL_ES: "Tradutor de espanhol",
+            USER_ROLE_TL_FR: "Tradutor de francês",
+            USER_ROLE_TL_PT: "Tradutor de português",
+            USER_ROLE_TL_RO: "Tradutor de romeno",
+            USER_ROLE_TL_GL: "Tradutor de galego",
+            USER_ROLE_TL_EU: "Tradutor de basco",
+            USER_ROLE_TL_CA: "Tradutor de catalão",
+
+            // LANGUAGES
+            LANGUAGE_EN: "Inglês",
+            LANGUAGE_ES: "Espanhol",
+            LANGUAGE_GL: "Galego",
+            LANGUAGE_CA: "Catalão",
+            LANGUAGE_EU: "Basco",
+            LANGUAGE_PT: "Português",
+            LANGUAGE_FR: "Francês",
+            LANGUAGE_RO: "Romeno",
         }
     },
     // FRENCH
