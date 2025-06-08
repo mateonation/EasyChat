@@ -19,7 +19,7 @@ import { ChatmembersModule } from './entities/chats/chatmembers/chatmembers.modu
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'webchatdb',
+      database: 'easychatdb',
       autoLoadEntities: true,
       synchronize: true,
     }),
