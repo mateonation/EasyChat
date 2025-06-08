@@ -31,9 +31,7 @@ export class MessagesController {
 
             // Check if chat exists
             const chatDoesExist = await this.chatsService.findById(dto.chatId, req.session.user.id);
-            if (!chatDoesExist) {
-                throw new NotFoundException('Chat not found');
-            }
+            if (!chatDoesExist) throw new NotFoundException('Chat not found');
 
             // Check if user is a member of the chat
             const member = await this.membersService.findChatMember(req.session.user.id, dto.chatId);
