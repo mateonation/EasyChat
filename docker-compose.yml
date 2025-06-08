@@ -22,5 +22,24 @@ services:
     ports:
       - "8080:8080"
 
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: easychat-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./back:/app
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: user
+      DB_PASSWORD: 1234
+      DB_NAME: easychatdb
+
 volumes:
   mysql-data:

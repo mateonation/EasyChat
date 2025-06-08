@@ -15,7 +15,7 @@ import { ChatmembersModule } from './entities/chats/chatmembers/chatmembers.modu
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: 'mysql', // Use 'mysql' if running in Docker, or 'localhost' if running locally
       port: 3306,
       username: 'root',
       password: 'root',
