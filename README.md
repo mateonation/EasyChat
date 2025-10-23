@@ -1,5 +1,5 @@
 # 💬 Easy Chat
-Made by Mateo Fernández Rivera, student of Web Application Development in C.P.R. Liceo La Paz (A Coruña, Spain).
+Made by Mateo Fernández Rivera as the final project of the 2024/2025 course of Web Application Development at C.P.R. Liceo La Paz (A Coruña, Spain).
 
 ## 📜 DESCRICIÓN
 Easy Chat is the name of an **instant messaging web application**, developed and designed by MFR.
